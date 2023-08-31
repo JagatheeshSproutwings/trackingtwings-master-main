@@ -1,18 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Table,
-  Button,
-  Card,
-  ButtonGroup,
-  Drawer,
-  Select,
-  Input,
-  Alert,
-  Form,
-  Row,
-  Col,
-  Space,
-} from "antd";
+import { Table, Button, Card, Row, Col, Input } from "antd";
 import { PlusOutlined, SearchOutlined, EditOutlined } from "@ant-design/icons";
 import utils from "utils";
 import OrderListData from "assets/data/order-list.data.json";
@@ -23,68 +10,27 @@ import api from "configs/apiConfig";
 import Create from "./create";
 import Edit from "./edit";
 
-
-
 export const User = () => {
-  const [list, setList] = useState(userData);
+  const [userList, setUserList] = useState(userData);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [open, setOpen] = useState(false);
+  const [isCreateVisible, setIsCreateVisible] = useState(false);
+  const [isEditVisible, setIsEditVisible] = useState(false);
+  const [editdata, setEditData] = useState("");
 
-  const [isTableVisible, setIsTableVisible] = useState(true);
-
-  const [isCardVisible, setIsCardVisible] = useState(false);
-  const [isEditCardVisible, setIsEditCardVisible] = useState(false);
-
-  
-  const showDrawer = () => {
-    setOpen(true);
+  const handleCreateCard = () => {
+    setIsCreateVisible(true);
+    setIsEditVisible(false);
   };
-  const onClose = () => {
-    setOpen(false);
+  const handleEditCard = () => {
+    setIsCreateVisible(false);
+    setIsEditVisible(true);
   };
-  const handleShowCard = () => {
-    setIsCardVisible(true);
-    setIsEditCardVisible(false);
-    setIsTableVisible(false);
-  };
-
-
-  const getRole = () => {
-    return localStorage.getItem("role");
-  };
-  const role = getRole();
 
   const getUser = () => {
     return localStorage.getItem("id");
   };
+
   const user = getUser();
-
-  // Define the functions outside the component
-  async function fetchRoleOptions(setRoleOptions) {
-    try {
-      const response = await api.get(`role_rights_list/${role}`);
-      if (response.data.success) {
-        setRoleOptions(response.data.data);
-      } else {
-        console.error("API request was not successful");
-      }
-    } catch (error) {
-      console.error("Error fetching roles:", error);
-    }
-  }
-
-  async function fetchCountryOptions(setCountryOptions) {
-    try {
-      const response = await api.get("country");
-      if (response.data.success) {
-        setCountryOptions(response.data.data);
-      } else {
-        console.error("API request was not successful");
-      }
-    } catch (error) {
-      console.error("Error fetching countries:", error);
-    }
-  }
 
   async function loadUsers(setUserList) {
     try {
@@ -113,9 +59,7 @@ export const User = () => {
   }
 
   function handleEditClick(record) {
-    setIsEditCardVisible(true);
-
-    alert("dd");
+    handleEditCard();
 
     const id = record.id;
     const email = record.email;
@@ -125,18 +69,14 @@ export const User = () => {
     const country = record.country;
     const country_id = record.country_id;
 
-    setOpen(true);
+    const data = [id, email, mobile_no, role, role_id, country, country_id];
+
+    setEditData(data);
   }
 
-  // Inside your component
   useEffect(() => {
-    fetchRoleOptions(setRoleOptions);
-    fetchCountryOptions(setCountryOptions);
     loadUsers(setUserList);
   }, []);
-
-
-
 
   const tableColumns = [
     {
@@ -177,7 +117,7 @@ export const User = () => {
     const value = e.currentTarget.value;
     const searchArray = e.currentTarget.value ? userList : OrderListData;
     const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
+    setUserList(data);
     setSelectedRowKeys([]);
   };
 
@@ -212,8 +152,8 @@ export const User = () => {
                 <Button
                   type="primary"
                   icon={<PlusOutlined />}
-                  onClick={handleShowCard}
                   ghost
+                  onClick={handleCreateCard}
                 >
                   Add User
                 </Button>
@@ -236,14 +176,10 @@ export const User = () => {
           </Card>
         </Col>
         <Col sm={24} md={10} lg={10}>
-          {isCardVisible && (
-           
-          )}
+          {isCreateVisible && <Create />}
+          {isEditVisible && <Edit parentToChild={editdata} />}
         </Col>
       </Row>
-
-      <Create />
-      <Edit />
     </>
   );
 };
