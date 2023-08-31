@@ -23,7 +23,7 @@ import {
 import utils from "utils";
 import OrderListData from "assets/data/order-list.data.json";
 import userData from "assets/data/user-list.data.json";
-import { Global } from "@emotion/react";
+
 const { Option } = Select;
 export const User = () => {
   const [form] = Form.useForm();
@@ -32,14 +32,12 @@ export const User = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [open, setOpen] = useState(false);
 
+  const [pointList, setPointList] = useState([]);
   const [userList, setUserList] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-
   const [selectedPlanId, setselectedPlanId] = useState();
   const [PlanOptions, setPlanOptions] = useState([]);
 
   const [isSubmitted, setIsSubmitted] = useState(false);
-
   const [editedName, setEditedName] = useState("");
 
   const showDrawer = () => {
@@ -130,6 +128,35 @@ export const User = () => {
     }
   }
 
+  async function loadPoints(setPointList) {
+    try {
+      const response = await api.post("point_stock_list", [
+        created_by,
+        role_id,
+      ]);
+
+      if (response.data && Array.isArray(response.data.data)) {
+        const processedData = response.data.data.map((item) => ({
+          // id: item.id,
+          // name: item.name,
+          // email: item.email,
+          // mobile_no: item.mobile_no,
+          // role: item.role,
+          // role_id: item.role_id,
+          // country_id: item.country_id,
+          // country: item.country_name,
+        }));
+
+        console.log(processedData);
+        setPointList(processedData);
+      } else {
+        console.error("API request was not successful");
+      }
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  }
+
   function handleEditClick(record) {
     // Display an alert with the record information
     const id = record.id;
@@ -149,6 +176,7 @@ export const User = () => {
   useEffect(() => {
     fetchPlanOptions(setPlanOptions);
     loadUsers(setUserList);
+    loadPoints(setPointList);
   }, []);
 
   const handlePlanIdChange = (countryId) => {
@@ -157,20 +185,28 @@ export const User = () => {
 
   const tableColumns = [
     {
+      title: "Point Type",
+      dataIndex: "point_type",
+    },
+    {
+      title: "Package Code",
+      dataIndex: "package_code",
+    },
+    {
+      title: "Package Name",
+      dataIndex: "package_name",
+    },
+    {
+      title: "Period Name",
+      dataIndex: "period_name",
+    },
+    {
+      title: "Period Days",
+      dataIndex: "period_days",
+    },
+    {
       title: "Name",
       dataIndex: "name",
-    },
-    {
-      title: "Email",
-      dataIndex: "email",
-    },
-    {
-      title: "Role",
-      dataIndex: "role",
-    },
-    {
-      title: "Country",
-      dataIndex: "country",
     },
     {
       title: "Edit",
@@ -245,7 +281,7 @@ export const User = () => {
           <Table
             bordered
             columns={tableColumns}
-            dataSource={userList}
+            dataSource={pointList}
             rowKey="id"
             rowSelection={{
               selectedRowKeys: selectedRowKeys,
