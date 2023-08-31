@@ -48,9 +48,9 @@ export const protectedRoutes = [
     component: React.lazy(() => import("views/app-views/vehicle_management/vehicle/creation")),
   },
   {
-    key: "reports.idle_report",
-    path: `${APP_PREFIX_PATH}/reports/idle_report`,
-    component: React.lazy(() => import("views/app-views/reports/idle_report")),
+    key: "reports",
+    path: `${APP_PREFIX_PATH}/report_management`,
+    component: React.lazy(() => import("views/app-views/report_management")),
   },
   {
     key: "reports.parking_report",

@@ -99,11 +99,11 @@ export const FONT_SIZES = {
 
 export const SPACER = {
     0: '0',
-    1: '0.25rem',
-    2: '0.5rem',
-    3: '1rem',
-    4: '1.5rem',
-    5: '3rem',
+    1: '0.1rem',
+    2: '0.25rem',
+    3: '0.5rem',
+    4: '1rem',
+    5: '1.5rem',
 }
 
 const BREAKPOINT = {

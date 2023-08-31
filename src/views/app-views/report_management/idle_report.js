@@ -1,19 +1,49 @@
-import React, { useState, useEffect } from "react";
-import { Table, Button, Card, Select, DatePicker } from "antd";
+import React,{useState,useEffect} from 'react'
+import { Card,Table, Button, Select, Input, Form, Space, DatePicker } from "antd";
+import api from "configs/apiConfig";
 import Flex from "components/shared-components/Flex";
 import { FileExcelOutlined, SearchOutlined } from "@ant-design/icons";
-import api from "configs/apiConfig";
-import { Excel } from "antd-table-saveas-excel";
 
+import { Excel } from "antd-table-saveas-excel";
 const { Option } = Select;
 const { RangePicker } = DatePicker;
-
-export const IdleReport = () => {
+function Idlereport({}) {
   const [idleList, setIdleList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedDateRange, setSelectedDateRange] = useState(null);
   const [selectedVehicleId, setSelectedVehicleId] = useState("All");
   const [vehicleOptions, setVehicleOptions] = useState([]);
+  const tableColumns = [
+    {
+      title: "S.No",
+      dataIndex: "s_no",
+    },
+    {
+      title: "Vehicle Name",
+      dataIndex: "vehicle_name",
+    },
+    {
+      title: "Start Date",
+      dataIndex: "start_date",
+    },
+    {
+      title: "End Date",
+      dataIndex: "end_date",
+    },
+    {
+      title: "Location",
+      dataIndex: "location",
+    },
+    {
+      title: "Duration",
+      dataIndex: "duration",
+    },
+    {
+      title: "Map View",
+      dataIndex: "map_view",
+    },
+  ];
+
 
   useEffect(() => {
     async function fetchVehicleOptions() {
@@ -96,38 +126,6 @@ export const IdleReport = () => {
 
     // Perform additional actions based on the selected values
   };
-
-  const tableColumns = [
-    {
-      title: "S.No",
-      dataIndex: "s_no",
-    },
-    {
-      title: "Vehicle Name",
-      dataIndex: "vehicle_name",
-    },
-    {
-      title: "Start Date",
-      dataIndex: "start_date",
-    },
-    {
-      title: "End Date",
-      dataIndex: "end_date",
-    },
-    {
-      title: "Location",
-      dataIndex: "location",
-    },
-    {
-      title: "Duration",
-      dataIndex: "duration",
-    },
-    {
-      title: "Map View",
-      dataIndex: "map_view",
-    },
-  ];
-
   const handleClick = () => {
     const excel = new Excel();
     excel
@@ -138,11 +136,10 @@ export const IdleReport = () => {
       })
       .saveAs("Excel.xlsx");
   };
-
   return (
-    <>
+    <div>
       <Card title="Idle Report">
-        <Flex
+      <Flex
           alignItems="center"
           justifyContent="space-between"
           mobileFlex={false}
@@ -181,7 +178,8 @@ export const IdleReport = () => {
                 )}
               </Select>
             </div>
-            <div className="mb-3">
+            
+            <div className="mb-3 mr-3">
               <Button
                 type="primary"
                 success
@@ -202,18 +200,13 @@ export const IdleReport = () => {
             </div>
           </Flex>
         </Flex>
-        <div className="table-responsive">
-          {isLoading ? (
-            <div>Loading...</div> // Display loading indicator
-          ) : idleList.length > 0 ? (
-            <Table bordered columns={tableColumns} dataSource={idleList} />
-          ) : (
-            <p>No Data Found</p>
-          )}
-        </div>
-      </Card>
-    </>
-  );
-};
+        <Table bordered rowKey="id" columns={tableColumns} dataSource={idleList}>
 
-export default IdleReport;
+        </Table>
+      </Card>
+      
+    </div>
+  )
+}
+
+export default Idlereport

@@ -74,7 +74,7 @@ const getBaseComponentThemeConfig = (
         },
         Card: {
             colorTextHeading: GRAY_SCALE.GRAY_DARK,
-            paddingLG: 20,
+            paddingLG: 10,
             ...Card
         },
         Layout: {
