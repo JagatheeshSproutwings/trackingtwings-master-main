@@ -40,7 +40,7 @@ export const User = () => {
   async function loadUsers(setUserList) {
     const data = { user_id: user, role_id: role };
     try {
-      const response = await api.get(`user_list/${user}`);
+      const response = await api.post("user_list", data);
 
       if (response.data && Array.isArray(response.data.data)) {
         const processedData = response.data.data.map((item) => ({
