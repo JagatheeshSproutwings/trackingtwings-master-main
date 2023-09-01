@@ -16,7 +16,7 @@ import api from "configs/apiConfig";
 const { TextArea } = Input;
 const { Option } = Select;
 
-export default function Create() {
+export default function Edit({ parentToChild }) {
   const [selectedRoleId, setSelectedRoleId] = useState();
   const [roleOptions, setRoleOptions] = useState([]);
   const [selectedCountryId, setSelectedCountryId] = useState();
@@ -40,8 +40,8 @@ export default function Create() {
     document.getElementById("mobile_er_span").textContent = "";
 
     try {
-      await api.post("user/store", values);
-      window.location.reload(true);
+      await api.post("user/update", values);
+      // window.location.reload(true);
       setIsSubmitted(true);
     } catch (error) {
       if (error.response && error.response.status === 403) {
@@ -104,7 +104,7 @@ export default function Create() {
     <Row gutter={6}>
       <Col>
         <Card title="Edit User">
-          <p>ss</p>
+          <p></p>
           <Flex>
             <div className="container">
               <Form
@@ -119,6 +119,7 @@ export default function Create() {
                       size="small"
                       label="User Name"
                       name="name"
+                      initialValue={parentToChild[1]}
                       rules={[
                         {
                           required: true,
@@ -134,6 +135,7 @@ export default function Create() {
                       size="small"
                       label="E-Mail ID"
                       name="email"
+                      initialValue={parentToChild[2]}
                       rules={[
                         {
                           required: true,
@@ -149,11 +151,11 @@ export default function Create() {
                     </Form.Item>
                   </Col>
                   <Col sm={12} md={12} lg={12}>
-                    {" "}
                     <Form.Item
                       size="small"
                       label="Mobile No"
                       name="mobile_no"
+                      initialValue={parentToChild[3]}
                       rules={[
                         {
                           required: true,
@@ -173,6 +175,7 @@ export default function Create() {
                       size="small"
                       label="Password"
                       name="password"
+                      initialValue={parentToChild[4]}
                       rules={[
                         {
                           required: true,
@@ -193,6 +196,7 @@ export default function Create() {
                       size="small"
                       label="Confirm Password"
                       name="c_password"
+                      initialValue={parentToChild[4]}
                       rules={[
                         {
                           required: true,
@@ -216,65 +220,9 @@ export default function Create() {
                   <Col sm={12} md={12} lg={12}>
                     <Form.Item
                       size="small"
-                      label="Role"
-                      name="role_id"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please Select a Role",
-                        },
-                      ]}
-                    >
-                      <Select
-                        showSearch
-                        placeholder="Select Role"
-                        optionFilterProp="children"
-                        onChange={handleRoleIdChange}
-                        value={selectedRoleId}
-                        filterOption={(input, option) =>
-                          option.children
-                            .toLowerCase()
-                            .indexOf(input.toLowerCase()) >= 0
-                        }
-                      >
-                        {Array.isArray(roleOptions) ? (
-                          roleOptions.map((role) => (
-                            <Option key={role.id} value={role.id}>
-                              {role.name}
-                            </Option>
-                          ))
-                        ) : (
-                          <Option value="Loading">Loading...</Option>
-                        )}
-                      </Select>
-                    </Form.Item>
-                  </Col>
-                  <Col sm={24} md={24} lg={24}>
-                    <Form.Item
-                      size="small"
-                      label="Address"
-                      name="address"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please enter a Address",
-                        },
-                      ]}
-                    >
-                      <TextArea
-                        rows={4}
-                        placeholder="Please Enter Adress"
-                        maxLength={100}
-                      />
-                    </Form.Item>
-                  </Col>
-                </Row>
-                <Row align={"middle"}>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      size="small"
                       label="Country"
                       name="country_id"
+                      initialValue={parentToChild[7]}
                       rules={[
                         {
                           required: true,
@@ -306,8 +254,39 @@ export default function Create() {
                       </Select>
                     </Form.Item>
                   </Col>
+                  <Col sm={24} md={24} lg={24}>
+                    <Form.Item
+                      size="small"
+                      label="Address"
+                      name="address"
+                      initialValue={parentToChild[9]}
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please enter a Address",
+                        },
+                      ]}
+                    >
+                      <TextArea
+                        rows={4}
+                        placeholder="Please Enter Adress"
+                        maxLength={100}
+                      />
+                    </Form.Item>
+                  </Col>
                 </Row>
-
+                <Row align={"middle"}>
+                  <Col sm={12} md={12} lg={12}>
+                    <Form.Item name="id" initialValue={parentToChild[0]}>
+                      <Input></Input>
+                    </Form.Item>
+                  </Col>
+                  <Col sm={12} md={12} lg={12}>
+                    <Form.Item name="role_id" initialValue={parentToChild[5]}>
+                      <Input></Input>
+                    </Form.Item>
+                  </Col>
+                </Row>
                 <Row align={"middle"}>
                   <Col span={12}>
                     <Form.Item>
