@@ -4,6 +4,7 @@ import {
   MailOutlined,
   ProfileOutlined,
   FileDoneOutlined,
+  CarOutlined,
   InfoCircleOutlined,
   DotChartOutlined,
   SettingOutlined,
@@ -187,6 +188,17 @@ const reportNavTree = [
     submenu: [],
   },
 ];
+const deviceNavTree = [
+  {
+    key: "devices",
+    path: `${APP_PREFIX_PATH}/device_management`,
+    title: "Device",
+    icon: CarOutlined,
+    breadcrumb: false,
+    isGroupTitle: false,
+    submenu: [],
+  },
+];
 // const reportNavTree = [
 //   {
 //     key: "reports",
@@ -323,12 +335,8 @@ const settingNavTree = [
 const navigationConfig = [
   ...dashBoardNavTree,
   ...reportNavTree,
-  ...pointNavTree,
-  ...vehcileManagementNavTree,
-  ...fuelManagementNavTree,
-  ...userManagementNavTree,
+  ...deviceNavTree,
   ...settingNavTree,
-  ...stockManagementNavTree,
 ];
 
 export default navigationConfig;

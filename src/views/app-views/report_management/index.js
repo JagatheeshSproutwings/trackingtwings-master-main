@@ -17,10 +17,24 @@ const Report = () => {
     const [currentReport,SetReport] = useState("");
     const [currentUser,SetCurrentUser] = useState("");
     const [currentRole,SetCurrentRole] = useState("");
+    const [currentCustomer,SetCurrentCustomer] = useState("");
+    const [userList,SetUserList] = useState([]);
     const token = useSelector((state) => state.auth);
+
+    const handleShowStatus = (value) => {
+        SetCurrentCustomer(value);
+      };
     
+      const getUserList = async (values) => {
+        const vehicle_data = await api.get("vehicle_count");
+        console.log(vehicle_data.data);
+        
+        // SetCustomerId(user_data.data.message);
+      };
+
     const handleReport = (report) => {
-        if(currentUser!='')
+        
+        if(currentCustomer!='')
         {
             SetReport(report);
         }
@@ -44,10 +58,10 @@ const Report = () => {
       const subdealer = () => {
         return localStorage.getItem("subdealer_id");
       }; 
-       
-    const newLocal = <Card>
+
+    const newLocal = <Card> 
         <Form layout="vertical" size='small'>
-            {currentRole==1 || currentRole==2  && (
+            {(currentRole==1)  && (
             <Form.Item  label="Admin" name="admin_id" size='small' rules={[
                 {
                     required: true,
@@ -57,7 +71,8 @@ const Report = () => {
                     <Select.Option value="1">Acute</Select.Option>
                 </Select>
             </Form.Item> )}
-            {currentRole==2 || currentRole==3  && (
+
+            {(currentRole==1 || currentRole==2)  && (
             <Form.Item label="Distributor" name="dealer_id" rules={[
                 {
                     required: true,
@@ -68,7 +83,7 @@ const Report = () => {
                 </Select>
             </Form.Item>)}
 
-            {currentRole==3 || currentRole==4  && (
+            {(currentRole==1 || currentRole==2 || currentRole==3)  && (
             <Form.Item label="Dealer" name="dealer_id" rules={[
                 {
                     required: true,
@@ -79,7 +94,7 @@ const Report = () => {
                 </Select>
             </Form.Item>
             )}
-            {currentRole==3 || currentRole==4  && (
+            {(currentRole==1 || currentRole==2 ||currentRole==3 || currentRole==4)  && (
             <Form.Item label="SubDealer" name="subdealer_id" rules={[
                 {
                     required: true,
@@ -90,16 +105,16 @@ const Report = () => {
                 </Select>
             </Form.Item>
             )}
-
-            <Form.Item label="Customer" defaultValue={currentUser} name="customer_id" rules={[
+            {(currentRole==1 || currentRole==2 ||currentRole==3 || currentRole==4 || currentRole==5)  && (
+            <Form.Item label="Customer"  name="customer_id" rules={[
                 {
                     required: true,
                 },
             ]}>
-                <Select >
-                    <Select.Option value="10">{currentUser}</Select.Option>
+                <Select onChange={handleShowStatus}>
+                    <Select.Option value="10">Customer 1</Select.Option>
                 </Select>
-            </Form.Item>
+            </Form.Item> )}
             
             <Form.Item label="Reports" rules={[
                 {
@@ -124,8 +139,10 @@ const Report = () => {
         {
             console.log(user());
             SetCurrentUser(user());
+            SetCurrentCustomer(user());
         }
         SetCurrentRole(role());
+        getUserList();
     }, []);
 
   return (
