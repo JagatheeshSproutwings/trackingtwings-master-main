@@ -32,9 +32,14 @@ export const User = () => {
 
   const user = getUser();
 
+  const getRole = () => {
+    return localStorage.getItem("role");
+  };
+  const role = getRole();
+
   async function loadUsers(setUserList) {
     try {
-      const response = await api.get(`user_list/${user}`);
+      const response = await api.post("user_list", [user, role]);
 
       if (response.data && Array.isArray(response.data.data)) {
         const processedData = response.data.data.map((item) => ({
@@ -42,10 +47,12 @@ export const User = () => {
           name: item.name,
           email: item.email,
           mobile_no: item.mobile_no,
-          role: item.role,
+          password: item.password,
           role_id: item.role_id,
+          role: item.role,
           country_id: item.country_id,
           country: item.country_name,
+          address: item.address,
         }));
 
         console.log(processedData);
@@ -62,14 +69,28 @@ export const User = () => {
     handleEditCard();
 
     const id = record.id;
+    const name = record.name;
     const email = record.email;
     const mobile_no = record.mobile_no;
+    const password = record.password;
     const role = record.role;
     const role_id = record.role_id;
     const country = record.country;
     const country_id = record.country_id;
+    const address = record.address;
 
-    const data = [id, email, mobile_no, role, role_id, country, country_id];
+    const data = [
+      id,
+      name,
+      email,
+      mobile_no,
+      password,
+      role_id,
+      role,
+      country_id,
+      country,
+      address,
+    ];
 
     setEditData(data);
   }
@@ -113,13 +134,13 @@ export const User = () => {
     },
   ];
 
-  const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const searchArray = e.currentTarget.value ? userList : OrderListData;
-    const data = utils.wildCardSearch(searchArray, value);
-    setUserList(data);
-    setSelectedRowKeys([]);
-  };
+  // const onSearch = (e) => {
+  //   const value = e.currentTarget.value;
+  //   const searchArray = e.currentTarget.value ? userList : OrderListData;
+  //   const data = utils.wildCardSearch(searchArray, value);
+  //   setUserList(data);
+  //   setSelectedRowKeys([]);
+  // };
 
   const rowSelection = {
     onChange: (key, rows) => {
@@ -142,7 +163,7 @@ export const User = () => {
                   <Input
                     placeholder="Search"
                     prefix={<SearchOutlined />}
-                    onChange={(e) => onSearch(e)}
+                    // onChange={(e) => onSearch(e)}
                   />
                 </div>
 

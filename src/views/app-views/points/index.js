@@ -88,14 +88,16 @@ export const User = () => {
 
     try {
       const response = await api.post("point", updatedValues);
+
       setIsSubmitted(true);
       // Handle successful response here if needed
     } catch (error) {
       if (error.response && error.response.status === 403) {
         const errorData = error.response.data;
-
+        alert(errorData.message);
         if (errorData.message && typeof errorData.message === "object") {
           const validationErrors = errorData.message;
+          alert(validationErrors);
         }
       }
     }
@@ -137,17 +139,17 @@ export const User = () => {
 
       if (response.data && Array.isArray(response.data.data)) {
         const processedData = response.data.data.map((item) => ({
-          // id: item.id,
-          // name: item.name,
-          // email: item.email,
-          // mobile_no: item.mobile_no,
-          // role: item.role,
-          // role_id: item.role_id,
-          // country_id: item.country_id,
-          // country: item.country_name,
+          id: item.id,
+          point_type: item.point_type,
+          package_code: item.package_code,
+          period_name: item.period_name,
+          period_days: item.period_days,
+          name: item.name,
+          total_point: item.total_point,
         }));
 
-        console.log(processedData);
+        alert("dd");
+        alert(processedData);
         setPointList(processedData);
       } else {
         console.error("API request was not successful");
@@ -203,6 +205,10 @@ export const User = () => {
     {
       title: "Period Days",
       dataIndex: "period_days",
+    },
+    {
+      title: "Total Points",
+      dataIndex: "total_point",
     },
     {
       title: "Name",
@@ -384,6 +390,16 @@ export const User = () => {
             </div>
           )}
         </div>
+
+        <span
+          id="pnt_span"
+          style={{
+            color: "red",
+            fontSize: "12px",
+            fontWeight: "bold",
+            fontFamily: "sans-serif",
+          }}
+        ></span>
       </Drawer>
     </>
   );
