@@ -243,7 +243,9 @@ export default function Create() {
                             </Option>
                           ))
                         ) : (
-                          <Option value="Loading">Loading...</Option>
+                          <Option value="Loading" disabled>
+                            Loading...
+                          </Option>
                         )}
                       </Select>
                     </Form.Item>

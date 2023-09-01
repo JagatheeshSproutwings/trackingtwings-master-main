@@ -88,14 +88,16 @@ export const User = () => {
 
     try {
       const response = await api.post("point", updatedValues);
+
       setIsSubmitted(true);
       // Handle successful response here if needed
     } catch (error) {
       if (error.response && error.response.status === 403) {
         const errorData = error.response.data;
-
+        alert(errorData.message);
         if (errorData.message && typeof errorData.message === "object") {
           const validationErrors = errorData.message;
+          alert(validationErrors);
         }
       }
     }
@@ -115,8 +117,10 @@ export const User = () => {
   }
 
   async function loadUsers(setUserList) {
+    const data = { user_id: created_by, role_id: role_id };
+
     try {
-      const response = await api.post("user_point_list", [created_by, role_id]);
+      const response = await api.post("user_point_list", data);
       console.log(response);
       if (response.data.success) {
         setUserList(response.data.data);
@@ -130,24 +134,20 @@ export const User = () => {
 
   async function loadPoints(setPointList) {
     try {
-      const response = await api.post("point_stock_list", [
-        created_by,
-        role_id,
-      ]);
+      const data = { user_id: created_by, role_id: role_id };
+      const response = await api.post("point_stock_list", data);
 
       if (response.data && Array.isArray(response.data.data)) {
         const processedData = response.data.data.map((item) => ({
-          // id: item.id,
-          // name: item.name,
-          // email: item.email,
-          // mobile_no: item.mobile_no,
-          // role: item.role,
-          // role_id: item.role_id,
-          // country_id: item.country_id,
-          // country: item.country_name,
+          id: item.id,
+          point_type: item.point_type,
+          package_code: item.package_code,
+          period_name: item.period_name,
+          period_days: item.period_days,
+          name: item.name,
+          total_point: item.total_point,
         }));
 
-        console.log(processedData);
         setPointList(processedData);
       } else {
         console.error("API request was not successful");
@@ -205,20 +205,12 @@ export const User = () => {
       dataIndex: "period_days",
     },
     {
-      title: "Name",
-      dataIndex: "name",
+      title: "Total Points",
+      dataIndex: "total_point",
     },
     {
-      title: "Edit",
-      dataIndex: "edit",
-      render: (_, record) => (
-        <span
-          style={{ cursor: "pointer" }}
-          onClick={() => handleEditClick(record)}
-        >
-          <EditOutlined />
-        </span>
-      ),
+      title: "Name",
+      dataIndex: "name",
     },
   ];
 
@@ -384,6 +376,16 @@ export const User = () => {
             </div>
           )}
         </div>
+
+        <span
+          id="pnt_span"
+          style={{
+            color: "red",
+            fontSize: "12px",
+            fontWeight: "bold",
+            fontFamily: "sans-serif",
+          }}
+        ></span>
       </Drawer>
     </>
   );
