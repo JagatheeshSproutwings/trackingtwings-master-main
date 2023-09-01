@@ -44,7 +44,6 @@ function Idlereport({}) {
     },
   ];
 
-
   useEffect(() => {
     async function fetchVehicleOptions() {
       try {
@@ -58,7 +57,6 @@ function Idlereport({}) {
         console.error("Error fetching vehicle options:", error);
       }
     }
-
     fetchVehicleOptions();
   }, []);
 

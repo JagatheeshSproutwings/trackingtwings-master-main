@@ -148,6 +148,7 @@ export const User = () => {
           total_point: item.total_point,
         }));
 
+        console.log(processedData);
         setPointList(processedData);
       } else {
         console.error("API request was not successful");
