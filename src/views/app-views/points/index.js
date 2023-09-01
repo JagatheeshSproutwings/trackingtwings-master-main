@@ -117,8 +117,10 @@ export const User = () => {
   }
 
   async function loadUsers(setUserList) {
+    const data = { user_id: created_by, role_id: role_id };
+
     try {
-      const response = await api.post("user_point_list", [created_by, role_id]);
+      const response = await api.post("user_point_list", data);
       console.log(response);
       if (response.data.success) {
         setUserList(response.data.data);
@@ -132,10 +134,8 @@ export const User = () => {
 
   async function loadPoints(setPointList) {
     try {
-      const response = await api.post("point_stock_list", [
-        created_by,
-        role_id,
-      ]);
+      const data = { user_id: created_by, role_id: role_id };
+      const response = await api.post("point_stock_list", data);
 
       if (response.data && Array.isArray(response.data.data)) {
         const processedData = response.data.data.map((item) => ({
@@ -148,8 +148,7 @@ export const User = () => {
           total_point: item.total_point,
         }));
 
-        alert("dd");
-        alert(processedData);
+        console.log(processedData);
         setPointList(processedData);
       } else {
         console.error("API request was not successful");
@@ -213,18 +212,6 @@ export const User = () => {
     {
       title: "Name",
       dataIndex: "name",
-    },
-    {
-      title: "Edit",
-      dataIndex: "edit",
-      render: (_, record) => (
-        <span
-          style={{ cursor: "pointer" }}
-          onClick={() => handleEditClick(record)}
-        >
-          <EditOutlined />
-        </span>
-      ),
     },
   ];
 
