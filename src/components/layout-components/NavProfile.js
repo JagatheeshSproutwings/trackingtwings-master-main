@@ -48,7 +48,7 @@ const Title = styled.span(() => ({
 // )
 
 const MenuItemSignOut = (props) => {
-    const token = useSelector(state => state.auth);
+    //const token = useSelector(state => state.auth);
 
 	const dispatch = useDispatch();
 	
@@ -89,11 +89,11 @@ export const NavProfile = ({mode}) => {
         backgroundColor: '#87d068',
       }} size={{
       xs: 24,
-      sm: 27,
-      md: 35,
-      lg: 40,
-      xl: 50,
-      xxl: 55,
+      sm: 25,
+      md: 27,
+      lg: 30,
+      xl: 35,
+      xxl: 40,
     }} icon={<UserOutlined />}  />
 					<UserInfo className="profile-text">
 						<Name>{token?.user_info?.name}</Name>

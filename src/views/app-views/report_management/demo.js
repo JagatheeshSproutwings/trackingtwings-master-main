@@ -11,7 +11,6 @@ const { Option } = Select;
 const { RangePicker } = DatePicker;
 const NotificationType = 'success' | 'info' | 'warning' | 'error';
 const Report = () => {
-    const [form] = Form.useForm();
     // Use State Values 
     const [isLoading, setIsLoading] = useState(false);
     const [user_role,SetUserRole] = useState("");
@@ -25,11 +24,6 @@ const Report = () => {
     const [dealerList,SetDealerList] = useState([]);
     const [subdealerList,SetSubdealerList] = useState([]);
     const [customerList,SetCustomerList] = useState([]);
-    const [selectAdmin,setAdminSelect] = useState("");
-    const [selectDistributor,setDistributorSelect] = useState("");
-    const [selectDealer,setDelaerSelect] = useState("");
-    const [selectSubDealer,setSubDealerSelect] = useState("");
-    const [selectCustomer,setCustomerSelect] = useState("");
     const token = useSelector((state) => state.auth);
 
     const handleShowStatus = (value) => {
@@ -50,8 +44,7 @@ const Report = () => {
         }
         if(currentRole==2) 
         {
-            console.log("Admin Login");
-            console.log(vehicle_data?.data?.data?.user_list);
+            console.log("Admin");
             SetDistributorList(vehicle_data?.data?.data?.user_list);
                
         }
@@ -159,145 +152,98 @@ const Report = () => {
             SetSubdealerList(user_details?.data?.data?.subdealer_list);
         }
       }
-
-      // OnChange Of Admin
-      const AdminChange = async (value,option) => {
-        
-        form.setFieldValue('');
-        SetDistributorList([]);
-        SetDealerList([]);
-        SetSubdealerList([]);
-        SetCurrentCustomer([]);
-        const user_get_data = {user_id:value};
-        const distributor_list = await api.post("role_based_user_list",user_get_data).then((res) => {return res}).catch((err) => {return err});
-        console.log(distributor_list?.data?.data?.user_list);
-        SetDistributorList(distributor_list?.data?.data?.user_list);
-      }
-      // On change Distributor 
-      const DistributorChange = async (value,option) => {
-        
-        form.setFieldValue('');
-        SetDealerList("");
-        SetSubdealerList("");
-        SetCurrentCustomer("");
-
-        const user_get_data = {user_id:value};
-        const dealer_list = await api.post("role_based_user_list",user_get_data).then((res) => {return res}).catch((err) => {return err});
-        console.log(dealer_list?.data?.data?.user_list);
-        SetDealerList(dealer_list?.data?.data?.user_list);
-      }
-      // on change Dealer
-      const DealerChange = async (value,option) => {
-        alert("Dealer Change");
-        
-        SetSubdealerList([]);
-        SetCurrentCustomer("");
-        SetCustomerList([]);
-        form.setFieldValue('');
-        const user_get_data = {user_id:value};
-        const subdealer_list = await api.post("role_based_user_list",user_get_data).then((res) => {return res}).catch((err) => {return err});
-        console.log(subdealer_list?.data);
-        
-        SetCustomerList(subdealer_list?.data?.data?.user_list);
-        SetSubdealerList(subdealer_list?.data?.data?.subdealer_list);
-        console.log(Array.isArray(subdealer_list?.data?.data?.subdealer_list)? (subdealer_list?.data?.data?.subdealer_list).length:0);
-      }
-// on change SubDealer
-const SubDealerChange = async (value,option) => {
-    SetCurrentCustomer("");
-    SetCustomerList([]);
-    form.setFieldValue('');
-    const user_get_data = {user_id:value};
-    const customer_list = await api.post("role_based_user_list",user_get_data).then((res) => {return res}).catch((err) => {return err});
-    console.log(customer_list?.data);
-
-    SetCustomerList(customer_list?.data?.data?.user_list);
-  }
-  const CustomerChange = async (value,option) => {
-    alert("Customer Change");
-    SetCurrentCustomer(value);
-    // form.setFieldValue('');
-    // const user_get_data = {user_id:value};
-    // const customer_list = await api.post("role_based_user_list",user_get_data).then((res) => {return res}).catch((err) => {return err});
-    // console.log(customer_list?.data?.data?.user_list);
-    // SetCustomerList(customer_list?.data?.data?.user_list);
-  }
       useEffect(() => {
         
         if(role()== 6 && user()!='')
         {
             SetCurrentCustomer(user());
         }
+        
         SetCurrentUser(user());
         SetCurrentRole(role());
         getUserList();
     }, []);
     const newLocal = <Card> 
         <Form layout="vertical" size='small'>
-        {(currentRole==1)  && (
+            {(currentRole==1)  && (
             <Form.Item  label="Admin" name="admin_id" size='small' rules={[
                 {
                     required: true,
                 },
             ]}>
-                <Select onChange={AdminChange}>
+                <Select onChange = {handleAdmin}>
                 {Array.isArray(adminList) ? (
                   adminList.map((admin) => (
-                    <Select.Option key={admin?.id} role_id="2"  value={admin?.id} >{admin?.name}</Select.Option>
+                    <Select.Option role_id="2"  value={admin?.id}>{admin?.name}</Select.Option>
                   ))) : (
-                    <Select.Option role_id="2" value=""></Select.Option>
+                    <Select.Option value=""></Select.Option>
                   )}
                 </Select>
             </Form.Item> )}
+
             {(currentRole==1 || currentRole==2)  && (
-            <Form.Item label="Distributor" name="distributor_id"  rules={[{required:true}]}>
-                <Select onChange={DistributorChange}>
+            <Form.Item label="Distributor" name="dealer_id" size='small' rules={[
+                {
+                    required: true,
+                },
+            ]}>
+                <Select onChange = {handleDistributor}>
                 {Array.isArray(distributorList) ? (
                   distributorList.map((distributor) => (
-                    <Option key={distributor?.id} role_id="3"  value={distributor?.id}>{distributor?.name}</Option>
+                    <Select.Option value={distributor?.id}  role_id="3">{distributor?.name}</Select.Option>
                   ))) : (
-                    <Option role_id="3" value={selectDistributor}></Option>
+                    <Select.Option value=""></Select.Option>
                   )}
                 </Select>
-            </Form.Item>
-            )}
+            </Form.Item>)}
 
             {(currentRole==1 || currentRole==2 || currentRole==3)  && (
-            <Form.Item label="Dealer" name="dealer_id"  rules={[{required:true}]}>
-                <Select onChange={DealerChange}>
-                {Array.isArray(dealerList) ? (
-                  dealerList.map((dealer) => (
-                    <Option key={dealer?.id} role_id="4"  value={dealer?.id}>{dealer?.name}</Option>
+            <Form.Item label="Dealer" name="dealer_id" size='small' onChange = {handleDealer} rules={[
+                {
+                    required: true,
+                },
+            ]}>
+                <Select >
+                
+                    <Select.Option role_id="4"  value={dealer?.id}>{dealer?.name}</Select.Option>
+                  
+                    <Select.Option value=""></Select.Option>
+                  
+                    
+                </Select>
+            </Form.Item>
+            )}
+            {(currentRole==1 || currentRole==2 ||currentRole==3 || currentRole==4)  && (
+            <Form.Item label="SubDealer" name="subdealer_id" size='small' rules={[
+                {
+                    required: true,
+                },
+            ]}>
+                <Select onChange = {handleUser}>
+                {Array.isArray(subdealerList) ? (
+                  subdealerList.map((sub_dealer) => (
+                    <Select.Option role_id="5"  value={sub_dealer?.id}>{sub_dealer?.name}</Select.Option>
                   ))) : (
-                    <Option role_id="4" value=""></Option>
+                    <Select.Option value=""></Select.Option>
                   )}
                 </Select>
             </Form.Item>
             )}
-            {(currentRole==1 || currentRole==2 || currentRole==3 || currentRole==4)  && (
-            <Form.Item label="Subdealer" name="subdealer_id"  rules={[{required:true}]}>
-                <Select onChange={SubDealerChange}>
-                {(Array.isArray(subdealerList) && subdealerList.length>0) ? (
-                  subdealerList.map((subdealer) => (
-                    <Option key={subdealer?.id} role_id="5"  value={subdealer?.id}>{subdealer?.name}</Option>
+            {(currentRole==1 || currentRole==2 ||currentRole==3 || currentRole==4 || currentRole==5)  && (
+            <Form.Item label="Customer"  name="customer_id" size='small' rules={[
+                {
+                    required: true,
+                },
+            ]}>
+                <Select onChange={handleShowStatus}>
+                {Array.isArray(subdealerList) ? (
+                  subdealerList.map((sub_dealer) => (
+                    <Select.Option role_id="6"  value={sub_dealer?.id}>{sub_dealer?.name}</Select.Option>
                   ))) : (
-                    <Option ></Option>
+                    <Select.Option value=""></Select.Option>
                   )}
                 </Select>
-            </Form.Item>
-            )}
-            {(currentRole==1 || currentRole==2 || currentRole==3 || currentRole==4 || currentRole==5)  && (
-            <Form.Item label="Customer" name="customer_id"  rules={[{required:true}]}>
-                <Select onChange={CustomerChange}>
-                {Array.isArray(customerList) ? (
-                  customerList.map((customer) => (
-                    <Option key={customer?.id} role_id="6"  value={customer?.id}>{customer?.name}</Option>
-                  ))) : (
-                    <Option role_id="6" value=""></Option>
-                  )}
-                </Select>
-            </Form.Item>
-            )}
+            </Form.Item> )}
             
             <Form.Item label="Reports" rules={[
                 {

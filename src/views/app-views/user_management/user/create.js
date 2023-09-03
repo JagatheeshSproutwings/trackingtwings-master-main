@@ -22,7 +22,7 @@ export default function Create() {
   const [selectedCountryId, setSelectedCountryId] = useState();
   const [countryOptions, setCountryOptions] = useState([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
-
+  const [form] = Form.useForm();
   const handleRoleIdChange = (roleID) => {
     setSelectedRoleId(roleID);
   };
@@ -41,8 +41,9 @@ export default function Create() {
 
     try {
       await api.post("user/store", values);
-      window.location.reload(true);
+     // window.location.reload(true);
       setIsSubmitted(true);
+      form.resetFields();
     } catch (error) {
       if (error.response && error.response.status === 403) {
         const errorData = error.response.data;
@@ -106,7 +107,7 @@ export default function Create() {
         <Card title="New User">
           <Flex>
             <div className="container">
-              <Form
+              <Form 
                 size="small"
                 name="registrationForm"
                 onFinish={onFinish}

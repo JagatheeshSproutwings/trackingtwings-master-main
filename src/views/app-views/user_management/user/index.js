@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Table, Button, Card, Row, Col, Input } from "antd";
 import { PlusOutlined, SearchOutlined, EditOutlined } from "@ant-design/icons";
 import utils from "utils";
-import OrderListData from "assets/data/order-list.data.json";
-import userData from "assets/data/user-list.data.json";
 import Flex from "components/shared-components/Flex";
 import api from "configs/apiConfig";
 
@@ -11,7 +9,7 @@ import Create from "./create";
 import Edit from "./edit";
 
 export const User = () => {
-  const [userList, setUserList] = useState(userData);
+  const [userList, setUserList] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isCreateVisible, setIsCreateVisible] = useState(false);
   const [isEditVisible, setIsEditVisible] = useState(false);

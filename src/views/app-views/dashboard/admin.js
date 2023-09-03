@@ -26,12 +26,14 @@ import { useSelector } from "react-redux";
 import api from "configs/apiConfig";
 import { CarOutlined } from "@ant-design/icons";
 const { Option } = Select;
+const { Meta } = Card;
 export const Admin = () => {
   const [CustomerId, SetCustomerId] = useState("");
   const [UserDetail, SetUserDetail] = useState({});
   const [VehicleDetail, SetVehicleDetail] = useState("");
   const token = useSelector((state) => state.auth);
   console.log(token);
+
   const position = [11.0467, 76.9254];
   const { BaseLayer } = LayersControl;
   const tableColumns = [
@@ -72,8 +74,11 @@ export const Admin = () => {
     <>
       <Row gutter={16}>
         <Col span={4}>
-          <Card title="All" size="small" bordered={false}>
+          <Card title="All" size="small" bordered={true}>
             {VehicleDetail?.data?.total_vehicles}
+            <Meta
+      description="This is the description"
+    />
           </Card>
         </Col>
         <Col span={4}>
@@ -103,7 +108,13 @@ export const Admin = () => {
         </Col>
       </Row>
       <Row>
-        <Col span={18}>
+        <Col span={24} >
+        <Table></Table>
+        </Col>
+        
+      </Row>
+      {/* <Row>
+        <Col span={24}>
           <MapContainer center={position} zoom={13} scrollWheelZoom={true}>
             <LayersControl>
               <BaseLayer checked name="OpenStreetMap">
@@ -128,10 +139,7 @@ export const Admin = () => {
             </LayersControl>
           </MapContainer>
         </Col>
-        <Col span={6}>
-          <h2>Charts</h2>
-        </Col>
-      </Row>
+      </Row> */}
     </>
   );
 };

@@ -4,12 +4,49 @@ import {
   MailOutlined,
   ProfileOutlined,
   FileDoneOutlined,
+  CarOutlined,
   InfoCircleOutlined,
   DotChartOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
 import { APP_PREFIX_PATH } from "configs/AppConfig";
 
+// const dashBoardNavTree = [
+//   {
+//     key: "dashboard",
+//     path: `${APP_PREFIX_PATH}/dashboards/`,
+//     title: "sidenav.dashboard",
+//     icon: DashboardOutlined,
+//     breadcrumb: false,
+
+//     submenu: [
+//       {
+//         key: "admin_dashboard",
+//         path: `${APP_PREFIX_PATH}/dashboards/admin`,
+//         title: "Dashboard",
+//         icon: DashboardOutlined,
+//         breadcrumb: false,
+//         submenu: [],
+//       },
+//       {
+//         key: "dashboard.customer",
+//         path: `${APP_PREFIX_PATH}/dashboards/customer`,
+//         title: "Customer",
+//         icon: DashboardOutlined,
+//         breadcrumb: false,
+//         submenu: [],
+//       },
+//       {
+//         key: "dashboard.single",
+//         path: `${APP_PREFIX_PATH}/single_dashboard`,
+//         title: "Single Dashboard",
+//         icon: DashboardOutlined,
+//         breadcrumb: false,
+//         submenu: [],
+//       },
+//     ],
+//   },
+// ];
 const dashBoardNavTree = [
   {
     key: "dashboard",
@@ -17,36 +54,9 @@ const dashBoardNavTree = [
     title: "sidenav.dashboard",
     icon: DashboardOutlined,
     breadcrumb: false,
-
-    submenu: [
-      {
-        key: "admin_dashboard",
-        path: `${APP_PREFIX_PATH}/dashboards/admin`,
-        title: "Dashboard",
-        icon: DashboardOutlined,
-        breadcrumb: false,
-        submenu: [],
-      },
-      {
-        key: "dashboard.customer",
-        path: `${APP_PREFIX_PATH}/dashboards/customer`,
-        title: "Customer",
-        icon: DashboardOutlined,
-        breadcrumb: false,
-        submenu: [],
-      },
-      {
-        key: "dashboard.single",
-        path: `${APP_PREFIX_PATH}/single_dashboard`,
-        title: "Single Dashboard",
-        icon: DashboardOutlined,
-        breadcrumb: false,
-        submenu: [],
-      },
-    ],
+    submenu: [],
   },
 ];
-
 const vehcileManagementNavTree = [
   {
     key: "vehicleManagement",
@@ -101,61 +111,72 @@ const fuelManagementNavTree = [
   },
 ];
 
+// const userManagementNavTree = [
+//   {
+//     key: "usermanagement",
+//     path: `${APP_PREFIX_PATH}/user_managements`,
+//     title: "User Management",
+//     icon: ProfileOutlined,
+//     breadcrumb: false,
+
+//     submenu: [
+//       {
+//         key: "user_management.roles",
+//         path: `${APP_PREFIX_PATH}/user_management/roles`,
+//         title: "Roles",
+//         breadcrumb: false,
+//         submenu: [],
+//       },
+//       {
+//         key: "user_management.permissions",
+//         path: `${APP_PREFIX_PATH}/user_management/permissions`,
+//         title: "Permissions",
+//         breadcrumb: false,
+//         submenu: [],
+//       },
+//       {
+//         key: "permissionAssign",
+//         path: `${APP_PREFIX_PATH}/user_management/permissionAssign`,
+//         title: "Role Permission Assign",
+//         breadcrumb: false,
+//         submenu: [],
+//       },
+//       {
+//         key: "user",
+//         path: `${APP_PREFIX_PATH}/user_management/user`,
+//         title: "User",
+//         breadcrumb: false,
+//         submenu: [],
+//       },
+//       {
+//         key: "customer",
+//         path: `${APP_PREFIX_PATH}/user_management/customer`,
+//         title: "Customer",
+//         breadcrumb: false,
+//         submenu: [],
+//       },
+//     ],
+//   },
+// ];
 const userManagementNavTree = [
   {
     key: "usermanagement",
-    path: `${APP_PREFIX_PATH}/user_managements`,
+    path: `${APP_PREFIX_PATH}/user_management/user`,
     title: "User Management",
     icon: ProfileOutlined,
     breadcrumb: false,
-
-    submenu: [
-      {
-        key: "user_management.roles",
-        path: `${APP_PREFIX_PATH}/user_management/roles`,
-        title: "Roles",
-        breadcrumb: false,
-        submenu: [],
-      },
-      {
-        key: "user_management.permissions",
-        path: `${APP_PREFIX_PATH}/user_management/permissions`,
-        title: "Permissions",
-        breadcrumb: false,
-        submenu: [],
-      },
-      {
-        key: "permissionAssign",
-        path: `${APP_PREFIX_PATH}/user_management/permissionAssign`,
-        title: "Role Permission Assign",
-        breadcrumb: false,
-        submenu: [],
-      },
-      {
-        key: "user",
-        path: `${APP_PREFIX_PATH}/user_management/user`,
-        title: "User",
-        breadcrumb: false,
-        submenu: [],
-      },
-      {
-        key: "customer",
-        path: `${APP_PREFIX_PATH}/user_management/customer`,
-        title: "Customer",
-        breadcrumb: false,
-        submenu: [],
-      },
-    ],
+    isGroupTitle: false,
+    submenu: [],
   },
 ];
 
-const stockManagementNavTree = [
-  {
-    key: "stockmanagement",
-    path: `${APP_PREFIX_PATH}/stock_management`,
-    title: "Stock Management",
-    icon: ProfileOutlined,
-    breadcrumb: false,
+// const stockManagementNavTree = [
+//   {
+//     key: "stockmanagement",
+//     path: `${APP_PREFIX_PATH}/stock_management`,
+//     title: "Stock Management",
+//     icon: ProfileOutlined,
+//     breadcrumb: false,
 
     submenu: [
       {
@@ -182,6 +203,17 @@ const reportNavTree = [
     path: `${APP_PREFIX_PATH}/report_management`,
     title: "Reports",
     icon: FileDoneOutlined,
+    breadcrumb: false,
+    isGroupTitle: false,
+    submenu: [],
+  },
+];
+const deviceNavTree = [
+  {
+    key: "devices",
+    path: `${APP_PREFIX_PATH}/device_management`,
+    title: "Device",
+    icon: CarOutlined,
     breadcrumb: false,
     isGroupTitle: false,
     submenu: [],
@@ -322,11 +354,9 @@ const settingNavTree = [
 
 const navigationConfig = [
   ...dashBoardNavTree,
-  ...reportNavTree,
-  ...pointNavTree,
-  ...vehcileManagementNavTree,
-  ...fuelManagementNavTree,
   ...userManagementNavTree,
+  ...reportNavTree,
+  ...deviceNavTree,
   ...settingNavTree,
 ];
 

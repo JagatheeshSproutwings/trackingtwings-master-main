@@ -1,7 +1,7 @@
 export const ROW_GUTTER = 16;
 export const SIDE_NAV_WIDTH = 250;
-export const SIDE_NAV_COLLAPSED_WIDTH = 80;
-export const HEADER_HEIGHT = 50;
+export const SIDE_NAV_COLLAPSED_WIDTH = 70;
+export const HEADER_HEIGHT = 40;
 export const FOOTER_HEIGHT = 30;
 export const TOP_NAV_HEIGHT = 55;
 export const SIDE_NAV_LIGHT = 'SIDE_NAV_LIGHT';
@@ -42,7 +42,7 @@ export const GRAY_LIGHTEST = '#f7f7f8';
 
 export const BODY_BACKGROUND = '#fafafb';
 
-export const FONT_SIZE_BASE = 14;
+export const FONT_SIZE_BASE = 12;
 
 export const TEMPLATE = {
     HEADER_HEIGHT,
@@ -99,11 +99,11 @@ export const FONT_SIZES = {
 
 export const SPACER = {
     0: '0',
-    1: '0.1rem',
-    2: '0.25rem',
-    3: '0.5rem',
-    4: '1rem',
-    5: '1.5rem',
+    1: '0.25rem',
+    2: '0.5rem',
+    3: '1rem',
+    4: '1.5rem',
+    5: '3rem',
 }
 
 const BREAKPOINT = {
@@ -124,7 +124,7 @@ export const MEDIA_QUERIES = {
 }
 
 export const BORDER = {
-    BASE_COLOR: '#e6ebf1'
+    BASE_COLOR: '#ED1C24'
 }
 
 export const GRAY_SCALE = {
