@@ -58,7 +58,7 @@ const vehcileManagementNavTree = [
     submenu: [
       {
         key: "vehicle_creation",
-        path: `${APP_PREFIX_PATH}/vehicle_management/vehicle/creation`,
+        path: `${APP_PREFIX_PATH}/vehicle_management/vehicle`,
         title: "Vehicle Creation",
         breadcrumb: false,
         submenu: [],
@@ -149,32 +149,32 @@ const userManagementNavTree = [
   },
 ];
 
-// const stockManagementNavTree = [
-//   {
-//     key: "stockmanagement",
-//     path: `${APP_PREFIX_PATH}/stock_management`,
-//     title: "Stock Management",
-//     icon: ProfileOutlined,
-//     breadcrumb: false,
+const stockManagementNavTree = [
+  {
+    key: "stockmanagement",
+    path: `${APP_PREFIX_PATH}/stock_management`,
+    title: "Stock Management",
+    icon: ProfileOutlined,
+    breadcrumb: false,
 
-//     submenu: [
-//       {
-//         key: "stock_management.sim",
-//         path: `${APP_PREFIX_PATH}/stock_management/sim`,
-//         title: "Sim",
-//         breadcrumb: false,
-//         submenu: [],
-//       },
-//       {
-//         key: "stock_management.device",
-//         path: `${APP_PREFIX_PATH}/stock_management/device`,
-//         title: "Device",
-//         breadcrumb: false,
-//         submenu: [],
-//       },
-//     ],
-//   },
-// ];
+    submenu: [
+      {
+        key: "stock_management.sim",
+        path: `${APP_PREFIX_PATH}/stock_management/sim`,
+        title: "Sim",
+        breadcrumb: false,
+        submenu: [],
+      },
+      {
+        key: "stock_management.device",
+        path: `${APP_PREFIX_PATH}/stock_management/device`,
+        title: "Device",
+        breadcrumb: false,
+        submenu: [],
+      },
+    ],
+  },
+];
 
 const reportNavTree = [
   {
