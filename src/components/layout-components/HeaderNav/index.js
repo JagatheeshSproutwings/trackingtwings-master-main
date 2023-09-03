@@ -86,6 +86,7 @@ export const HeaderNav = props => {
 							)
 						}
 					</NavEdge>
+					
 					<NavEdge right>
 						<NavProfile mode={navMode} />
 					</NavEdge>
