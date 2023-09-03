@@ -178,24 +178,24 @@ const userManagementNavTree = [
 //     icon: ProfileOutlined,
 //     breadcrumb: false,
 
-    submenu: [
-      {
-        key: "stock_management.sim",
-        path: `${APP_PREFIX_PATH}/stock_management/sim`,
-        title: "Sim",
-        breadcrumb: false,
-        submenu: [],
-      },
-      {
-        key: "stock_management.device",
-        path: `${APP_PREFIX_PATH}/stock_management/device`,
-        title: "Device",
-        breadcrumb: false,
-        submenu: [],
-      },
-    ],
-  },
-];
+//     submenu: [
+//       {
+//         key: "stock_management.sim",
+//         path: `${APP_PREFIX_PATH}/stock_management/sim`,
+//         title: "Sim",
+//         breadcrumb: false,
+//         submenu: [],
+//       },
+//       {
+//         key: "stock_management.device",
+//         path: `${APP_PREFIX_PATH}/stock_management/device`,
+//         title: "Device",
+//         breadcrumb: false,
+//         submenu: [],
+//       },
+//     ],
+//   },
+// ];
 
 const reportNavTree = [
   {
