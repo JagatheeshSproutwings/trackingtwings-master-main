@@ -9,76 +9,79 @@ import {
   Row,
   Col,
   Space,
+  DatePicker,
 } from "antd";
 import Flex from "components/shared-components/Flex";
 import api from "configs/apiConfig";
+import moment from "moment";
 
-const { TextArea } = Input;
 const { Option } = Select;
 
 export default function Edit({ parentToChild }) {
-  const [selectedRoleId, setSelectedRoleId] = useState();
-  const [roleOptions, setRoleOptions] = useState([]);
-  const [selectedCountryId, setSelectedCountryId] = useState();
-  const [countryOptions, setCountryOptions] = useState([]);
+  const [selectedNetworkId, setselectedNetworkId] = useState();
+  const [networkOptions, setNetworkOptions] = useState([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleRoleIdChange = (roleID) => {
-    setSelectedRoleId(roleID);
+  const handleNetworkIdChange = (roleID) => {
+    setselectedNetworkId(roleID);
   };
-  const handleCountryIdChange = (countryId) => {
-    setSelectedCountryId(countryId);
-  };
+
   useEffect(() => {
-    fetchRoleOptions(setRoleOptions);
-    fetchCountryOptions(setCountryOptions);
+    fetchRoleOptions(setNetworkOptions);
   }, []);
 
   const onFinish = async (values) => {
-    document.getElementById("name_er_span").textContent = "";
-    document.getElementById("email_er_span").textContent = "";
-    document.getElementById("mobile_er_span").textContent = "";
+    document.getElementById("imei_er_span").textContent = "";
+    document.getElementById("mob1_er_span").textContent = "";
+    document.getElementById("mob2_er_span").textContent = "";
+
+    const validFrom = moment(values.valid_from).format("YYYY-MM-DD");
+    const validTo = moment(values.valid_to).format("YYYY-MM-DD");
+
+    const data = {
+      id: parentToChild[0],
+      network_id: values.network_id,
+      sim_imei_no: values.sim_imei_no,
+      sim_mob_no1: values.sim_mob_no1,
+      sim_mob_no2: values.sim_mob_no2,
+      valid_from: validFrom,
+      valid_to: validTo,
+    };
 
     try {
-      await api.post("user/update", values);
-      // window.location.reload(true);
+      await api.post("sim/update", data);
       setIsSubmitted(true);
     } catch (error) {
       if (error.response && error.response.status === 403) {
         const errorData = error.response.data;
         if (errorData.message && typeof errorData.message === "object") {
           const validationErrors = errorData.message;
-          if (validationErrors.hasOwnProperty("name")) {
+          if (validationErrors.hasOwnProperty("sim_imei_no")) {
             console.log(validationErrors.name);
-            document.getElementById("name_er_span").textContent =
-              validationErrors.name;
+            document.getElementById("imei_er_span").textContent =
+              validationErrors.sim_imei_no;
           }
-          if (validationErrors.hasOwnProperty("email")) {
+          if (validationErrors.hasOwnProperty("sim_mob_no1")) {
             console.log(validationErrors.email);
-            document.getElementById("email_er_span").textContent =
-              validationErrors.email;
+            document.getElementById("mob1_er_span").textContent =
+              validationErrors.sim_mob_no1;
           }
-          if (validationErrors.hasOwnProperty("mobile_no")) {
+          if (validationErrors.hasOwnProperty("sim_mob_no2")) {
             console.log(validationErrors.mobile_no);
-            document.getElementById("mobile_er_span").textContent =
-              validationErrors.mobile_no;
+            document.getElementById("mob2_er_span").textContent =
+              validationErrors.sim_mob_no2;
           }
         }
       }
     }
   };
 
-  const getRole = () => {
-    return localStorage.getItem("role");
-  };
-  const role = getRole();
-
   // Define the functions outside the component
-  async function fetchRoleOptions(setRoleOptions) {
+  async function fetchRoleOptions(setNetworkOptions) {
     try {
-      const response = await api.get(`role_rights_list/${role}`);
+      const response = await api.get("network");
       if (response.data.success) {
-        setRoleOptions(response.data.data);
+        setNetworkOptions(response.data.data);
       } else {
         console.error("API request was not successful");
       }
@@ -87,24 +90,11 @@ export default function Edit({ parentToChild }) {
     }
   }
 
-  async function fetchCountryOptions(setCountryOptions) {
-    try {
-      const response = await api.get("country");
-      if (response.data.success) {
-        setCountryOptions(response.data.data);
-      } else {
-        console.error("API request was not successful");
-      }
-    } catch (error) {
-      console.error("Error fetching countries:", error);
-    }
-  }
-
   return (
     <Row gutter={6}>
       <Col>
-        <Card title="Edit User">
-          <p></p>
+        <Card title="New Sim">
+          {parentToChild}
           <Flex>
             <div className="container">
               <Form
@@ -117,176 +107,123 @@ export default function Edit({ parentToChild }) {
                   <Col sm={12} md={12} lg={12}>
                     <Form.Item
                       size="small"
-                      label="User Name"
-                      name="name"
+                      label="Network"
+                      name="network_id"
                       initialValue={parentToChild[1]}
                       rules={[
                         {
                           required: true,
-                          message: "Please enter your name",
-                        },
-                      ]}
-                    >
-                      <Input />
-                    </Form.Item>
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      size="small"
-                      label="E-Mail ID"
-                      name="email"
-                      initialValue={parentToChild[2]}
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please enter your email",
-                        },
-                        {
-                          type: "email",
-                          message: "Please enter a valid email",
-                        },
-                      ]}
-                    >
-                      <Input />
-                    </Form.Item>
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      size="small"
-                      label="Mobile No"
-                      name="mobile_no"
-                      initialValue={parentToChild[3]}
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please enter your mobile no",
-                        },
-                        {
-                          type: "text",
-                          message: "Please enter a valid mobile no",
-                        },
-                      ]}
-                    >
-                      <Input />
-                    </Form.Item>
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      size="small"
-                      label="Password"
-                      name="password"
-                      initialValue={parentToChild[4]}
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please enter a password",
-                        },
-                        {
-                          min: 6,
-                          message:
-                            "Password must be at least 6 characters long",
-                        },
-                      ]}
-                    >
-                      <Input.Password />
-                    </Form.Item>
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      size="small"
-                      label="Confirm Password"
-                      name="c_password"
-                      initialValue={parentToChild[4]}
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please confirm your password",
-                        },
-                        ({ getFieldValue }) => ({
-                          validator(_, value) {
-                            if (!value || getFieldValue("password") === value) {
-                              return Promise.resolve();
-                            }
-                            return Promise.reject(
-                              new Error("Passwords do not match")
-                            );
-                          },
-                        }),
-                      ]}
-                    >
-                      <Input.Password />
-                    </Form.Item>
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      size="small"
-                      label="Country"
-                      name="country_id"
-                      initialValue={parentToChild[7]}
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please Select a Country",
+                          message: "Please Select a Network",
                         },
                       ]}
                     >
                       <Select
                         showSearch
-                        placeholder="Select Country"
+                        placeholder="Select Network"
                         optionFilterProp="children"
-                        onChange={handleCountryIdChange}
-                        value={selectedCountryId}
+                        onChange={handleNetworkIdChange}
+                        value={selectedNetworkId}
                         filterOption={(input, option) =>
                           option.children
                             .toLowerCase()
                             .indexOf(input.toLowerCase()) >= 0
                         }
                       >
-                        {Array.isArray(countryOptions) ? (
-                          countryOptions.map((country) => (
-                            <Option key={country.id} value={country.id}>
-                              {country.country_name}
+                        {Array.isArray(networkOptions) ? (
+                          networkOptions.map((network) => (
+                            <Option key={network.id} value={network.id}>
+                              {network.network_provider_name}
                             </Option>
                           ))
                         ) : (
-                          <Option value="Loading">Loading...</Option>
+                          <Option value="Loading" disabled>
+                            Loading...
+                          </Option>
                         )}
                       </Select>
                     </Form.Item>
                   </Col>
-                  <Col sm={24} md={24} lg={24}>
+                  <Col sm={12} md={12} lg={12}>
                     <Form.Item
                       size="small"
-                      label="Address"
-                      name="address"
-                      initialValue={parentToChild[9]}
+                      label="Sim IMEI No"
+                      name="sim_imei_no"
+                      initialValue={parentToChild[3]}
                       rules={[
                         {
                           required: true,
-                          message: "Please enter a Address",
+                          message: "Please enter a Sim IMEI No",
                         },
                       ]}
                     >
-                      <TextArea
-                        rows={4}
-                        placeholder="Please Enter Adress"
-                        maxLength={100}
-                      />
-                    </Form.Item>
-                  </Col>
-                </Row>
-                <Row align={"middle"}>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item name="id" initialValue={parentToChild[0]}>
-                      <Input></Input>
+                      <Input />
                     </Form.Item>
                   </Col>
                   <Col sm={12} md={12} lg={12}>
-                    <Form.Item name="role_id" initialValue={parentToChild[5]}>
-                      <Input></Input>
+                    <Form.Item
+                      initialValue={parentToChild[4]}
+                      size="small"
+                      label="Primary Number"
+                      name="sim_mob_no1"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please enter a Primary Number",
+                        },
+                      ]}
+                    >
+                      <Input />
+                    </Form.Item>
+                  </Col>
+                  <Col sm={12} md={12} lg={12}>
+                    <Form.Item
+                      initialValue={parentToChild[5]}
+                      size="small"
+                      label="Secondary Mobile No"
+                      name="sim_mob_no2"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please enter a Secondary Mobile No",
+                        },
+                      ]}
+                    >
+                      <Input />
+                    </Form.Item>
+                  </Col>
+
+                  <Col sm={12} md={12} lg={12}>
+                    <Form.Item
+                      name="valid_from"
+                      label="Valid From"
+                      initialValue={moment(parentToChild[6])}
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please enter a valid from",
+                        },
+                      ]}
+                    >
+                      <DatePicker style={{ width: "100%", fontSize: "16px" }} />
+                    </Form.Item>
+                  </Col>
+                  <Col sm={12} md={12} lg={12}>
+                    <Form.Item
+                      name="valid_to"
+                      label="Valid To"
+                      initialValue={moment(parentToChild[6])}
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please select a valid to",
+                        },
+                      ]}
+                    >
+                      <DatePicker style={{ width: "100%", fontSize: "16px" }} />
                     </Form.Item>
                   </Col>
                 </Row>
+
                 <Row align={"middle"}>
                   <Col span={12}>
                     <Form.Item>
@@ -303,7 +240,7 @@ export default function Edit({ parentToChild }) {
                 </Row>
 
                 <span
-                  id="name_er_span"
+                  id="imei_er_span"
                   style={{
                     color: "red",
                     fontSize: "12px",
@@ -313,7 +250,7 @@ export default function Edit({ parentToChild }) {
                 ></span>
 
                 <span
-                  id="email_er_span"
+                  id="mob1_er_span"
                   style={{
                     color: "red",
                     fontSize: "12px",
@@ -323,7 +260,7 @@ export default function Edit({ parentToChild }) {
                 ></span>
 
                 <span
-                  id="mobile_er_span"
+                  id="mob2_er_span"
                   style={{
                     color: "red",
                     fontSize: "12px",

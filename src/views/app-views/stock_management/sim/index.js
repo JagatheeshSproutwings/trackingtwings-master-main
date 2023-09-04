@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button, Card, Row, Col, Input } from "antd";
 import { PlusOutlined, SearchOutlined, EditOutlined } from "@ant-design/icons";
-import utils from "utils";
-import OrderListData from "assets/data/order-list.data.json";
-import userData from "assets/data/user-list.data.json";
 import Flex from "components/shared-components/Flex";
 import api from "configs/apiConfig";
-
 import Create from "./create";
 import Edit from "./edit";
 
-export const User = () => {
-  const [userList, setUserList] = useState(userData);
+export const Sim = () => {
+  const [simList, setSimList] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isCreateVisible, setIsCreateVisible] = useState(false);
   const [isEditVisible, setIsEditVisible] = useState(false);
@@ -26,38 +22,22 @@ export const User = () => {
     setIsEditVisible(true);
   };
 
-  const getUser = () => {
-    return localStorage.getItem("id");
-  };
-
-  const user = getUser();
-
-  const getRole = () => {
-    return localStorage.getItem("role");
-  };
-  const role = getRole();
-
-  async function loadUsers(setUserList) {
-    const data = { user_id: user, role_id: role };
+  async function loadSims(setSimList) {
     try {
-      const response = await api.post("user_list", data);
+      const response = await api.post("sim_list");
 
       if (response.data && Array.isArray(response.data.data)) {
         const processedData = response.data.data.map((item) => ({
           id: item.id,
-          name: item.name,
-          email: item.email,
-          mobile_no: item.mobile_no,
-          password: item.password,
-          role_id: item.role_id,
-          role: item.role,
-          country_id: item.country_id,
-          country: item.country_name,
-          address: item.address,
+          network_id: item.network_id,
+          network_provider_name: item.network_provider_name,
+          sim_imei_no: item.sim_imei_no,
+          sim_mob_no1: item.sim_mob_no1,
+          sim_mob_no2: item.sim_mob_no2,
+          valid_from: item.valid_from,
+          valid_to: item.valid_to,
         }));
-
-        console.log(processedData);
-        setUserList(processedData);
+        setSimList(processedData);
       } else {
         console.error("API request was not successful");
       }
@@ -70,56 +50,48 @@ export const User = () => {
     handleEditCard();
 
     const id = record.id;
-    const name = record.name;
-    const email = record.email;
-    const mobile_no = record.mobile_no;
-    const password = record.password;
-    const role = record.role;
-    const role_id = record.role_id;
-    const country = record.country;
-    const country_id = record.country_id;
-    const address = record.address;
+    const network_id = record.network_id;
+    const network_provider_name = record.network_provider_name;
+    const sim_imei_no = record.sim_imei_no;
+    const sim_mob_no1 = record.sim_mob_no1;
+    const sim_mob_no2 = record.sim_mob_no2;
+    const valid_form = record.valid_form;
+    const valid_to = record.valid_to;
 
     const data = [
       id,
-      name,
-      email,
-      mobile_no,
-      password,
-      role_id,
-      role,
-      country_id,
-      country,
-      address,
+      network_id,
+      network_provider_name,
+      sim_imei_no,
+      sim_mob_no1,
+      sim_mob_no2,
+      valid_form,
+      valid_to,
     ];
 
     setEditData(data);
   }
 
   useEffect(() => {
-    loadUsers(setUserList);
+    loadSims(setSimList);
   }, []);
 
   const tableColumns = [
     {
-      title: "Name",
-      dataIndex: "name",
+      title: "Network",
+      dataIndex: "network_provider_name",
     },
     {
-      title: "Email",
-      dataIndex: "email",
+      title: "Sim IMEI No",
+      dataIndex: "sim_imei_no",
     },
     {
-      title: "Mobile Number",
-      dataIndex: "mobile_no",
+      title: "Sim Mobile Number",
+      dataIndex: "sim_mob_no1",
     },
     {
-      title: "Role",
-      dataIndex: "role",
-    },
-    {
-      title: "Country",
-      dataIndex: "country",
+      title: "Sim Mobile Number",
+      dataIndex: "sim_mob_no2",
     },
     {
       title: "Edit",
@@ -137,9 +109,9 @@ export const User = () => {
 
   // const onSearch = (e) => {
   //   const value = e.currentTarget.value;
-  //   const searchArray = e.currentTarget.value ? userList : OrderListData;
+  //   const searchArray = e.currentTarget.value ? simList : OrderListData;
   //   const data = utils.wildCardSearch(searchArray, value);
-  //   setUserList(data);
+  //   setSimList(data);
   //   setSelectedRowKeys([]);
   // };
 
@@ -153,7 +125,7 @@ export const User = () => {
     <>
       <Row gutter={6}>
         <Col sm={24} md={14} lg={14}>
-          <Card title="User">
+          <Card title="Sim">
             <Flex
               alignItems="center"
               justifyContent="space-between"
@@ -177,7 +149,7 @@ export const User = () => {
                   ghost
                   onClick={handleCreateCard}
                 >
-                  Add User
+                  Add Sim
                 </Button>
               </div>
             </Flex>
@@ -185,7 +157,7 @@ export const User = () => {
               <Table
                 bordered
                 columns={tableColumns}
-                dataSource={userList}
+                dataSource={simList}
                 rowKey="id"
                 rowSelection={{
                   selectedRowKeys: selectedRowKeys,
@@ -205,4 +177,4 @@ export const User = () => {
     </>
   );
 };
-export default User;
+export default Sim;

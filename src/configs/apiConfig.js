@@ -2,6 +2,8 @@ import axios from "axios";
 
  //const baseURL = "http://148.113.16.25/twings_app/public/api/";
 const baseURL = "http://localhost/laravel/twings_api/public/api/";
+//  const baseURL = "http://148.113.16.25/twings_app/public/api/";
+const baseURL = "http://localhost/laravel/twings_api/public/api/";
 
 const api = axios.create({
   baseURL: baseURL,

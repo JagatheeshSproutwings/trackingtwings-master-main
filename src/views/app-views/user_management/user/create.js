@@ -41,7 +41,7 @@ export default function Create() {
 
     try {
       await api.post("user/store", values);
-     // window.location.reload(true);
+      // window.location.reload(true);
       setIsSubmitted(true);
       form.resetFields();
     } catch (error) {
@@ -107,7 +107,7 @@ export default function Create() {
         <Card title="New User">
           <Flex>
             <div className="container">
-              <Form 
+              <Form
                 size="small"
                 name="registrationForm"
                 onFinish={onFinish}
