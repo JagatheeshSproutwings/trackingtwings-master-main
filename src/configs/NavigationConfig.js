@@ -193,6 +193,13 @@ const stockManagementNavTree = [
         breadcrumb: false,
         submenu: [],
       },
+      {
+        key: "stock_management.demo",
+        path: `${APP_PREFIX_PATH}/stock_management/demo`,
+        title: "Demo",
+        breadcrumb: false,
+        submenu: [],
+      },
     ],
   },
 ];

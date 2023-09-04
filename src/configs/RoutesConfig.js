@@ -136,6 +136,13 @@ export const protectedRoutes = [
     ),
   },
   {
+    key: "stock_management.demo",
+    path: `${APP_PREFIX_PATH}/stock_management/demo`,
+    component: React.lazy(() =>
+      import("views/app-views/stock_management/demo")
+    ),
+  },
+  {
     key: "vehicle_management.vehicle",
     path: `${APP_PREFIX_PATH}/vehicle_management/vehicle`,
     component: React.lazy(() =>
