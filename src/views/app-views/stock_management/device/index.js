@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button, Card, Row, Col, Input } from "antd";
 import { PlusOutlined, SearchOutlined, EditOutlined } from "@ant-design/icons";
-import utils from "utils";
-import OrderListData from "assets/data/order-list.data.json";
-import userData from "assets/data/user-list.data.json";
 import Flex from "components/shared-components/Flex";
 import api from "configs/apiConfig";
-
 import Create from "./create";
 import Edit from "./edit";
 
-export const User = () => {
-  const [userList, setUserList] = useState(userData);
+export const Device = () => {
+  const [deviceList, setDeviceList] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isCreateVisible, setIsCreateVisible] = useState(false);
   const [isEditVisible, setIsEditVisible] = useState(false);
@@ -26,38 +22,24 @@ export const User = () => {
     setIsEditVisible(true);
   };
 
-  const getUser = () => {
-    return localStorage.getItem("id");
-  };
-
-  const user = getUser();
-
-  const getRole = () => {
-    return localStorage.getItem("role");
-  };
-  const role = getRole();
-
-  async function loadUsers(setUserList) {
-    const data = { user_id: user, role_id: role };
+  async function loadDevices(setDeviceList) {
     try {
-      const response = await api.post("user_list", data);
+      const response = await api.post("device_list");
 
       if (response.data && Array.isArray(response.data.data)) {
         const processedData = response.data.data.map((item) => ({
           id: item.id,
-          name: item.name,
-          email: item.email,
-          mobile_no: item.mobile_no,
-          password: item.password,
-          role_id: item.role_id,
-          role: item.role,
-          country_id: item.country_id,
-          country: item.country_name,
-          address: item.address,
+          supplier_id: item.supplier_id,
+          supplier_name: item.supplier_name,
+          device_imei_no: item.device_imei_no,
+          ccid: item.ccid,
+          uid: item.uid,
+          device_make_id: item.device_make_id,
+          device_model_id: item.device_model_id,
+          device_make: item.device_make,
+          device_model: item.device_model,
         }));
-
-        console.log(processedData);
-        setUserList(processedData);
+        setDeviceList(processedData);
       } else {
         console.error("API request was not successful");
       }
@@ -70,56 +52,52 @@ export const User = () => {
     handleEditCard();
 
     const id = record.id;
-    const name = record.name;
-    const email = record.email;
-    const mobile_no = record.mobile_no;
-    const password = record.password;
-    const role = record.role;
-    const role_id = record.role_id;
-    const country = record.country;
-    const country_id = record.country_id;
-    const address = record.address;
+    const supplier_id = record.supplier_id;
+    const supplier_name = record.supplier_name;
+    const device_make_id = record.device_make_id;
+    const device_model_id = record.device_model_id;
+    const device_make = record.device_make;
+    const device_model = record.device_model;
+    const device_imei_no = record.device_imei_no;
+    const ccid = record.ccid;
+    const uid = record.uid;
 
     const data = [
       id,
-      name,
-      email,
-      mobile_no,
-      password,
-      role_id,
-      role,
-      country_id,
-      country,
-      address,
+      supplier_id,
+      supplier_name,
+      device_make_id,
+      device_make,
+      device_model_id,
+      device_model,
+      device_imei_no,
+      ccid,
+      uid,
     ];
 
     setEditData(data);
   }
 
   useEffect(() => {
-    loadUsers(setUserList);
+    loadDevices(setDeviceList);
   }, []);
 
   const tableColumns = [
     {
-      title: "Name",
-      dataIndex: "name",
+      title: "Supplier Name",
+      dataIndex: "supplier_name",
     },
     {
-      title: "Email",
-      dataIndex: "email",
+      title: "Device No",
+      dataIndex: "device_imei_no",
     },
     {
-      title: "Mobile Number",
-      dataIndex: "mobile_no",
+      title: "Device Make",
+      dataIndex: "device_make",
     },
     {
-      title: "Role",
-      dataIndex: "role",
-    },
-    {
-      title: "Country",
-      dataIndex: "country",
+      title: "Device Model",
+      dataIndex: "device_model",
     },
     {
       title: "Edit",
@@ -137,9 +115,9 @@ export const User = () => {
 
   // const onSearch = (e) => {
   //   const value = e.currentTarget.value;
-  //   const searchArray = e.currentTarget.value ? userList : OrderListData;
+  //   const searchArray = e.currentTarget.value ? deviceList : OrderListData;
   //   const data = utils.wildCardSearch(searchArray, value);
-  //   setUserList(data);
+  //   setDeviceList(data);
   //   setSelectedRowKeys([]);
   // };
 
@@ -153,7 +131,7 @@ export const User = () => {
     <>
       <Row gutter={6}>
         <Col sm={24} md={14} lg={14}>
-          <Card title="User">
+          <Card title="Device">
             <Flex
               alignItems="center"
               justifyContent="space-between"
@@ -177,7 +155,7 @@ export const User = () => {
                   ghost
                   onClick={handleCreateCard}
                 >
-                  Add User
+                  Add Device
                 </Button>
               </div>
             </Flex>
@@ -185,7 +163,7 @@ export const User = () => {
               <Table
                 bordered
                 columns={tableColumns}
-                dataSource={userList}
+                dataSource={deviceList}
                 rowKey="id"
                 rowSelection={{
                   selectedRowKeys: selectedRowKeys,
@@ -205,4 +183,4 @@ export const User = () => {
     </>
   );
 };
-export default User;
+export default Device;
