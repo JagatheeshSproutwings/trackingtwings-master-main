@@ -148,7 +148,7 @@ export default function Create() {
                       <Input />
                     </Form.Item>
                   </Col>
-                  
+
                   <Col sm={12} md={12} lg={12}>
                     <Form.Item
                       size="small"
@@ -308,7 +308,6 @@ export default function Create() {
                     </Form.Item>
                   </Col>
                 </Row>
-                
 
                 <Row align={"middle"}>
                   <Col span={12}>
