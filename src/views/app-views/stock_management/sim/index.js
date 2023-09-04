@@ -5,21 +5,32 @@ import Flex from "components/shared-components/Flex";
 import api from "configs/apiConfig";
 import Create from "./create";
 import Edit from "./edit";
+import Assign from "../demo/index";
 
 export const Sim = () => {
   const [simList, setSimList] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isCreateVisible, setIsCreateVisible] = useState(false);
   const [isEditVisible, setIsEditVisible] = useState(false);
+  const [isAssignVisible, setIsAssignVisible] = useState(false);
+
   const [editdata, setEditData] = useState("");
+  const [assigndata, setAssignData] = useState("");
 
   const handleCreateCard = () => {
     setIsCreateVisible(true);
     setIsEditVisible(false);
+    setIsAssignVisible(false);
   };
   const handleEditCard = () => {
     setIsCreateVisible(false);
     setIsEditVisible(true);
+    setIsAssignVisible(false);
+  };
+  const handleAssignCard = () => {
+    setIsCreateVisible(false);
+    setIsEditVisible(false);
+    setIsAssignVisible(true);
   };
 
   async function loadSims(setSimList) {
@@ -72,6 +83,18 @@ export const Sim = () => {
     setEditData(data);
   }
 
+  function handleAssignClick(record) {
+    handleAssignCard();
+
+    const id = record.id;
+    const type = "Sim";
+    const sim_imei_no = record.sim_imei_no;
+
+    const data = [id, type, sim_imei_no];
+
+    setAssignData(data);
+  }
+
   useEffect(() => {
     loadSims(setSimList);
   }, []);
@@ -102,6 +125,18 @@ export const Sim = () => {
           onClick={() => handleEditClick(record)}
         >
           <EditOutlined />
+        </span>
+      ),
+    },
+    {
+      title: "Assign",
+      dataIndex: "edit",
+      render: (_, record) => (
+        <span
+          style={{ cursor: "pointer" }}
+          onClick={() => handleAssignClick(record)} // Replace handleEditClick with your custom action function
+        >
+          <EditOutlined /> {/* Replace EditOutlined with your custom icon */}
         </span>
       ),
     },
@@ -172,6 +207,7 @@ export const Sim = () => {
         <Col sm={24} md={10} lg={10}>
           {isCreateVisible && <Create />}
           {isEditVisible && <Edit parentToChild={editdata} />}
+          {isAssignVisible && <Assign parentToChild={assigndata} />}
         </Col>
       </Row>
     </>

@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Row, Col, Card, Select, Form, Button } from "antd";
 import api from "configs/apiConfig";
 import Input from "antd/es/input/Input";
+import Flex from "components/shared-components/Flex";
 const { Option } = Select;
 
-const Report = () => {
+const Assign = ({ parentToChild }) => {
   const [form] = Form.useForm();
 
   const [adminList, SetAdminList] = useState([]);
@@ -118,7 +119,7 @@ const Report = () => {
       const form_data = await api
         .post("sim_transfer", values)
         .then((res) => {
-          return res;
+          return alert("Sim Transfered Successfuly");
         })
         .catch((err) => {
           return [];
@@ -128,7 +129,7 @@ const Report = () => {
       const form_data = await api
         .post("device_transfer", values)
         .then((res) => {
-          return res;
+          return alert("Device Transfered Successfuly");
         })
         .catch((err) => {
           return [];
@@ -136,104 +137,139 @@ const Report = () => {
     }
   };
 
-  const newLocal = (
-    <Card>
-      <Form layout="vertical" size="small" onFinish={onFinish}>
-        <Row gutter={[8, 8]}>
-          <Form.Item size="small" type="text" name="id" initialValue={1}>
-            <Input style={{ display: "none" }}></Input>
-          </Form.Item>
-          <Form.Item size="small" type="text" name="type" initialValue={"Sim"}>
-            <Input style={{ border: "none" }} readOnly size="big"></Input>
-          </Form.Item>
-        </Row>
-        <Form.Item label="IMEI No" type="text">
-          <Input readOnly></Input>
-        </Form.Item>
-
-        {currentRole == 1 && (
-          <Form.Item label="Admin" name="admin_id">
-            <Select onChange={AdminChange}>
-              {Array.isArray(adminList) ? (
-                adminList.map((admin) => (
-                  <Select.Option key={admin?.id} role_id="2" value={admin?.id}>
-                    {admin?.name}
-                  </Select.Option>
-                ))
-              ) : (
-                <Select.Option role_id="2" value=""></Select.Option>
-              )}
-            </Select>
-          </Form.Item>
-        )}
-        {(currentRole == 1 || currentRole == 2) && (
-          <Form.Item label="Distributor" name="distributor_id">
-            <Select onChange={DistributorChange}>
-              {Array.isArray(distributorList) ? (
-                distributorList.map((distributor) => (
-                  <Option
-                    key={distributor?.id}
-                    role_id="3"
-                    value={distributor?.id}
-                  >
-                    {distributor?.name}
-                  </Option>
-                ))
-              ) : (
-                <Option role_id="3" value=""></Option>
-              )}
-            </Select>
-          </Form.Item>
-        )}
-        {(currentRole == 1 || currentRole == 2 || currentRole == 3) && (
-          <Form.Item label="Dealer" name="dealer_id">
-            <Select onChange={DealerChange}>
-              {Array.isArray(dealerList) ? (
-                dealerList.map((dealer) => (
-                  <Option key={dealer?.id} role_id="4" value={dealer?.id}>
-                    {dealer?.name}
-                  </Option>
-                ))
-              ) : (
-                <Option role_id="4" value=""></Option>
-              )}
-            </Select>
-          </Form.Item>
-        )}
-        {(currentRole == 1 ||
-          currentRole == 2 ||
-          currentRole == 3 ||
-          currentRole == 4) && (
-          <Form.Item label="Subdealer" name="subdealer_id">
-            <Select>
-              {Array.isArray(subdealerList) && subdealerList.length > 0 ? (
-                subdealerList.map((subdealer) => (
-                  <Option key={subdealer?.id} role_id="5" value={subdealer?.id}>
-                    {subdealer?.name}
-                  </Option>
-                ))
-              ) : (
-                <Option></Option>
-              )}
-            </Select>
-          </Form.Item>
-        )}
-        <Button type="primary" htmlType="submit">
-          Register
-        </Button>
-      </Form>
-    </Card>
-  );
-
   return (
-    <>
-      <Row gutter={6}>
-        <Col xs={24} sm={24} xl={4} md={4} lg={4} xxl={4}>
-          {newLocal}
-        </Col>
-      </Row>
-    </>
+    <Row gutter={18}>
+      <Col>
+        <Card>
+          <Flex>
+            <Form layout="vertical" size="small" onFinish={onFinish}>
+              <Row>
+                <Form.Item
+                  size="small"
+                  type="text"
+                  name="id"
+                  initialValue={parentToChild[0]}
+                >
+                  <Input style={{ display: "none" }}></Input>
+                </Form.Item>
+                <Form.Item
+                  type="text"
+                  name="type"
+                  initialValue={parentToChild[1]}
+                >
+                  <Input style={{ border: "none" }} readOnly></Input>
+                </Form.Item>
+              </Row>
+              <Row gutter={[8, 8]}>
+                <Col sm={12} md={12} lg={12}>
+                  <Form.Item
+                    label="IMEI No"
+                    name="imei_no"
+                    initialValue={parentToChild[2]}
+                  >
+                    <Input readOnly />
+                  </Form.Item>
+                </Col>
+                <Col sm={12} md={12} lg={12}>
+                  {currentRole == 1 && (
+                    <Form.Item label="Admin" name="admin_id">
+                      <Select onChange={AdminChange}>
+                        {Array.isArray(adminList) ? (
+                          adminList.map((admin) => (
+                            <Select.Option
+                              key={admin?.id}
+                              role_id="2"
+                              value={admin?.id}
+                            >
+                              {admin?.name}
+                            </Select.Option>
+                          ))
+                        ) : (
+                          <Select.Option role_id="2" value=""></Select.Option>
+                        )}
+                      </Select>
+                    </Form.Item>
+                  )}
+                </Col>
+                <Col sm={12} md={12} lg={12}>
+                  {(currentRole == 1 || currentRole == 2) && (
+                    <Form.Item label="Distributor" name="distributor_id">
+                      <Select onChange={DistributorChange}>
+                        {Array.isArray(distributorList) ? (
+                          distributorList.map((distributor) => (
+                            <Option
+                              key={distributor?.id}
+                              role_id="3"
+                              value={distributor?.id}
+                            >
+                              {distributor?.name}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option role_id="3" value=""></Option>
+                        )}
+                      </Select>
+                    </Form.Item>
+                  )}
+                </Col>
+                <Col sm={12} md={12} lg={12}>
+                  {(currentRole == 1 ||
+                    currentRole == 2 ||
+                    currentRole == 3) && (
+                    <Form.Item label="Dealer" name="dealer_id">
+                      <Select onChange={DealerChange}>
+                        {Array.isArray(dealerList) ? (
+                          dealerList.map((dealer) => (
+                            <Option
+                              key={dealer?.id}
+                              role_id="4"
+                              value={dealer?.id}
+                            >
+                              {dealer?.name}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option role_id="4" value=""></Option>
+                        )}
+                      </Select>
+                    </Form.Item>
+                  )}
+                </Col>
+                <Col sm={12} md={12} lg={12}>
+                  {(currentRole == 1 ||
+                    currentRole == 2 ||
+                    currentRole == 3 ||
+                    currentRole == 4) && (
+                    <Form.Item label="Subdealer" name="subdealer_id">
+                      <Select>
+                        {Array.isArray(subdealerList) &&
+                        subdealerList.length > 0 ? (
+                          subdealerList.map((subdealer) => (
+                            <Option
+                              key={subdealer?.id}
+                              role_id="5"
+                              value={subdealer?.id}
+                            >
+                              {subdealer?.name}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option></Option>
+                        )}
+                      </Select>
+                    </Form.Item>
+                  )}
+                </Col>
+              </Row>
+              <Button type="primary" htmlType="submit">
+                Register
+              </Button>
+            </Form>
+          </Flex>
+        </Card>
+      </Col>
+    </Row>
   );
 };
 
-export default Report;
+export default Assign;
