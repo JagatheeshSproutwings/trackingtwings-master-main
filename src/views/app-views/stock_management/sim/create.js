@@ -27,7 +27,7 @@ export default function Create() {
   };
 
   useEffect(() => {
-    fetchRoleOptions(setNetworkOptions);
+    fetchNetworkOptions(setNetworkOptions);
   }, []);
 
   const onFinish = async (values) => {
@@ -50,6 +50,12 @@ export default function Create() {
     try {
       await api.post("sim/store", data);
       setIsSubmitted(true);
+
+      document.getElementById("sim_imei_no").value = "";
+      document.getElementById("sim_mob_no1").value = "";
+      document.getElementById("sim_mob_no2").value = "";
+      document.getElementById("valid_from").value = "";
+      document.getElementById("valid_to").value = "";
     } catch (error) {
       if (error.response && error.response.status === 403) {
         const errorData = error.response.data;
@@ -76,7 +82,7 @@ export default function Create() {
   };
 
   // Define the functions outside the component
-  async function fetchRoleOptions(setNetworkOptions) {
+  async function fetchNetworkOptions(setNetworkOptions) {
     try {
       const response = await api.get("network");
       if (response.data.success) {
@@ -140,12 +146,12 @@ export default function Create() {
                       </Select>
                     </Form.Item>
                   </Col>
-
                   <Col sm={12} md={12} lg={12}>
                     <Form.Item
                       size="small"
                       label="Sim IMEI No"
                       name="sim_imei_no"
+                      id="sim_imei_no"
                       rules={[
                         {
                           required: true,
@@ -153,7 +159,7 @@ export default function Create() {
                         },
                       ]}
                     >
-                      <Input />
+                      <Input id="sim_imei_no" />
                     </Form.Item>
                   </Col>
                   <Col sm={12} md={12} lg={12}>
@@ -186,7 +192,6 @@ export default function Create() {
                       <Input />
                     </Form.Item>
                   </Col>
-
                   <Col sm={12} md={12} lg={12}>
                     <Form.Item
                       name="valid_from"

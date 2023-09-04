@@ -9,76 +9,77 @@ import {
   Row,
   Col,
   Space,
+  DatePicker,
 } from "antd";
 import Flex from "components/shared-components/Flex";
 import api from "configs/apiConfig";
+import moment from "moment";
 
-const { TextArea } = Input;
 const { Option } = Select;
 
 export default function Edit({ parentToChild }) {
-  const [selectedRoleId, setSelectedRoleId] = useState();
-  const [roleOptions, setRoleOptions] = useState([]);
-  const [selectedCountryId, setSelectedCountryId] = useState();
-  const [countryOptions, setCountryOptions] = useState([]);
+  const [selectedSupplierId, setselectedSupplierId] = useState();
+  const [supplierOptions, setSupplierOptions] = useState([]);
+  const [selectedMakeId, setselectedMakeId] = useState();
+  const [makeOptions, setMakeOptions] = useState([]);
+  const [selectedModelId, setselectedModelId] = useState();
+  const [modelOptions, setModelOptions] = useState([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleRoleIdChange = (roleID) => {
-    setSelectedRoleId(roleID);
+  const handleSupplierIdChange = (roleID) => {
+    setselectedSupplierId(roleID);
   };
-  const handleCountryIdChange = (countryId) => {
-    setSelectedCountryId(countryId);
+  const handleMakeIdChange = (roleID) => {
+    setselectedMakeId(roleID);
   };
+
+  const handleModelIdChange = (roleID) => {
+    setselectedModelId(roleID);
+  };
+
   useEffect(() => {
-    fetchRoleOptions(setRoleOptions);
-    fetchCountryOptions(setCountryOptions);
+    fetchSupplierOptions(setSupplierOptions);
+    fetchMakeOptions(setMakeOptions);
+    fetchModelOptions(setModelOptions);
   }, []);
 
   const onFinish = async (values) => {
-    document.getElementById("name_er_span").textContent = "";
-    document.getElementById("email_er_span").textContent = "";
-    document.getElementById("mobile_er_span").textContent = "";
+    document.getElementById("imei_er_span").textContent = "";
+
+    const data = {
+      id: parentToChild[0],
+      supplier_id: values.supplier_id,
+      device_make_id: values.device_make_id,
+      device_model_id: values.device_model_id,
+      device_imei_no: values.device_imei_no,
+      uid: values.uid,
+      ccid: values.ccid,
+    };
 
     try {
-      await api.post("user/update", values);
-      // window.location.reload(true);
+      await api.post("device/update", data);
       setIsSubmitted(true);
     } catch (error) {
       if (error.response && error.response.status === 403) {
         const errorData = error.response.data;
         if (errorData.message && typeof errorData.message === "object") {
           const validationErrors = errorData.message;
-          if (validationErrors.hasOwnProperty("name")) {
+          if (validationErrors.hasOwnProperty("device_imei_no")) {
             console.log(validationErrors.name);
-            document.getElementById("name_er_span").textContent =
-              validationErrors.name;
-          }
-          if (validationErrors.hasOwnProperty("email")) {
-            console.log(validationErrors.email);
-            document.getElementById("email_er_span").textContent =
-              validationErrors.email;
-          }
-          if (validationErrors.hasOwnProperty("mobile_no")) {
-            console.log(validationErrors.mobile_no);
-            document.getElementById("mobile_er_span").textContent =
-              validationErrors.mobile_no;
+            document.getElementById("imei_er_span").textContent =
+              validationErrors.device_imei_no;
           }
         }
       }
     }
   };
 
-  const getRole = () => {
-    return localStorage.getItem("role");
-  };
-  const role = getRole();
-
   // Define the functions outside the component
-  async function fetchRoleOptions(setRoleOptions) {
+  async function fetchSupplierOptions(setSupplierOptions) {
     try {
-      const response = await api.get(`role_rights_list/${role}`);
+      const response = await api.get("supplier");
       if (response.data.success) {
-        setRoleOptions(response.data.data);
+        setSupplierOptions(response.data.data);
       } else {
         console.error("API request was not successful");
       }
@@ -87,24 +88,36 @@ export default function Edit({ parentToChild }) {
     }
   }
 
-  async function fetchCountryOptions(setCountryOptions) {
+  async function fetchMakeOptions(setMakeOptions) {
     try {
-      const response = await api.get("country");
+      const response = await api.get("device_make");
       if (response.data.success) {
-        setCountryOptions(response.data.data);
+        setMakeOptions(response.data.data);
       } else {
         console.error("API request was not successful");
       }
     } catch (error) {
-      console.error("Error fetching countries:", error);
+      console.error("Error fetching roles:", error);
+    }
+  }
+
+  async function fetchModelOptions(setModelOptions) {
+    try {
+      const response = await api.get("device_model");
+      if (response.data.success) {
+        setModelOptions(response.data.data);
+      } else {
+        console.error("API request was not successful");
+      }
+    } catch (error) {
+      console.error("Error fetching roles:", error);
     }
   }
 
   return (
     <Row gutter={6}>
       <Col>
-        <Card title="Edit User">
-          <p></p>
+        <Card title="Edit Device">
           <Flex>
             <div className="container">
               <Form
@@ -116,174 +129,155 @@ export default function Edit({ parentToChild }) {
                 <Row gutter={[8, 8]}>
                   <Col sm={12} md={12} lg={12}>
                     <Form.Item
-                      size="small"
-                      label="User Name"
-                      name="name"
                       initialValue={parentToChild[1]}
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please enter your name",
-                        },
-                      ]}
-                    >
-                      <Input />
-                    </Form.Item>
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item
                       size="small"
-                      label="E-Mail ID"
-                      name="email"
-                      initialValue={parentToChild[2]}
+                      label="Supplier"
+                      name="supplier_id"
                       rules={[
                         {
                           required: true,
-                          message: "Please enter your email",
-                        },
-                        {
-                          type: "email",
-                          message: "Please enter a valid email",
-                        },
-                      ]}
-                    >
-                      <Input />
-                    </Form.Item>
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      size="small"
-                      label="Mobile No"
-                      name="mobile_no"
-                      initialValue={parentToChild[3]}
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please enter your mobile no",
-                        },
-                        {
-                          type: "text",
-                          message: "Please enter a valid mobile no",
-                        },
-                      ]}
-                    >
-                      <Input />
-                    </Form.Item>
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      size="small"
-                      label="Password"
-                      name="password"
-                      initialValue={parentToChild[4]}
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please enter a password",
-                        },
-                        {
-                          min: 6,
-                          message:
-                            "Password must be at least 6 characters long",
-                        },
-                      ]}
-                    >
-                      <Input.Password />
-                    </Form.Item>
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      size="small"
-                      label="Confirm Password"
-                      name="c_password"
-                      initialValue={parentToChild[4]}
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please confirm your password",
-                        },
-                        ({ getFieldValue }) => ({
-                          validator(_, value) {
-                            if (!value || getFieldValue("password") === value) {
-                              return Promise.resolve();
-                            }
-                            return Promise.reject(
-                              new Error("Passwords do not match")
-                            );
-                          },
-                        }),
-                      ]}
-                    >
-                      <Input.Password />
-                    </Form.Item>
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      size="small"
-                      label="Country"
-                      name="country_id"
-                      initialValue={parentToChild[7]}
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please Select a Country",
+                          message: "Please Select a Supplier",
                         },
                       ]}
                     >
                       <Select
                         showSearch
-                        placeholder="Select Country"
+                        placeholder="Select Supplier"
                         optionFilterProp="children"
-                        onChange={handleCountryIdChange}
-                        value={selectedCountryId}
+                        onChange={handleSupplierIdChange}
+                        value={selectedSupplierId}
                         filterOption={(input, option) =>
                           option.children
                             .toLowerCase()
                             .indexOf(input.toLowerCase()) >= 0
                         }
                       >
-                        {Array.isArray(countryOptions) ? (
-                          countryOptions.map((country) => (
-                            <Option key={country.id} value={country.id}>
-                              {country.country_name}
+                        {Array.isArray(supplierOptions) ? (
+                          supplierOptions.map((supplier) => (
+                            <Option key={supplier.id} value={supplier.id}>
+                              {supplier.supplier_name}
                             </Option>
                           ))
                         ) : (
-                          <Option value="Loading">Loading...</Option>
+                          <Option value="Loading" disabled>
+                            Loading...
+                          </Option>
                         )}
                       </Select>
                     </Form.Item>
                   </Col>
-                  <Col sm={24} md={24} lg={24}>
+                  <Col sm={12} md={12} lg={12}>
                     <Form.Item
+                      initialValue={parentToChild[3]}
                       size="small"
-                      label="Address"
-                      name="address"
-                      initialValue={parentToChild[9]}
+                      label="Device Make"
+                      name="device_make_id"
                       rules={[
                         {
                           required: true,
-                          message: "Please enter a Address",
+                          message: "Please Select a Device Make",
                         },
                       ]}
                     >
-                      <TextArea
-                        rows={4}
-                        placeholder="Please Enter Adress"
-                        maxLength={100}
-                      />
+                      <Select
+                        showSearch
+                        placeholder="Select Device Make"
+                        optionFilterProp="children"
+                        onChange={handleMakeIdChange}
+                        value={selectedMakeId}
+                        filterOption={(input, option) =>
+                          option.children
+                            .toLowerCase()
+                            .indexOf(input.toLowerCase()) >= 0
+                        }
+                      >
+                        {Array.isArray(makeOptions) ? (
+                          makeOptions.map((make) => (
+                            <Option key={make.id} value={make.id}>
+                              {make.device_make}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="Loading" disabled>
+                            Loading...
+                          </Option>
+                        )}
+                      </Select>
                     </Form.Item>
                   </Col>
-                </Row>
-                <Row align={"middle"}>
                   <Col sm={12} md={12} lg={12}>
-                    <Form.Item name="id" initialValue={parentToChild[0]}>
-                      <Input></Input>
+                    <Form.Item
+                      initialValue={parentToChild[5]}
+                      size="small"
+                      label="Device Model"
+                      name="device_model_id"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please Select a Device Model",
+                        },
+                      ]}
+                    >
+                      <Select
+                        showSearch
+                        placeholder="Select Device Model"
+                        optionFilterProp="children"
+                        onChange={handleModelIdChange}
+                        value={selectedModelId}
+                        filterOption={(input, option) =>
+                          option.children
+                            .toLowerCase()
+                            .indexOf(input.toLowerCase()) >= 0
+                        }
+                      >
+                        {Array.isArray(modelOptions) ? (
+                          modelOptions.map((model) => (
+                            <Option key={model.id} value={model.id}>
+                              {model.device_model}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="Loading" disabled>
+                            Loading...
+                          </Option>
+                        )}
+                      </Select>
                     </Form.Item>
                   </Col>
                   <Col sm={12} md={12} lg={12}>
-                    <Form.Item name="role_id" initialValue={parentToChild[5]}>
-                      <Input></Input>
+                    <Form.Item
+                      initialValue={parentToChild[7]}
+                      size="small"
+                      label="Device IMEI No"
+                      name="device_imei_no"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please enter a Device IMEI No",
+                        },
+                      ]}
+                    >
+                      <Input />
+                    </Form.Item>
+                  </Col>
+                  <Col sm={12} md={12} lg={12}>
+                    <Form.Item
+                      initialValue={parentToChild[8]}
+                      size="small"
+                      label="Device UID"
+                      name="uid"
+                    >
+                      <Input />
+                    </Form.Item>
+                  </Col>
+                  <Col sm={12} md={12} lg={12}>
+                    <Form.Item
+                      initialValue={parentToChild[9]}
+                      size="small"
+                      label="Device CCID"
+                      name="ccid"
+                    >
+                      <Input />
                     </Form.Item>
                   </Col>
                 </Row>
@@ -303,27 +297,7 @@ export default function Edit({ parentToChild }) {
                 </Row>
 
                 <span
-                  id="name_er_span"
-                  style={{
-                    color: "red",
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                    fontFamily: "sans-serif",
-                  }}
-                ></span>
-
-                <span
-                  id="email_er_span"
-                  style={{
-                    color: "red",
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                    fontFamily: "sans-serif",
-                  }}
-                ></span>
-
-                <span
-                  id="mobile_er_span"
+                  id="imei_er_span"
                   style={{
                     color: "red",
                     fontSize: "12px",
