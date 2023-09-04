@@ -42,11 +42,7 @@ export const protectedRoutes = [
     path: `${APP_PREFIX_PATH}/dashboard/single_dashboard`,
     component: React.lazy(() => import("views/app-views/single_dashboard")),
   },
-  {
-    key: "vehicle_creation",
-    path: `${APP_PREFIX_PATH}/vehicle_management/vehicle/creation`,
-    component: React.lazy(() => import("views/app-views/vehicle_management/vehicle/creation")),
-  },
+
   {
     key: "reports",
     path: `${APP_PREFIX_PATH}/report_management`,
@@ -137,6 +133,13 @@ export const protectedRoutes = [
     path: `${APP_PREFIX_PATH}/stock_management/device`,
     component: React.lazy(() =>
       import("views/app-views/stock_management/device")
+    ),
+  },
+  {
+    key: "vehicle_management.vehicle",
+    path: `${APP_PREFIX_PATH}/vehicle_management/vehicle`,
+    component: React.lazy(() =>
+      import("views/app-views/vehicle_management/vehicle")
     ),
   },
 ];

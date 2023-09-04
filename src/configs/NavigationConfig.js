@@ -68,7 +68,7 @@ const vehcileManagementNavTree = [
     submenu: [
       {
         key: "vehicle_creation",
-        path: `${APP_PREFIX_PATH}/vehicle_management/vehicle/creation`,
+        path: `${APP_PREFIX_PATH}/vehicle_management/vehicle`,
         title: "Vehicle Creation",
         breadcrumb: false,
         submenu: [],
@@ -169,6 +169,7 @@ const userManagementNavTree = [
     submenu: [],
   },
 ];
+
 // const stockManagementNavTree = [
 //   {
 //     key: "stockmanagement",
