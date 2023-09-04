@@ -5,11 +5,12 @@ import { PlusOutlined } from '@ant-design/icons';
 import FormItem from 'antd/es/form/FormItem';
 import moment from 'moment/moment';
 import api from 'configs/apiConfig';
+import { currentUser } from 'auth/FirebaseAuth';
 const { Option } = Select;
 const Device = () => {
     const [form] = Form.useForm();
     const [open, setOpen] = useState(false);
-   
+    const [currentRole,SetCurrentRole] = useState(localStorage.getItem("role")||"");
     const tableColumns = [
         {
           title: "S.No",
@@ -108,9 +109,9 @@ const Device = () => {
       };
   return (
     <div>
-
-      <Card title="Device List" >
-        <Form name="device_list_form" layout="horizontal">
+        
+      <Card title="Vehicle List" >
+        <Form name="vehicle_list_form" layout="horizontal">
             <Row gutter={6}>
                 <Col span={4}>
                     <FormItem name="admin_id" >

@@ -148,26 +148,7 @@ export default function Create() {
                       <Input />
                     </Form.Item>
                   </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    {" "}
-                    <Form.Item
-                      size="small"
-                      label="Mobile No"
-                      name="mobile_no"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please enter your mobile no",
-                        },
-                        {
-                          type: "text",
-                          message: "Please enter a valid mobile no",
-                        },
-                      ]}
-                    >
-                      <Input />
-                    </Form.Item>
-                  </Col>
+                  
                   <Col sm={12} md={12} lg={12}>
                     <Form.Item
                       size="small"
@@ -214,6 +195,26 @@ export default function Create() {
                     </Form.Item>
                   </Col>
                   <Col sm={12} md={12} lg={12}>
+                    {" "}
+                    <Form.Item
+                      size="small"
+                      label="Mobile No"
+                      name="mobile_no"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please enter your mobile no",
+                        },
+                        {
+                          type: "text",
+                          message: "Please enter a valid mobile no",
+                        },
+                      ]}
+                    >
+                      <Input />
+                    </Form.Item>
+                  </Col>
+                  <Col sm={12} md={12} lg={12}>
                     <Form.Item
                       size="small"
                       label="Role"
@@ -251,27 +252,6 @@ export default function Create() {
                       </Select>
                     </Form.Item>
                   </Col>
-                  <Col sm={24} md={24} lg={24}>
-                    <Form.Item
-                      size="small"
-                      label="Address"
-                      name="address"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please enter a Address",
-                        },
-                      ]}
-                    >
-                      <TextArea
-                        rows={4}
-                        placeholder="Please Enter Adress"
-                        maxLength={100}
-                      />
-                    </Form.Item>
-                  </Col>
-                </Row>
-                <Row align={"middle"}>
                   <Col sm={12} md={12} lg={12}>
                     <Form.Item
                       size="small"
@@ -308,7 +288,27 @@ export default function Create() {
                       </Select>
                     </Form.Item>
                   </Col>
+                  <Col sm={24} md={24} lg={24}>
+                    <Form.Item
+                      size="small"
+                      label="Address"
+                      name="address"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please enter a Address",
+                        },
+                      ]}
+                    >
+                      <TextArea
+                        rows={4}
+                        placeholder="Please Enter Adress"
+                        maxLength={100}
+                      />
+                    </Form.Item>
+                  </Col>
                 </Row>
+                
 
                 <Row align={"middle"}>
                   <Col span={12}>
