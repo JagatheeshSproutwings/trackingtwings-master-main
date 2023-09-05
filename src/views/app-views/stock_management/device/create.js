@@ -272,7 +272,7 @@ export default function Create() {
                     <Form.Item>
                       <Space wrap>
                         <Button type="primary" shape="round" htmlType="submit">
-                          Register
+                          Save
                         </Button>
                         <Button type="primary" shape="round">
                           Back

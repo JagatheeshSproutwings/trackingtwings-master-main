@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Row,
   Col,
@@ -8,17 +8,16 @@ import {
   Form,
   Drawer,
   Select,
-  Space,
-  Modal,
   Input,
   DatePicker,
 } from "antd";
-import Flex from "components/shared-components/Flex";
 import { PlusOutlined } from "@ant-design/icons";
 import FormItem from "antd/es/form/FormItem";
 import moment from "moment/moment";
 import api from "configs/apiConfig";
+
 const { Option } = Select;
+
 const Device = () => {
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
@@ -57,67 +56,8 @@ const Device = () => {
       dataIndex: "actions",
     },
   ];
-  //   const data = [
-  //     {
-  //       key: '1',
-  //       firstName: 'John',
-  //       lastName: 'Brown',
-  //       age: 32,
-  //       address: 'New York No. 1 Lake Park',
-  //       tags: ['nice', 'developer'],
-  //     },
-  //     {
-  //       key: '2',
-  //       firstName: 'Jim',
-  //       lastName: 'Green',
-  //       age: 42,
-  //       address: 'London No. 1 Lake Park',
-  //       tags: ['loser'],
-  //     },
-  //     {
-  //       key: '3',
-  //       firstName: 'Joe',
-  //       lastName: 'Black',
-  //       age: 32,
-  //       address: 'Sydney No. 1 Lake Park',
-  //       tags: ['cool', 'teacher'],
-  //     },
-  //   ];
+
   const dateFormat = "YYYY-MM-DD";
-  const device_list = {
-    s_no: 1,
-    vehicle_name: 1,
-    device_make: 1,
-    device_model: 1,
-    created_at: 1,
-    point_recharge: 1,
-    customer_recharge: 1,
-    actions: "actions",
-  };
-  const onFinish = async (values) => {
-    console.log(values);
-  };
-  const vehcihle_type_list = async () => {
-    const types = await api
-      .get("vehicle_type")
-      .then((res) => {
-        return res;
-      })
-      .catch((err) => {
-        return err;
-      });
-    try {
-      console.log(types);
-    } catch (error) {}
-  };
-  const handleOk = () => {
-    setOpen(false);
-    form.submit();
-  };
-  const handleCancel = () => {
-    console.log("Clicked cancel button");
-    setOpen(false);
-  };
   const showDrawer = () => {
     setOpen(true);
   };
@@ -126,10 +66,6 @@ const Device = () => {
   };
   return (
     <div>
-      <Card>
-        <Button>Add Sim</Button>
-      </Card>
-
       <Card title="Device List">
         <Form name="device_list_form" layout="horizontal">
           <Row gutter={6}>
@@ -188,8 +124,8 @@ const Device = () => {
           open={open}
           title="Create a new Device"
         >
-          <span>Licence Details:</span>
-          <Form form={form} name="device_form" onFinish={onFinish}>
+          <h5>Licence Details:</h5>
+          <Form form={form} name="device_form">
             <Row gutter={6}>
               <Col sm={12} md={24} lg={24} xxl={24}>
                 <Row gutter={6}>
@@ -223,7 +159,7 @@ const Device = () => {
                     </FormItem>
                   </Col>
                 </Row>
-                <span>Device Details :</span>
+                <h5>Device Details :</h5>
                 <Row gutter={6}>
                   <Col sm={3} md={6} lg={6} xxl={6}>
                     <FormItem
@@ -260,16 +196,19 @@ const Device = () => {
                     <FormItem
                       name="device_imei"
                       rules={[
-                        { required: true, message: "Please Enter Device IMEI" },
+                        {
+                          required: true,
+                          message: "Please Select Device IMEI",
+                        },
                       ]}
                     >
-                      <Input
-                        type="text"
-                        name="device_imei"
-                        placeholder="Device IMEI"
-                      ></Input>
+                      <Select placeholder="Select Device IMEI">
+                        <Option value="1">8001</Option>
+                        <Option value="2">8002</Option>
+                      </Select>
                     </FormItem>
                   </Col>
+
                   <Col sm={3} md={6} lg={6} xxl={6}>
                     <FormItem
                       name="device_uid"
@@ -305,7 +244,7 @@ const Device = () => {
                     </FormItem>
                   </Col>
                 </Row>
-                <span>SIM Details :</span>
+                <h5>SIM Details :</h5>
                 <Row gutter={6}>
                   <Col sm={3} md={6} lg={6} xxl={6}>
                     <FormItem
@@ -368,7 +307,7 @@ const Device = () => {
                     </FormItem>
                   </Col>
                 </Row>
-                <span>Vehicle Details :</span>
+                <h5>Vehicle Details :</h5>
                 <Row gutter={6}>
                   <Col sm={3} md={6} lg={6} xxl={6}>
                     <FormItem

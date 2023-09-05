@@ -114,8 +114,8 @@ const Assign = ({ parentToChild }) => {
 
   const onFinish = async (values) => {
     console.log(values["type"]);
-    if (values["type"] == "Sim") {
-      console.log(values["type"]);
+    values["id"] = parentToChild[0];
+    if (parentToChild[1] == "Sim") {
       const form_data = await api
         .post("sim_transfer", values)
         .then((res) => {
@@ -124,8 +124,8 @@ const Assign = ({ parentToChild }) => {
         .catch((err) => {
           return [];
         });
-    } else if (values["type"] == "Device") {
-      console.log(values["type"]);
+    } else if (parentToChild[1] == "Device") {
+      values["id"] = parentToChild[0];
       const form_data = await api
         .post("device_transfer", values)
         .then((res) => {
@@ -138,38 +138,12 @@ const Assign = ({ parentToChild }) => {
   };
 
   return (
-    <Row gutter={18}>
+    <Row gutter={6}>
       <Col>
-        <Card>
+        <Card title="Assign Form">
           <Flex>
-            <Form layout="vertical" size="small" onFinish={onFinish}>
-              <Row>
-                <Form.Item
-                  size="small"
-                  type="text"
-                  name="id"
-                  initialValue={parentToChild[0]}
-                >
-                  <Input style={{ display: "none" }}></Input>
-                </Form.Item>
-                <Form.Item
-                  type="text"
-                  name="type"
-                  initialValue={parentToChild[1]}
-                >
-                  <Input style={{ border: "none" }} readOnly></Input>
-                </Form.Item>
-              </Row>
-              <Row gutter={[8, 8]}>
-                <Col sm={12} md={12} lg={12}>
-                  <Form.Item
-                    label="IMEI No"
-                    name="imei_no"
-                    initialValue={parentToChild[2]}
-                  >
-                    <Input readOnly />
-                  </Form.Item>
-                </Col>
+            <div className="container">
+              <Form layout="vertical" size="small" onFinish={onFinish}>
                 <Col sm={12} md={12} lg={12}>
                   {currentRole == 1 && (
                     <Form.Item label="Admin" name="admin_id">
@@ -260,11 +234,11 @@ const Assign = ({ parentToChild }) => {
                     </Form.Item>
                   )}
                 </Col>
-              </Row>
-              <Button type="primary" htmlType="submit">
-                Register
-              </Button>
-            </Form>
+                <Button type="primary" htmlType="submit">
+                  Assign
+                </Button>
+              </Form>
+            </div>
           </Flex>
         </Card>
       </Col>

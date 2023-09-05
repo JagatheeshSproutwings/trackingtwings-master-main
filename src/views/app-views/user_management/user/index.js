@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button, Card, Row, Col, Input } from "antd";
 import { PlusOutlined, SearchOutlined, EditOutlined } from "@ant-design/icons";
-import utils from "utils";
 import Flex from "components/shared-components/Flex";
 import api from "configs/apiConfig";
 
 import Create from "./create";
 import Edit from "./edit";
+import Role from "./role";
 
 export const User = () => {
   const [userList, setUserList] = useState([]);
@@ -165,7 +165,6 @@ export const User = () => {
                     // onChange={(e) => onSearch(e)}
                   />
                 </div>
-
                 <div className="mb-3"></div>
               </Flex>
               <div className="mb-3">
@@ -196,7 +195,7 @@ export const User = () => {
           </Card>
         </Col>
         <Col sm={24} md={10} lg={10}>
-          {isCreateVisible && <Create />}
+          {isCreateVisible && <Role />}
           {isEditVisible && <Edit parentToChild={editdata} />}
         </Col>
       </Row>

@@ -93,8 +93,7 @@ export default function Edit({ parentToChild }) {
   return (
     <Row gutter={6}>
       <Col>
-        <Card title="New Sim">
-          {parentToChild}
+        <Card title="Edit Sim">
           <Flex>
             <div className="container">
               <Form
@@ -229,7 +228,7 @@ export default function Edit({ parentToChild }) {
                     <Form.Item>
                       <Space wrap>
                         <Button type="primary" shape="round" htmlType="submit">
-                          Register
+                          Update
                         </Button>
                         <Button type="primary" shape="round">
                           Back

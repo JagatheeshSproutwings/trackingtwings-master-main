@@ -47,69 +47,60 @@ import { APP_PREFIX_PATH } from "configs/AppConfig";
 //     ],
 //   },
 // ];
-const dashBoardNavTree = [
-  {
-    key: "dashboard",
-    path: `${APP_PREFIX_PATH}/dashboards/`,
-    title: "sidenav.dashboard",
-    icon: DashboardOutlined,
-    breadcrumb: false,
-    submenu: [],
-  },
-];
-const vehcileManagementNavTree = [
-  {
-    key: "vehicleManagement",
-    path: `${APP_PREFIX_PATH}/vehicle_management`,
-    title: "Vehicle Management",
-    icon: AppstoreOutlined,
-    breadcrumb: false,
 
-    submenu: [
-      {
-        key: "vehicle_creation",
-        path: `${APP_PREFIX_PATH}/vehicle_management/vehicle`,
-        title: "Vehicle Creation",
-        breadcrumb: false,
-        submenu: [],
-      },
-      {
-        key: "vehicle_documents",
-        path: `${APP_PREFIX_PATH}/vehicle_management/documents`,
-        title: "Documents",
-        breadcrumb: false,
-        submenu: [],
-      },
-      {
-        key: "vehicle_settings",
-        path: `${APP_PREFIX_PATH}/vehicle_management/settings`,
-        title: "Settings",
-        breadcrumb: false,
-        submenu: [],
-      },
-    ],
-  },
-];
+// const vehcileManagementNavTree = [
+//   {
+//     key: "vehicleManagement",
+//     path: `${APP_PREFIX_PATH}/vehicle_management`,
+//     title: "Vehicle Management",
+//     icon: AppstoreOutlined,
+//     breadcrumb: false,
 
-const fuelManagementNavTree = [
-  {
-    key: "fuel_management",
-    path: `${APP_PREFIX_PATH}/fuel_management`,
-    title: "Fuel Management",
-    icon: DotChartOutlined,
-    breadcrumb: false,
+//     submenu: [
+//       {
+//         key: "vehicle_creation",
+//         path: `${APP_PREFIX_PATH}/vehicle_management/vehicle`,
+//         title: "Vehicle Creation",
+//         breadcrumb: false,
+//         submenu: [],
+//       },
+//       {
+//         key: "vehicle_documents",
+//         path: `${APP_PREFIX_PATH}/vehicle_management/documents`,
+//         title: "Documents",
+//         breadcrumb: false,
+//         submenu: [],
+//       },
+//       {
+//         key: "vehicle_settings",
+//         path: `${APP_PREFIX_PATH}/vehicle_management/settings`,
+//         title: "Settings",
+//         breadcrumb: false,
+//         submenu: [],
+//       },
+//     ],
+//   },
+// ];
 
-    submenu: [
-      {
-        key: "configuration",
-        path: `${APP_PREFIX_PATH}/fuel_management/configuration`,
-        title: "Fuel Configuration",
-        breadcrumb: false,
-        submenu: [],
-      },
-    ],
-  },
-];
+// const fuelManagementNavTree = [
+//   {
+//     key: "fuel_management",
+//     path: `${APP_PREFIX_PATH}/fuel_management`,
+//     title: "Fuel Management",
+//     icon: DotChartOutlined,
+//     breadcrumb: false,
+
+//     submenu: [
+//       {
+//         key: "configuration",
+//         path: `${APP_PREFIX_PATH}/fuel_management/configuration`,
+//         title: "Fuel Configuration",
+//         breadcrumb: false,
+//         submenu: [],
+//       },
+//     ],
+//   },
+// ];
 
 // const userManagementNavTree = [
 //   {
@@ -158,6 +149,17 @@ const fuelManagementNavTree = [
 //     ],
 //   },
 // ];
+
+const dashBoardNavTree = [
+  {
+    key: "dashboard",
+    path: `${APP_PREFIX_PATH}/dashboards/`,
+    title: "sidenav.dashboard",
+    icon: DashboardOutlined,
+    breadcrumb: false,
+    submenu: [],
+  },
+];
 const userManagementNavTree = [
   {
     key: "usermanagement",
@@ -169,7 +171,6 @@ const userManagementNavTree = [
     submenu: [],
   },
 ];
-
 const stockManagementNavTree = [
   {
     key: "stockmanagement",
@@ -193,23 +194,15 @@ const stockManagementNavTree = [
         breadcrumb: false,
         submenu: [],
       },
-      {
-        key: "stock_management.demo",
-        path: `${APP_PREFIX_PATH}/stock_management/demo`,
-        title: "Demo",
-        breadcrumb: false,
-        submenu: [],
-      },
     ],
   },
 ];
-
-const reportNavTree = [
+const pointNavTree = [
   {
-    key: "reports",
-    path: `${APP_PREFIX_PATH}/report_management`,
-    title: "Reports",
-    icon: FileDoneOutlined,
+    key: "points",
+    path: `${APP_PREFIX_PATH}/points`,
+    title: "Points",
+    icon: SettingOutlined,
     breadcrumb: false,
     isGroupTitle: false,
     submenu: [],
@@ -226,6 +219,29 @@ const deviceNavTree = [
     submenu: [],
   },
 ];
+const settingNavTree = [
+  {
+    key: "settings",
+    path: `${APP_PREFIX_PATH}/settings`,
+    title: "Settings",
+    icon: SettingOutlined,
+    breadcrumb: false,
+    isGroupTitle: false,
+    submenu: [],
+  },
+];
+const reportNavTree = [
+  {
+    key: "reports",
+    path: `${APP_PREFIX_PATH}/report_management`,
+    title: "Reports",
+    icon: FileDoneOutlined,
+    breadcrumb: false,
+    isGroupTitle: false,
+    submenu: [],
+  },
+];
+
 // const reportNavTree = [
 //   {
 //     key: "reports",
@@ -336,36 +352,15 @@ const deviceNavTree = [
 //     ],
 //   },
 // ];
-const pointNavTree = [
-  {
-    key: "points",
-    path: `${APP_PREFIX_PATH}/points`,
-    title: "Points",
-    icon: SettingOutlined,
-    breadcrumb: false,
-    isGroupTitle: false,
-    submenu: [],
-  },
-];
-const settingNavTree = [
-  {
-    key: "settings",
-    path: `${APP_PREFIX_PATH}/settings`,
-    title: "Settings",
-    icon: SettingOutlined,
-    breadcrumb: false,
-    isGroupTitle: false,
-    submenu: [],
-  },
-];
 
 const navigationConfig = [
   ...dashBoardNavTree,
   ...userManagementNavTree,
-  ...reportNavTree,
+  ...stockManagementNavTree,
+  ...pointNavTree,
   ...deviceNavTree,
   ...settingNavTree,
-  ...stockManagementNavTree,
+  ...reportNavTree,
 ];
 
 export default navigationConfig;
