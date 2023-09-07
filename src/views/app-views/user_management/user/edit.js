@@ -42,7 +42,8 @@ export default function Edit({ parentToChild }) {
     try {
       await api.post("user/update", values);
       // window.location.reload(true);
-      setIsSubmitted(true);
+      // setIsSubmitted(true);
+      alert("User Updated Successfully");
     } catch (error) {
       if (error.response && error.response.status === 403) {
         const errorData = error.response.data;
@@ -170,7 +171,7 @@ export default function Edit({ parentToChild }) {
                       <Input />
                     </Form.Item>
                   </Col>
-                  <Col sm={12} md={12} lg={12}>
+                  {/* <Col sm={12} md={12} lg={12}>
                     <Form.Item
                       size="small"
                       label="Password"
@@ -216,7 +217,7 @@ export default function Edit({ parentToChild }) {
                     >
                       <Input.Password />
                     </Form.Item>
-                  </Col>
+                  </Col> */}
                   <Col sm={12} md={12} lg={12}>
                     <Form.Item
                       size="small"
@@ -277,12 +278,16 @@ export default function Edit({ parentToChild }) {
                 </Row>
                 <Row align={"middle"}>
                   <Col sm={12} md={12} lg={12}>
-                    <Form.Item name="id" initialValue={parentToChild[0]}>
+                    <Form.Item hidden name="id" initialValue={parentToChild[0]}>
                       <Input></Input>
                     </Form.Item>
                   </Col>
                   <Col sm={12} md={12} lg={12}>
-                    <Form.Item name="role_id" initialValue={parentToChild[5]}>
+                    <Form.Item
+                      hidden
+                      name="role_id"
+                      initialValue={parentToChild[5]}
+                    >
                       <Input></Input>
                     </Form.Item>
                   </Col>

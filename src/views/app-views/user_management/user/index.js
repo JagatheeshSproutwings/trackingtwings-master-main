@@ -3,14 +3,15 @@ import { Table, Button, Card, Row, Col, Input } from "antd";
 import { PlusOutlined, SearchOutlined, EditOutlined } from "@ant-design/icons";
 import Flex from "components/shared-components/Flex";
 import api from "configs/apiConfig";
+import utils from "utils";
 
-import Create from "./create";
 import Edit from "./edit";
 import Role from "./role";
 
 export const User = () => {
   const [userList, setUserList] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]);
   const [isCreateVisible, setIsCreateVisible] = useState(false);
   const [isEditVisible, setIsEditVisible] = useState(false);
   const [editdata, setEditData] = useState("");
@@ -133,16 +134,16 @@ export const User = () => {
     },
   ];
 
-  // const onSearch = (e) => {
-  //   const value = e.currentTarget.value;
-  //   const searchArray = e.currentTarget.value ? userList : OrderListData;
-  //   const data = utils.wildCardSearch(searchArray, value);
-  //   setUserList(data);
-  //   setSelectedRowKeys([]);
-  // };
-
+  const onSearch = (e) => {
+    const value = e.currentTarget.value;
+    const searchArray = e.currentTarget.value ? userList : [];
+    const data = utils.wildCardSearch(searchArray, value);
+    setUserList(data);
+    setSelectedRowKeys([]);
+  };
   const rowSelection = {
     onChange: (key, rows) => {
+      setSelectedRows(rows);
       setSelectedRowKeys(key);
     },
   };
@@ -162,7 +163,7 @@ export const User = () => {
                   <Input
                     placeholder="Search"
                     prefix={<SearchOutlined />}
-                    // onChange={(e) => onSearch(e)}
+                    onChange={(e) => onSearch(e)}
                   />
                 </div>
                 <div className="mb-3"></div>

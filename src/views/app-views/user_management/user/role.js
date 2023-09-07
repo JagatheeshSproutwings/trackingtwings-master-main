@@ -9,6 +9,32 @@ const { Option } = Select;
 
 const Report = () => {
   const [form] = Form.useForm();
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  function handlePassword(event) {
+    let new_pass = event.target.value;
+    setPassword(new_pass);
+
+    // Regular expressions to validate password
+    var lowerCase = /[a-z]/g;
+    var upperCase = /[A-Z]/g;
+    var numbers = /[0-9]/g;
+    var symbols = /[!@#$%^&*()_+{}\[\]:;<>,.?~\\-]/g;
+
+    if (!new_pass.match(lowerCase)) {
+      setErrorMessage("Should contain lowercase letters!");
+    } else if (!new_pass.match(upperCase)) {
+      setErrorMessage("Should contain uppercase letters!");
+    } else if (!new_pass.match(numbers)) {
+      setErrorMessage("Should contain numbers!");
+    } else if (!new_pass.match(symbols)) {
+      setErrorMessage("Should contain at least one symbol!");
+    } else if (new_pass.length < 10) {
+      setErrorMessage("length should be more than 10.");
+    } else {
+      setErrorMessage("Password is strong!");
+    }
+  }
 
   const [adminList, SetAdminList] = useState([]);
   const [distributorList, SetDistributorList] = useState([]);
@@ -222,7 +248,7 @@ const Report = () => {
     <>
       <Row gutter={6}>
         <Col>
-          <Card>
+          <Card title="New User">
             <Flex>
               <div className="container">
                 <Form
@@ -464,23 +490,23 @@ const Report = () => {
                     </Col>
                     <Col sm={12} md={12} lg={12}>
                       <Form.Item
+                        value={password}
+                        onChange={handlePassword}
                         size="small"
-                        label="Password"
+                        label="Pasword"
                         name="password"
                         rules={[
                           {
                             required: true,
                             message: "Please enter a password",
                           },
-                          {
-                            min: 6,
-                            message:
-                              "Password must be at least 6 characters long",
-                          },
                         ]}
                       >
                         <Input.Password />
                       </Form.Item>
+                      <div style={{ color: "red" }} size="small">
+                        {errorMessage}
+                      </div>
                     </Col>
                     <Col sm={12} md={12} lg={12}>
                       <Form.Item
