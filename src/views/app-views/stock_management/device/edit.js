@@ -286,7 +286,7 @@ export default function Edit({ parentToChild }) {
                     <Form.Item>
                       <Space wrap>
                         <Button type="primary" shape="round" htmlType="submit">
-                          Register
+                          Update
                         </Button>
                         <Button type="primary" shape="round">
                           Back

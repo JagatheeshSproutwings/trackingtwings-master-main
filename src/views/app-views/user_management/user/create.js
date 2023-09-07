@@ -148,7 +148,6 @@ export default function Create() {
                       <Input />
                     </Form.Item>
                   </Col>
-
                   <Col sm={12} md={12} lg={12}>
                     <Form.Item
                       size="small"
@@ -314,7 +313,7 @@ export default function Create() {
                     <Form.Item>
                       <Space wrap>
                         <Button type="primary" shape="round" htmlType="submit">
-                          Register
+                          Save
                         </Button>
                         <Button type="primary" shape="round">
                           Back

@@ -5,13 +5,17 @@ import Flex from "components/shared-components/Flex";
 import api from "configs/apiConfig";
 import Create from "./create";
 import Edit from "./edit";
+import Assign from "../demo/index";
 
 export const Device = () => {
   const [deviceList, setDeviceList] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isCreateVisible, setIsCreateVisible] = useState(false);
   const [isEditVisible, setIsEditVisible] = useState(false);
+  const [isAssignVisible, setIsAssignVisible] = useState(false);
+
   const [editdata, setEditData] = useState("");
+  const [assigndata, setAssignData] = useState("");
 
   const handleCreateCard = () => {
     setIsCreateVisible(true);
@@ -20,6 +24,11 @@ export const Device = () => {
   const handleEditCard = () => {
     setIsCreateVisible(false);
     setIsEditVisible(true);
+  };
+  const handleAssignCard = () => {
+    setIsCreateVisible(false);
+    setIsEditVisible(false);
+    setIsAssignVisible(true);
   };
 
   async function loadDevices(setDeviceList) {
@@ -78,6 +87,18 @@ export const Device = () => {
     setEditData(data);
   }
 
+  function handleAssignClick(record) {
+    handleAssignCard();
+
+    const id = record.id;
+    const type = "Device";
+    const device_imei_no = record.device_imei_no;
+
+    const data = [id, type, device_imei_no];
+
+    setAssignData(data);
+  }
+
   useEffect(() => {
     loadDevices(setDeviceList);
   }, []);
@@ -108,6 +129,18 @@ export const Device = () => {
           onClick={() => handleEditClick(record)}
         >
           <EditOutlined />
+        </span>
+      ),
+    },
+    {
+      title: "Assign",
+      dataIndex: "edit",
+      render: (_, record) => (
+        <span
+          style={{ cursor: "pointer" }}
+          onClick={() => handleAssignClick(record)} // Replace handleEditClick with your custom action function
+        >
+          <EditOutlined /> {/* Replace EditOutlined with your custom icon */}
         </span>
       ),
     },
@@ -178,6 +211,7 @@ export const Device = () => {
         <Col sm={24} md={10} lg={10}>
           {isCreateVisible && <Create />}
           {isEditVisible && <Edit parentToChild={editdata} />}
+          {isAssignVisible && <Assign parentToChild={assigndata} />}
         </Col>
       </Row>
     </>
