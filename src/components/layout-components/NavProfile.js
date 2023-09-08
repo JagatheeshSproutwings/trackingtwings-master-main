@@ -79,7 +79,7 @@ const items = [
 
 export const NavProfile = ({mode}) => {
 	const token = useSelector(state => state.auth);
-	console.log("Navbar"+token);
+	
 	return (
 		
 		<Dropdown placement="bottomRight" menu={{items}} trigger={["click"]}>
