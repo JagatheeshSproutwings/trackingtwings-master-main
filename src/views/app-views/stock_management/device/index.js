@@ -20,6 +20,7 @@ export const Device = () => {
   const handleCreateCard = () => {
     setIsCreateVisible(true);
     setIsEditVisible(false);
+    setIsAssignVisible(false);
   };
   const handleEditCard = () => {
     setIsCreateVisible(false);
@@ -58,33 +59,23 @@ export const Device = () => {
   }
 
   function handleEditClick(record) {
-    handleEditCard();
+    setEditData([
+      record.id,
+      record.supplier_id,
+      record.supplier_name,
+      record.device_make_id,
+      record.device_make,
+      record.device_model_id,
+      record.device_model,
+      record.device_imei_no,
+      record.ccid,
+      record.uid,
+    ]);
 
-    const id = record.id;
-    const supplier_id = record.supplier_id;
-    const supplier_name = record.supplier_name;
-    const device_make_id = record.device_make_id;
-    const device_model_id = record.device_model_id;
-    const device_make = record.device_make;
-    const device_model = record.device_model;
-    const device_imei_no = record.device_imei_no;
-    const ccid = record.ccid;
-    const uid = record.uid;
-
-    const data = [
-      id,
-      supplier_id,
-      supplier_name,
-      device_make_id,
-      device_make,
-      device_model_id,
-      device_model,
-      device_imei_no,
-      ccid,
-      uid,
-    ];
-
-    setEditData(data);
+    // Set isEditVisible to true
+    setIsEditVisible(true);
+    setIsCreateVisible(false);
+    setIsAssignVisible(false);
   }
 
   function handleAssignClick(record) {
@@ -210,8 +201,8 @@ export const Device = () => {
         </Col>
         <Col sm={24} md={10} lg={10}>
           {isCreateVisible && <Create />}
-          {isEditVisible && <Edit parentToChild={editdata} />}
           {isAssignVisible && <Assign parentToChild={assigndata} />}
+          {isEditVisible && <Edit key={editdata[0]} parentToChild={editdata} />}
         </Col>
       </Row>
     </>

@@ -10,6 +10,7 @@ import Create from "./create";
 
 export const User = () => {
   const [userList, setUserList] = useState([]);
+
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [isCreateVisible, setIsCreateVisible] = useState(false);
@@ -36,7 +37,7 @@ export const User = () => {
   };
   const role = getRole();
 
-  async function loadUsers(setUserList) {
+  const loadUsers = async (setUserList) => {
     const data = { user_id: user, role_id: role };
     try {
       const response = await api.post("user_list", data);
@@ -63,36 +64,26 @@ export const User = () => {
     } catch (error) {
       console.error("Error fetching users:", error);
     }
-  }
+  };
 
   function handleEditClick(record) {
-    handleEditCard();
+    setEditData([
+      record.id,
+      record.name,
+      record.email,
+      record.mobile_no,
+      record.password,
+      record.role_id,
+      record.role,
+      record.country_id,
+      record.country,
+      record.address,
+    ]);
 
-    const id = record.id;
-    const name = record.name;
-    const email = record.email;
-    const mobile_no = record.mobile_no;
-    const password = record.password;
-    const role = record.role;
-    const role_id = record.role_id;
-    const country = record.country;
-    const country_id = record.country_id;
-    const address = record.address;
-
-    const data = [
-      id,
-      name,
-      email,
-      mobile_no,
-      password,
-      role_id,
-      role,
-      country_id,
-      country,
-      address,
-    ];
-
-    setEditData(data);
+    // Set isEditVisible to true
+    setIsEditVisible(true);
+    setIsCreateVisible(false);
+    loadUsers(setUserList);
   }
 
   useEffect(() => {
@@ -197,7 +188,7 @@ export const User = () => {
         </Col>
         <Col sm={24} md={10} lg={10}>
           {isCreateVisible && <Create />}
-          {isEditVisible && <Edit parentToChild={editdata} />}
+          {isEditVisible && <Edit key={editdata[0]} parentToChild={editdata} />}
         </Col>
       </Row>
     </>

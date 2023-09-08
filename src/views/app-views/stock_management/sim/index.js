@@ -62,29 +62,20 @@ export const Sim = () => {
   }
 
   function handleEditClick(record) {
-    handleEditCard();
+    setEditData([
+      record.id,
+      record.network_id,
+      record.network_provider_name,
+      record.sim_imei_no,
+      record.sim_mob_no2,
+      record.valid_form,
+      record.valid_to,
+    ]);
 
-    const id = record.id;
-    const network_id = record.network_id;
-    const network_provider_name = record.network_provider_name;
-    const sim_imei_no = record.sim_imei_no;
-    const sim_mob_no1 = record.sim_mob_no1;
-    const sim_mob_no2 = record.sim_mob_no2;
-    const valid_form = record.valid_form;
-    const valid_to = record.valid_to;
-
-    const data = [
-      id,
-      network_id,
-      network_provider_name,
-      sim_imei_no,
-      sim_mob_no1,
-      sim_mob_no2,
-      valid_form,
-      valid_to,
-    ];
-
-    setEditData(data);
+    // Set isEditVisible to true
+    setIsEditVisible(true);
+    setIsCreateVisible(false);
+    setIsAssignVisible(false);
   }
 
   function handleAssignClick(record) {
@@ -210,7 +201,7 @@ export const Sim = () => {
         </Col>
         <Col sm={24} md={10} lg={10}>
           {isCreateVisible && <Create />}
-          {isEditVisible && <Edit parentToChild={editdata} />}
+          {isEditVisible && <Edit key={editdata[0]} parentToChild={editdata} />}
           {isAssignVisible && <Assign parentToChild={assigndata} />}
         </Col>
       </Row>
