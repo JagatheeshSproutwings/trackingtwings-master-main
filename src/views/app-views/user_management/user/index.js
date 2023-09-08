@@ -6,7 +6,7 @@ import api from "configs/apiConfig";
 import utils from "utils";
 
 import Edit from "./edit";
-import Role from "./role";
+import Create from "./create";
 
 export const User = () => {
   const [userList, setUserList] = useState([]);
@@ -196,7 +196,7 @@ export const User = () => {
           </Card>
         </Col>
         <Col sm={24} md={10} lg={10}>
-          {isCreateVisible && <Role />}
+          {isCreateVisible && <Create />}
           {isEditVisible && <Edit parentToChild={editdata} />}
         </Col>
       </Row>

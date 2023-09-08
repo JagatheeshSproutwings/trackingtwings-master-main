@@ -282,7 +282,6 @@ const Device = () => {
     try {
       const device_data = await api.get(`device/${value}`);
       const deviceUid = device_data?.data?.data?.uid;
-      alert(deviceUid);
       const device_make_id = device_data?.data?.data?.device_make_id;
       const device_model_id = device_data?.data?.data?.device_model_id;
       const device_make = device_data?.data?.data?.device_make;
@@ -295,7 +294,6 @@ const Device = () => {
         SetMakeData(device_make);
         SetModelData(device_model);
       } else {
-        alert("UID not found in the response data");
       }
     } catch (error) {
       console.error("Error fetching device data:", error);
@@ -310,7 +308,6 @@ const Device = () => {
       if (sim_imei_no) {
         SetSimData(sim_imei_no);
       } else {
-        alert("UID not found in the response data");
       }
     } catch (error) {
       console.error("Error fetching device data:", error);
@@ -326,6 +323,12 @@ const Device = () => {
         .split("T")[0];
       await api.post("vehicle", values);
       alert("Vehicle Saved Successfully");
+      form.resetFields();
+      SetSimData("");
+      SetDeviceData("");
+      SetMakeData("");
+      SetModelData("");
+      onClose();
     } catch (error) {
       if (error.response && error.response.status === 403) {
         const errorData = error.response.data;
@@ -393,10 +396,44 @@ const Device = () => {
       console.error("Error fetching users:", error);
     }
   }
+  async function loadsims(SetSimList) {
+    try {
+      SetSimList([]);
+
+      const user_data = { user_id: currentUser };
+      const sim_list = await api.post("sim_stock_list", user_data);
+
+      if (sim_list.data && Array.isArray(sim_list.data.data)) {
+        SetSimList(sim_list?.data.data);
+      } else {
+        console.error("API request was not successful");
+      }
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  }
+  async function loaddevices(SetDeviceList) {
+    try {
+      SetDeviceList([]);
+
+      const user_data = { user_id: currentUser };
+      const device_list = await api.post("device_stock_list", user_data);
+
+      if (device_list.data && Array.isArray(device_list.data.data)) {
+        SetDeviceList(device_list?.data.data);
+      } else {
+        console.error("API request was not successful");
+      }
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  }
 
   useEffect(() => {
     loadVehicles(setVehicleList);
     loadPlans(SetPlanList);
+    loadsims(SetSimList);
+    loaddevices(SetDeviceList);
   }, []);
 
   async function loadPlans(SetPlanList) {
@@ -427,7 +464,7 @@ const Device = () => {
         <Row>
           <Col span={4}>
             <Button type="primary" onClick={showDrawer} icon={<PlusOutlined />}>
-              Add
+              Add Vehicle
             </Button>
           </Col>
         </Row>
@@ -461,7 +498,13 @@ const Device = () => {
               {currentRole == 1 && (
                 <Col sm={2} md={4} lg={4} xxl={4}>
                   <Form.Item name="admin_id">
-                    <Select onChange={AdminChange} placeholder="Select Admin">
+                    <Select
+                      showSearch
+                      allowClear
+                      optionFilterProp="children"
+                      onChange={AdminChange}
+                      placeholder="Select Admin"
+                    >
                       {Array.isArray(adminList) ? (
                         adminList.map((admin) => (
                           <Select.Option
@@ -483,6 +526,9 @@ const Device = () => {
                 <Col sm={2} md={4} lg={4} xxl={4}>
                   <Form.Item name="distributor_id">
                     <Select
+                      showSearch
+                      allowClear
+                      optionFilterProp="children"
                       onChange={DistributorChange}
                       placeholder="Select Distributor"
                     >
@@ -506,7 +552,13 @@ const Device = () => {
               {(currentRole == 1 || currentRole == 2 || currentRole == 3) && (
                 <Col sm={2} md={4} lg={4} xxl={4}>
                   <Form.Item name="dealer_id">
-                    <Select onChange={DealerChange} placeholder="Select Dealer">
+                    <Select
+                      showSearch
+                      allowClear
+                      optionFilterProp="children"
+                      onChange={DealerChange}
+                      placeholder="Select Dealer"
+                    >
                       {Array.isArray(dealerList) ? (
                         dealerList.map((dealer) => (
                           <Option
@@ -531,6 +583,9 @@ const Device = () => {
                 <Col sm={2} md={4} lg={4} xxl={4}>
                   <Form.Item name="subdealer_id">
                     <Select
+                      showSearch
+                      allowClear
+                      optionFilterProp="children"
                       onChange={SubDealerChange}
                       placeholder="Select SubDealer"
                     >
@@ -568,6 +623,9 @@ const Device = () => {
                     ]}
                   >
                     <Select
+                      showSearch
+                      allowClear
+                      optionFilterProp="children"
                       onChange={CustomerChange}
                       placeholder="Select Client"
                     >
@@ -824,7 +882,7 @@ const Device = () => {
             <Row>
               <Form.Item>
                 <Button type="primary" htmlType="submit">
-                  Submit
+                  Save
                 </Button>
               </Form.Item>
             </Row>

@@ -18,13 +18,18 @@ import moment from "moment";
 const { Option } = Select;
 
 export default function Edit({ parentToChild }) {
+  const [form] = Form.useForm();
+
   const [selectedSupplierId, setselectedSupplierId] = useState();
   const [supplierOptions, setSupplierOptions] = useState([]);
   const [selectedMakeId, setselectedMakeId] = useState();
   const [makeOptions, setMakeOptions] = useState([]);
   const [selectedModelId, setselectedModelId] = useState();
   const [modelOptions, setModelOptions] = useState([]);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isComponentVisible, setIsComponentVisible] = useState(true);
+  const toggleComponentVisibility = () => {
+    setIsComponentVisible(!isComponentVisible);
+  };
 
   const handleSupplierIdChange = (roleID) => {
     setselectedSupplierId(roleID);
@@ -58,7 +63,9 @@ export default function Edit({ parentToChild }) {
 
     try {
       await api.post("device/update", data);
-      setIsSubmitted(true);
+      form.resetFields();
+      alert("Sim Updated Successfully");
+      toggleComponentVisibility();
     } catch (error) {
       if (error.response && error.response.status === 403) {
         const errorData = error.response.data;
@@ -116,208 +123,206 @@ export default function Edit({ parentToChild }) {
 
   return (
     <Row gutter={6}>
-      <Col>
-        <Card title="Edit Device">
-          <Flex>
-            <div className="container">
-              <Form
-                size="small"
-                name="registrationForm"
-                onFinish={onFinish}
-                layout="vertical"
-              >
-                <Row gutter={[8, 8]}>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      initialValue={parentToChild[1]}
-                      size="small"
-                      label="Supplier"
-                      name="supplier_id"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please Select a Supplier",
-                        },
-                      ]}
-                    >
-                      <Select
-                        showSearch
-                        placeholder="Select Supplier"
-                        optionFilterProp="children"
-                        onChange={handleSupplierIdChange}
-                        value={selectedSupplierId}
-                        filterOption={(input, option) =>
-                          option.children
-                            .toLowerCase()
-                            .indexOf(input.toLowerCase()) >= 0
-                        }
+      {isComponentVisible && (
+        <Col>
+          <Card title="Edit Device">
+            <Flex>
+              <div className="container">
+                <Form
+                  size="small"
+                  name="registrationForm"
+                  onFinish={onFinish}
+                  layout="vertical"
+                >
+                  <Row gutter={[8, 8]}>
+                    <Col sm={12} md={12} lg={12}>
+                      <Form.Item
+                        initialValue={parentToChild[1]}
+                        size="small"
+                        label="Supplier"
+                        name="supplier_id"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please Select a Supplier",
+                          },
+                        ]}
                       >
-                        {Array.isArray(supplierOptions) ? (
-                          supplierOptions.map((supplier) => (
-                            <Option key={supplier.id} value={supplier.id}>
-                              {supplier.supplier_name}
+                        <Select
+                          showSearch
+                          placeholder="Select Supplier"
+                          optionFilterProp="children"
+                          onChange={handleSupplierIdChange}
+                          value={selectedSupplierId}
+                          filterOption={(input, option) =>
+                            option.children
+                              .toLowerCase()
+                              .indexOf(input.toLowerCase()) >= 0
+                          }
+                        >
+                          {Array.isArray(supplierOptions) ? (
+                            supplierOptions.map((supplier) => (
+                              <Option key={supplier.id} value={supplier.id}>
+                                {supplier.supplier_name}
+                              </Option>
+                            ))
+                          ) : (
+                            <Option value="Loading" disabled>
+                              Loading...
                             </Option>
-                          ))
-                        ) : (
-                          <Option value="Loading" disabled>
-                            Loading...
-                          </Option>
-                        )}
-                      </Select>
-                    </Form.Item>
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      initialValue={parentToChild[3]}
-                      size="small"
-                      label="Device Make"
-                      name="device_make_id"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please Select a Device Make",
-                        },
-                      ]}
-                    >
-                      <Select
-                        showSearch
-                        placeholder="Select Device Make"
-                        optionFilterProp="children"
-                        onChange={handleMakeIdChange}
-                        value={selectedMakeId}
-                        filterOption={(input, option) =>
-                          option.children
-                            .toLowerCase()
-                            .indexOf(input.toLowerCase()) >= 0
-                        }
+                          )}
+                        </Select>
+                      </Form.Item>
+                    </Col>
+                    <Col sm={12} md={12} lg={12}>
+                      <Form.Item
+                        initialValue={parentToChild[3]}
+                        size="small"
+                        label="Device Make"
+                        name="device_make_id"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please Select a Device Make",
+                          },
+                        ]}
                       >
-                        {Array.isArray(makeOptions) ? (
-                          makeOptions.map((make) => (
-                            <Option key={make.id} value={make.id}>
-                              {make.device_make}
+                        <Select
+                          showSearch
+                          placeholder="Select Device Make"
+                          optionFilterProp="children"
+                          onChange={handleMakeIdChange}
+                          value={selectedMakeId}
+                          filterOption={(input, option) =>
+                            option.children
+                              .toLowerCase()
+                              .indexOf(input.toLowerCase()) >= 0
+                          }
+                        >
+                          {Array.isArray(makeOptions) ? (
+                            makeOptions.map((make) => (
+                              <Option key={make.id} value={make.id}>
+                                {make.device_make}
+                              </Option>
+                            ))
+                          ) : (
+                            <Option value="Loading" disabled>
+                              Loading...
                             </Option>
-                          ))
-                        ) : (
-                          <Option value="Loading" disabled>
-                            Loading...
-                          </Option>
-                        )}
-                      </Select>
-                    </Form.Item>
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      initialValue={parentToChild[5]}
-                      size="small"
-                      label="Device Model"
-                      name="device_model_id"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please Select a Device Model",
-                        },
-                      ]}
-                    >
-                      <Select
-                        showSearch
-                        placeholder="Select Device Model"
-                        optionFilterProp="children"
-                        onChange={handleModelIdChange}
-                        value={selectedModelId}
-                        filterOption={(input, option) =>
-                          option.children
-                            .toLowerCase()
-                            .indexOf(input.toLowerCase()) >= 0
-                        }
+                          )}
+                        </Select>
+                      </Form.Item>
+                    </Col>
+                    <Col sm={12} md={12} lg={12}>
+                      <Form.Item
+                        initialValue={parentToChild[5]}
+                        size="small"
+                        label="Device Model"
+                        name="device_model_id"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please Select a Device Model",
+                          },
+                        ]}
                       >
-                        {Array.isArray(modelOptions) ? (
-                          modelOptions.map((model) => (
-                            <Option key={model.id} value={model.id}>
-                              {model.device_model}
+                        <Select
+                          showSearch
+                          placeholder="Select Device Model"
+                          optionFilterProp="children"
+                          onChange={handleModelIdChange}
+                          value={selectedModelId}
+                          filterOption={(input, option) =>
+                            option.children
+                              .toLowerCase()
+                              .indexOf(input.toLowerCase()) >= 0
+                          }
+                        >
+                          {Array.isArray(modelOptions) ? (
+                            modelOptions.map((model) => (
+                              <Option key={model.id} value={model.id}>
+                                {model.device_model}
+                              </Option>
+                            ))
+                          ) : (
+                            <Option value="Loading" disabled>
+                              Loading...
                             </Option>
-                          ))
-                        ) : (
-                          <Option value="Loading" disabled>
-                            Loading...
-                          </Option>
-                        )}
-                      </Select>
-                    </Form.Item>
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      initialValue={parentToChild[7]}
-                      size="small"
-                      label="Device IMEI No"
-                      name="device_imei_no"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please enter a Device IMEI No",
-                        },
-                      ]}
-                    >
-                      <Input />
-                    </Form.Item>
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      initialValue={parentToChild[8]}
-                      size="small"
-                      label="Device UID"
-                      name="uid"
-                    >
-                      <Input />
-                    </Form.Item>
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      initialValue={parentToChild[9]}
-                      size="small"
-                      label="Device CCID"
-                      name="ccid"
-                    >
-                      <Input />
-                    </Form.Item>
-                  </Col>
-                </Row>
-                <Row align={"middle"}>
-                  <Col span={12}>
-                    <Form.Item>
-                      <Space wrap>
-                        <Button type="primary" shape="round" htmlType="submit">
-                          Update
-                        </Button>
-                        <Button type="primary" shape="round">
-                          Back
-                        </Button>
-                      </Space>
-                    </Form.Item>
-                  </Col>
-                </Row>
+                          )}
+                        </Select>
+                      </Form.Item>
+                    </Col>
+                    <Col sm={12} md={12} lg={12}>
+                      <Form.Item
+                        initialValue={parentToChild[7]}
+                        size="small"
+                        label="Device IMEI No"
+                        name="device_imei_no"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please enter a Device IMEI No",
+                          },
+                        ]}
+                      >
+                        <Input />
+                      </Form.Item>
+                    </Col>
+                    <Col sm={12} md={12} lg={12}>
+                      <Form.Item
+                        initialValue={parentToChild[8]}
+                        size="small"
+                        label="Device UID"
+                        name="uid"
+                      >
+                        <Input />
+                      </Form.Item>
+                    </Col>
+                    <Col sm={12} md={12} lg={12}>
+                      <Form.Item
+                        initialValue={parentToChild[9]}
+                        size="small"
+                        label="Device CCID"
+                        name="ccid"
+                      >
+                        <Input />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                  <Row align={"middle"}>
+                    <Col span={12}>
+                      <Form.Item>
+                        <Space wrap>
+                          <Button
+                            type="primary"
+                            shape="round"
+                            htmlType="submit"
+                          >
+                            Update
+                          </Button>
+                          <Button type="primary" shape="round">
+                            Back
+                          </Button>
+                        </Space>
+                      </Form.Item>
+                    </Col>
+                  </Row>
 
-                <span
-                  id="imei_er_span"
-                  style={{
-                    color: "red",
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                    fontFamily: "sans-serif",
-                  }}
-                ></span>
-              </Form>
-              {isSubmitted && (
-                <div style={{ marginTop: "16px" }}>
-                  <Alert
-                    message="Form submitted successfully!"
-                    type="success"
-                  />
-                </div>
-              )}
-            </div>
-          </Flex>
-        </Card>
-      </Col>
+                  <span
+                    id="imei_er_span"
+                    style={{
+                      color: "red",
+                      fontSize: "12px",
+                      fontWeight: "bold",
+                      fontFamily: "sans-serif",
+                    }}
+                  ></span>
+                </Form>
+              </div>
+            </Flex>
+          </Card>
+        </Col>
+      )}
     </Row>
   );
 }

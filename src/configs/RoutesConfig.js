@@ -117,12 +117,11 @@ export const protectedRoutes = [
     path: `${APP_PREFIX_PATH}/user_management/user`,
     component: React.lazy(() => import("views/app-views/user_management/user")),
   },
-  {
-    key: "settings",
-    path: `${APP_PREFIX_PATH}/settings`,
-    component: React.lazy(() => import("views/app-views/settings")),
-  },
-
+  // {
+  //   key: "settings",
+  //   path: `${APP_PREFIX_PATH}/settings`,
+  //   component: React.lazy(() => import("views/app-views/settings")),
+  // },
   {
     key: "stock_management.sim",
     path: `${APP_PREFIX_PATH}/stock_management/sim`,

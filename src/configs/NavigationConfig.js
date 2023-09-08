@@ -219,17 +219,17 @@ const deviceNavTree = [
     submenu: [],
   },
 ];
-const settingNavTree = [
-  {
-    key: "settings",
-    path: `${APP_PREFIX_PATH}/settings`,
-    title: "Settings",
-    icon: SettingOutlined,
-    breadcrumb: false,
-    isGroupTitle: false,
-    submenu: [],
-  },
-];
+// const settingNavTree = [
+//   {
+//     key: "settings",
+//     path: `${APP_PREFIX_PATH}/settings`,
+//     title: "Settings",
+//     icon: SettingOutlined,
+//     breadcrumb: false,
+//     isGroupTitle: false,
+//     submenu: [],
+//   },
+// ];
 const reportNavTree = [
   {
     key: "reports",
@@ -359,7 +359,6 @@ const navigationConfig = [
   ...stockManagementNavTree,
   ...pointNavTree,
   ...deviceNavTree,
-  ...settingNavTree,
   ...reportNavTree,
 ];
 

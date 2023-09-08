@@ -2,12 +2,16 @@ import React, { useState, useEffect } from "react";
 import { Table, Button, Card, Row, Col, Input } from "antd";
 import { PlusOutlined, SearchOutlined, EditOutlined } from "@ant-design/icons";
 import Flex from "components/shared-components/Flex";
+import utils from "utils";
+
 import api from "configs/apiConfig";
 import Create from "./create";
 import Edit from "./edit";
 import Assign from "../demo/index";
 
 export const Sim = () => {
+  const [selectedRows, setSelectedRows] = useState([]);
+
   const [simList, setSimList] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isCreateVisible, setIsCreateVisible] = useState(false);
@@ -142,16 +146,16 @@ export const Sim = () => {
     },
   ];
 
-  // const onSearch = (e) => {
-  //   const value = e.currentTarget.value;
-  //   const searchArray = e.currentTarget.value ? simList : OrderListData;
-  //   const data = utils.wildCardSearch(searchArray, value);
-  //   setSimList(data);
-  //   setSelectedRowKeys([]);
-  // };
-
+  const onSearch = (e) => {
+    const value = e.currentTarget.value;
+    const searchArray = e.currentTarget.value ? simList : [];
+    const data = utils.wildCardSearch(searchArray, value);
+    setSimList(data);
+    setSelectedRowKeys([]);
+  };
   const rowSelection = {
     onChange: (key, rows) => {
+      setSelectedRows(rows);
       setSelectedRowKeys(key);
     },
   };
@@ -171,7 +175,7 @@ export const Sim = () => {
                   <Input
                     placeholder="Search"
                     prefix={<SearchOutlined />}
-                    // onChange={(e) => onSearch(e)}
+                    onChange={(e) => onSearch(e)}
                   />
                 </div>
 

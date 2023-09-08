@@ -1,19 +1,36 @@
 import React, { useState, useEffect } from "react";
-import { Button, Card, Select, Input, Form, Row, Col, Space } from "antd";
+import {
+  Button,
+  Card,
+  Select,
+  Input,
+  Alert,
+  Form,
+  Row,
+  Col,
+  Space,
+} from "antd";
 import Flex from "components/shared-components/Flex";
 import api from "configs/apiConfig";
 
 const { TextArea } = Input;
 const { Option } = Select;
 
-export default function Edit({ parentToChild }) {
+export default function Create() {
+  const [selectedRoleId, setSelectedRoleId] = useState();
+  const [roleOptions, setRoleOptions] = useState([]);
   const [selectedCountryId, setSelectedCountryId] = useState();
   const [countryOptions, setCountryOptions] = useState([]);
-
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [form] = Form.useForm();
+  const handleRoleIdChange = (roleID) => {
+    setSelectedRoleId(roleID);
+  };
   const handleCountryIdChange = (countryId) => {
     setSelectedCountryId(countryId);
   };
   useEffect(() => {
+    fetchRoleOptions(setRoleOptions);
     fetchCountryOptions(setCountryOptions);
   }, []);
 
@@ -23,10 +40,10 @@ export default function Edit({ parentToChild }) {
     document.getElementById("mobile_er_span").textContent = "";
 
     try {
-      await api.post("user/update", values);
+      await api.post("user/store", values);
       // window.location.reload(true);
-      // setIsSubmitted(true);
-      alert("User Updated Successfully");
+      setIsSubmitted(true);
+      form.resetFields();
     } catch (error) {
       if (error.response && error.response.status === 403) {
         const errorData = error.response.data;
@@ -52,6 +69,25 @@ export default function Edit({ parentToChild }) {
     }
   };
 
+  const getRole = () => {
+    return localStorage.getItem("role");
+  };
+  const role = getRole();
+
+  // Define the functions outside the component
+  async function fetchRoleOptions(setRoleOptions) {
+    try {
+      const response = await api.get(`role_rights_list/${role}`);
+      if (response.data.success) {
+        setRoleOptions(response.data.data);
+      } else {
+        console.error("API request was not successful");
+      }
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
+  }
+
   async function fetchCountryOptions(setCountryOptions) {
     try {
       const response = await api.get("country");
@@ -68,8 +104,7 @@ export default function Edit({ parentToChild }) {
   return (
     <Row gutter={6}>
       <Col>
-        <Card title="Edit User">
-          <p></p>
+        <Card title="New User">
           <Flex>
             <div className="container">
               <Form
@@ -84,7 +119,6 @@ export default function Edit({ parentToChild }) {
                       size="small"
                       label="User Name"
                       name="name"
-                      initialValue={parentToChild[1]}
                       rules={[
                         {
                           required: true,
@@ -100,7 +134,6 @@ export default function Edit({ parentToChild }) {
                       size="small"
                       label="E-Mail ID"
                       name="email"
-                      initialValue={parentToChild[2]}
                       rules={[
                         {
                           required: true,
@@ -118,9 +151,54 @@ export default function Edit({ parentToChild }) {
                   <Col sm={12} md={12} lg={12}>
                     <Form.Item
                       size="small"
+                      label="Password"
+                      name="password"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please enter a password",
+                        },
+                        {
+                          min: 6,
+                          message:
+                            "Password must be at least 6 characters long",
+                        },
+                      ]}
+                    >
+                      <Input.Password />
+                    </Form.Item>
+                  </Col>
+                  <Col sm={12} md={12} lg={12}>
+                    <Form.Item
+                      size="small"
+                      label="Confirm Password"
+                      name="c_password"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please confirm your password",
+                        },
+                        ({ getFieldValue }) => ({
+                          validator(_, value) {
+                            if (!value || getFieldValue("password") === value) {
+                              return Promise.resolve();
+                            }
+                            return Promise.reject(
+                              new Error("Passwords do not match")
+                            );
+                          },
+                        }),
+                      ]}
+                    >
+                      <Input.Password />
+                    </Form.Item>
+                  </Col>
+                  <Col sm={12} md={12} lg={12}>
+                    {" "}
+                    <Form.Item
+                      size="small"
                       label="Mobile No"
                       name="mobile_no"
-                      initialValue={parentToChild[3]}
                       rules={[
                         {
                           required: true,
@@ -135,13 +213,49 @@ export default function Edit({ parentToChild }) {
                       <Input />
                     </Form.Item>
                   </Col>
-
+                  <Col sm={12} md={12} lg={12}>
+                    <Form.Item
+                      size="small"
+                      label="Role"
+                      name="role_id"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please Select a Role",
+                        },
+                      ]}
+                    >
+                      <Select
+                        showSearch
+                        placeholder="Select Role"
+                        optionFilterProp="children"
+                        onChange={handleRoleIdChange}
+                        value={selectedRoleId}
+                        filterOption={(input, option) =>
+                          option.children
+                            .toLowerCase()
+                            .indexOf(input.toLowerCase()) >= 0
+                        }
+                      >
+                        {Array.isArray(roleOptions) ? (
+                          roleOptions.map((role) => (
+                            <Option key={role.id} value={role.id}>
+                              {role.name}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="Loading" disabled>
+                            Loading...
+                          </Option>
+                        )}
+                      </Select>
+                    </Form.Item>
+                  </Col>
                   <Col sm={12} md={12} lg={12}>
                     <Form.Item
                       size="small"
                       label="Country"
                       name="country_id"
-                      initialValue={parentToChild[7]}
                       rules={[
                         {
                           required: true,
@@ -151,7 +265,7 @@ export default function Edit({ parentToChild }) {
                     >
                       <Select
                         showSearch
-                        allowClear
+                        placeholder="Select Country"
                         optionFilterProp="children"
                         onChange={handleCountryIdChange}
                         value={selectedCountryId}
@@ -178,7 +292,6 @@ export default function Edit({ parentToChild }) {
                       size="small"
                       label="Address"
                       name="address"
-                      initialValue={parentToChild[9]}
                       rules={[
                         {
                           required: true,
@@ -186,32 +299,21 @@ export default function Edit({ parentToChild }) {
                         },
                       ]}
                     >
-                      <TextArea rows={4} maxLength={100} />
+                      <TextArea
+                        rows={4}
+                        placeholder="Please Enter Adress"
+                        maxLength={100}
+                      />
                     </Form.Item>
                   </Col>
                 </Row>
-                <Row align={"middle"}>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item hidden name="id" initialValue={parentToChild[0]}>
-                      <Input></Input>
-                    </Form.Item>
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      hidden
-                      name="role_id"
-                      initialValue={parentToChild[5]}
-                    >
-                      <Input></Input>
-                    </Form.Item>
-                  </Col>
-                </Row>
+
                 <Row align={"middle"}>
                   <Col span={12}>
                     <Form.Item>
                       <Space wrap>
                         <Button type="primary" shape="round" htmlType="submit">
-                          Register
+                          Save
                         </Button>
                         <Button type="primary" shape="round">
                           Back
@@ -251,6 +353,14 @@ export default function Edit({ parentToChild }) {
                   }}
                 ></span>
               </Form>
+              {isSubmitted && (
+                <div style={{ marginTop: "16px" }}>
+                  <Alert
+                    message="Form submitted successfully!"
+                    type="success"
+                  />
+                </div>
+              )}
             </div>
           </Flex>
         </Card>

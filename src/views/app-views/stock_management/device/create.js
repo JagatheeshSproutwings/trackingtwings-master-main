@@ -1,30 +1,19 @@
 import React, { useState, useEffect } from "react";
-import {
-  Button,
-  Card,
-  Select,
-  Input,
-  Alert,
-  Form,
-  Row,
-  Col,
-  Space,
-  DatePicker,
-} from "antd";
+import { Button, Card, Select, Input, Form, Row, Col, Space } from "antd";
 import Flex from "components/shared-components/Flex";
 import api from "configs/apiConfig";
-import moment from "moment";
 
 const { Option } = Select;
 
 export default function Create() {
+  const [form] = Form.useForm();
+
   const [selectedSupplierId, setselectedSupplierId] = useState();
   const [supplierOptions, setSupplierOptions] = useState([]);
   const [selectedMakeId, setselectedMakeId] = useState();
   const [makeOptions, setMakeOptions] = useState([]);
   const [selectedModelId, setselectedModelId] = useState();
   const [modelOptions, setModelOptions] = useState([]);
-  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleSupplierIdChange = (roleID) => {
     setselectedSupplierId(roleID);
@@ -57,7 +46,8 @@ export default function Create() {
 
     try {
       await api.post("device/store", data);
-      setIsSubmitted(true);
+      form.resetFields();
+      alert("Device Inserted Successfully");
     } catch (error) {
       if (error.response && error.response.status === 403) {
         const errorData = error.response.data;
@@ -120,6 +110,7 @@ export default function Create() {
           <Flex>
             <div className="container">
               <Form
+                form={form}
                 size="small"
                 name="registrationForm"
                 onFinish={onFinish}
@@ -140,8 +131,9 @@ export default function Create() {
                     >
                       <Select
                         showSearch
-                        placeholder="Select Supplier"
+                        allowClear
                         optionFilterProp="children"
+                        placeholder="Select Supplier"
                         onChange={handleSupplierIdChange}
                         value={selectedSupplierId}
                         filterOption={(input, option) =>
@@ -178,6 +170,7 @@ export default function Create() {
                     >
                       <Select
                         showSearch
+                        allowClear
                         placeholder="Select Device Make"
                         optionFilterProp="children"
                         onChange={handleMakeIdChange}
@@ -216,6 +209,7 @@ export default function Create() {
                     >
                       <Select
                         showSearch
+                        allowClear
                         placeholder="Select Device Model"
                         optionFilterProp="children"
                         onChange={handleModelIdChange}
@@ -292,14 +286,6 @@ export default function Create() {
                   }}
                 ></span>
               </Form>
-              {isSubmitted && (
-                <div style={{ marginTop: "16px" }}>
-                  <Alert
-                    message="Form submitted successfully!"
-                    type="success"
-                  />
-                </div>
-              )}
             </div>
           </Flex>
         </Card>

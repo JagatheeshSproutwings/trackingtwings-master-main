@@ -4,7 +4,6 @@ import {
   Card,
   Select,
   Input,
-  Alert,
   Form,
   Row,
   Col,
@@ -14,13 +13,15 @@ import {
 import Flex from "components/shared-components/Flex";
 import api from "configs/apiConfig";
 import moment from "moment";
+const dateFormat = "YYYY-MM-DD";
 
 const { Option } = Select;
 
 export default function Create() {
+  const [form] = Form.useForm();
+
   const [selectedNetworkId, setselectedNetworkId] = useState();
   const [networkOptions, setNetworkOptions] = useState([]);
-  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleNetworkIdChange = (roleID) => {
     setselectedNetworkId(roleID);
@@ -48,10 +49,17 @@ export default function Create() {
     };
 
     try {
-      await api.post("sim/store", data);
-      setIsSubmitted(true);
+      const valid_from = new Date(values["valid_from"]);
+      values["valid_from"] = valid_from.toISOString().split("T")[0];
+      const valid_to = new Date(values["valid_to"]);
+      values["valid_to"] = valid_to.toISOString().split("T")[0];
 
-      document.getElementById("sim_imei_no").value = "";
+      await api.post("sim/store", data);
+
+      alert("Sim Saved Successfully");
+
+      form.resetFields();
+
       document.getElementById("sim_mob_no1").value = "";
       document.getElementById("sim_mob_no2").value = "";
       document.getElementById("valid_from").value = "";
@@ -102,6 +110,7 @@ export default function Create() {
           <Flex>
             <div className="container">
               <Form
+                form={form}
                 size="small"
                 name="registrationForm"
                 onFinish={onFinish}
@@ -121,8 +130,8 @@ export default function Create() {
                       ]}
                     >
                       <Select
+                        allowClear
                         showSearch
-                        placeholder="Select Network"
                         optionFilterProp="children"
                         onChange={handleNetworkIdChange}
                         value={selectedNetworkId}
@@ -193,31 +202,21 @@ export default function Create() {
                     </Form.Item>
                   </Col>
                   <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      name="valid_from"
-                      label="Valid From"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please enter a valid from",
-                        },
-                      ]}
-                    >
-                      <DatePicker style={{ width: "100%", fontSize: "16px" }} />
+                    <Form.Item name="valid_from" label="Valid From">
+                      <DatePicker
+                        style={{ width: "100%", fontSize: "16px" }}
+                        required
+                        allowClear={false}
+                        format={dateFormat}
+                      ></DatePicker>
                     </Form.Item>
                   </Col>
                   <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      name="valid_to"
-                      label="Valid To"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please select a valid to",
-                        },
-                      ]}
-                    >
-                      <DatePicker style={{ width: "100%", fontSize: "16px" }} />
+                    <Form.Item name="valid_to" label="Valid To">
+                      <DatePicker
+                        style={{ width: "100%", fontSize: "16px" }}
+                        allowClear={false}
+                      ></DatePicker>
                     </Form.Item>
                   </Col>
                 </Row>
@@ -267,14 +266,6 @@ export default function Create() {
                   }}
                 ></span>
               </Form>
-              {isSubmitted && (
-                <div style={{ marginTop: "16px" }}>
-                  <Alert
-                    message="Form submitted successfully!"
-                    type="success"
-                  />
-                </div>
-              )}
             </div>
           </Flex>
         </Card>

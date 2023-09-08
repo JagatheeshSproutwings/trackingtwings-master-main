@@ -1,25 +1,9 @@
 import React, { useState, useEffect } from "react";
-import {
-  Table,
-  Button,
-  Card,
-  Drawer,
-  Select,
-  Input,
-  Alert,
-  Form,
-  Span,
-} from "antd";
+import { Table, Button, Card, Drawer, Select, Input, Alert, Form } from "antd";
 import Flex from "components/shared-components/Flex";
 import api from "configs/apiConfig";
-import { message } from "antd";
-import { EditOutlined } from "@ant-design/icons";
 
-import {
-  PlusOutlined,
-  FileExcelOutlined,
-  SearchOutlined,
-} from "@ant-design/icons";
+import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import utils from "utils";
 import OrderListData from "assets/data/order-list.data.json";
 import userData from "assets/data/user-list.data.json";
@@ -36,10 +20,12 @@ export const User = () => {
   const [userList, setUserList] = useState([]);
   const [selectedPlanId, setselectedPlanId] = useState();
   const [PlanOptions, setPlanOptions] = useState([]);
-
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [editedName, setEditedName] = useState("");
-
+  const [currentRole, SetCurrentRole] = useState(
+    localStorage.getItem("role") || ""
+  );
+  useEffect(() => {
+    SetCurrentRole(role());
+  }, []);
   const showDrawer = () => {
     setOpen(true);
   };
@@ -87,9 +73,11 @@ export const User = () => {
     console.log("Form values:", updatedValues);
 
     try {
-      const response = await api.post("point", updatedValues);
+      await api.post("point", updatedValues);
 
-      setIsSubmitted(true);
+      form.resetFields();
+      alert("Point Saved Successfully");
+
       // Handle successful response here if needed
     } catch (error) {
       if (error.response && error.response.status === 403) {
@@ -142,6 +130,7 @@ export const User = () => {
           id: item.id,
           point_type: item.point_type,
           package_code: item.package_code,
+          package_name: item.package_name,
           period_name: item.period_name,
           period_days: item.period_days,
           name: item.name,
@@ -156,21 +145,6 @@ export const User = () => {
     } catch (error) {
       console.error("Error fetching users:", error);
     }
-  }
-
-  function handleEditClick(record) {
-    // Display an alert with the record information
-    const id = record.id;
-    setEditedName(record.name);
-    const email = record.email;
-    const role = record.role;
-    const role_id = record.role_id;
-    const country = record.country;
-    const country_id = record.country_id;
-
-    console.log(editedName);
-    setOpen(true);
-    // You can replace the alert with your actual edit logic
   }
 
   // Inside your component
@@ -215,16 +189,6 @@ export const User = () => {
     },
   ];
 
-  const handleShowStatus = (value) => {
-    if (value !== "All") {
-      const key = "paymentStatus";
-      const data = utils.filterArray(OrderListData, key, value);
-      setList(data);
-    } else {
-      setList(OrderListData);
-    }
-  };
-
   const onSearch = (e) => {
     const value = e.currentTarget.value;
     const searchArray = e.currentTarget.value ? list : OrderListData;
@@ -259,16 +223,18 @@ export const User = () => {
 
             <div className="mb-3"></div>
           </Flex>
-          <div className="mb-3">
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={showDrawer}
-              ghost
-            >
-              Add Points
-            </Button>
-          </div>
+          {currentRole != 5 && (
+            <div className="mb-3">
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={showDrawer}
+                ghost
+              >
+                Add Points
+              </Button>
+            </div>
+          )}
         </Flex>
         <div className="table-responsive">
           <Table
@@ -289,7 +255,12 @@ export const User = () => {
       <Drawer placement="right" closable={false} onClose={onClose} open={open}>
         <div className="container">
           <h2>Point Info</h2>
-          <Form name="registrationForm" onFinish={onFinish} layout="vertical">
+          <Form
+            name="registrationForm"
+            onFinish={onFinish}
+            layout="vertical"
+            form={form}
+          >
             <Form.Item
               label="User"
               name="user_id"
@@ -297,9 +268,8 @@ export const User = () => {
             >
               <Select
                 showSearch
-                placeholder="Select User"
+                allowClear
                 optionFilterProp="children"
-                onChange={loadUsers}
                 value={setUserList}
                 filterOption={(input, option) =>
                   option.children.toLowerCase().indexOf(input.toLowerCase()) >=
@@ -323,7 +293,7 @@ export const User = () => {
               name="point_type_id"
               rules={[{ required: true, message: "Please Select Point Type" }]}
             >
-              <Select placeholder="Select Point Type">
+              <Select>
                 <Option value="1">New Point</Option>
                 <Option value="2">Recharge Point</Option>
               </Select>
@@ -336,8 +306,8 @@ export const User = () => {
             >
               <Select
                 showSearch
-                placeholder="Select Plan"
                 optionFilterProp="children"
+                allowClear
                 onChange={handlePlanIdChange}
                 value={selectedPlanId}
                 filterOption={(input, option) =>
@@ -367,15 +337,10 @@ export const User = () => {
 
             <Form.Item>
               <Button type="primary" htmlType="submit">
-                Register
+                Save
               </Button>
             </Form.Item>
           </Form>
-          {isSubmitted && (
-            <div style={{ marginTop: "16px" }}>
-              <Alert message="Form submitted successfully!" type="success" />
-            </div>
-          )}
         </div>
 
         <span
