@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Row, Col, Card, Select, Form, Button, Input } from "antd";
+import { Row, Col, Card, Select, Form, Button, Input,Space,notification } from "antd";
 import api from "configs/apiConfig";
 import Flex from "components/shared-components/Flex";
 import ButtonGroup from "antd/es/button/button-group";
+import { GREEN_BASE } from "constants/ThemeConstant";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -58,6 +59,7 @@ const Report = () => {
       await api.post("user/store", values);
       form.resetFields();
       alert("Data Saved Successfully");
+
     } catch (error) {
       if (error.response && error.response.status === 403) {
         const errorData = error.response.data;
@@ -648,14 +650,8 @@ const Report = () => {
                         <TextArea rows={4} maxLength={100} />
                       </Form.Item>
                     </Col>
-                    <ButtonGroup>
-                      <Button type="primary" shape="round" htmlType="submit">
-                        Save
-                      </Button>
-                      <Button type="primary" shape="round">
-                        Back
-                      </Button>
-                    </ButtonGroup>
+                    
+                    
                     <span
                       id="name_er_span"
                       style={{
@@ -683,6 +679,18 @@ const Report = () => {
                         fontFamily: "sans-serif",
                       }}
                     ></span>
+                  </Row>
+                  <Row>
+                  <Col col-offset={18} sm={24} md={24} lg={24}>
+                    <Space wrap>
+                      <Button type="primary" danger shape="round">
+                        Reset
+                      </Button>
+                      <Button type="primary" style={{backgroundColor:GREEN_BASE}}success shape="round" htmlType="submit">
+                        Save
+                      </Button>
+                    </Space>
+                    </Col>
                   </Row>
                 </Form>
               </div>

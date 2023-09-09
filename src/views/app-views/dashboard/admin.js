@@ -72,41 +72,39 @@ export const Admin = () => {
 
   return (
     <>
-      <Row gutter={16}>
-        <Col span={4}>
-          <Card title="All" size="small" bordered={true}>
-            {VehicleDetail?.data?.total_vehicles}
-            <Meta
-      description="This is the description"
-    />
-          </Card>
-        </Col>
-        <Col span={4}>
-          <Card title="Idle" size="small" bordered={false}>
-            {VehicleDetail?.data?.idle}
-          </Card>
-        </Col>
-        <Col span={4}>
-          <Card title="Moving" size="small" bordered={false}>
-            {VehicleDetail?.data?.running}
-          </Card>
-        </Col>
-        <Col span={4}>
-          <Card title="Parking" size="small" bordered={false}>
-            {VehicleDetail?.data?.stop}
-          </Card>
-        </Col>
-        <Col span={4}>
-          <Card title="No Network" size="small" bordered={false}>
-            {VehicleDetail?.data?.no_data}
-          </Card>
-        </Col>
-        <Col span={4}>
-          <Card title="Expired" size="small" bordered={false}>
-            {VehicleDetail?.data?.expired_vehicles}
-          </Card>
-        </Col>
-      </Row>
+      <Row gutter={16} style={{padding:0,margin:0}} >
+    <Col span={4} style={{padding:0,margin:0}}>
+      <Card title="All" size='small' headStyle={{ backgroundColor: '#5c6cfa', color: '#ffffff' }} bodyStyle={{ backgroundColor: '#c2c2be',color: '#ffffff' }} bordered={false} align="center">
+        {VehicleDetail?.data?.total_vehicles}
+      </Card>
+    </Col>
+    <Col span={4}>
+      <Card title="Idle" size='small' headStyle={{ backgroundColor: '#FF864A', color: '#ffffff' }} bodyStyle={{ backgroundColor: '#c2c2be' ,color: '#ffffff'}} bordered={false} align="center">
+      {VehicleDetail?.data?.idle}
+      </Card>
+    </Col>
+    <Col span={4}>
+      <Card title="Moving" size='small' headStyle={{ backgroundColor: '#11A578', color: '#ffffff' }} bodyStyle={{ backgroundColor: '#c2c2be',color: '#ffffff' }} bordered={false} align="center">
+      {VehicleDetail?.data?.running}
+      </Card>
+    </Col>
+    <Col span={4}>
+      <Card title="Parking"  size='small' headStyle={{ backgroundColor: '#13b3c2', color: '#ffffff' }} bodyStyle={{ backgroundColor: '#c2c2be',color: '#ffffff' }} bordered={false} align="center">
+      {VehicleDetail?.data?.stop}
+      </Card>
+    </Col>
+    <Col span={4}>
+      <Card title="Inactive" size='small' headStyle={{ backgroundColor: '#fc3158', color: '#ffffff' }} bodyStyle={{ backgroundColor: '#c2c2be',color: '#ffffff' }} bordered={false} align="center">
+      {VehicleDetail?.data?.no_data}
+      </Card>
+    </Col>
+    <Col span={4}>
+      <Card title="No Data" size='small' headStyle={{ backgroundColor: '#a1a108', color: '#ffffff' }} bodyStyle={{ backgroundColor: '#c2c2be',color: '#ffffff' }} bordered={false} align="center">
+      {VehicleDetail?.data?.inactive}
+      </Card>
+    </Col>
+
+    </Row>
       <Row>
         <Col span={24} >
         <Table></Table>
