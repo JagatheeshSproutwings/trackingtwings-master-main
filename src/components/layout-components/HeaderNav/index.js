@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import {Link } from "react-router-dom";
 import { TEMPLATE } from "constants/ThemeConstant";
 import {
   MenuFoldOutlined,
@@ -56,8 +57,8 @@ export const HeaderNav = (props) => {
     <div style={{ maxWidth: 300 }}>
       <div>
         <List size="small" itemLayout="horizontal">
-          <List.Item>Device</List.Item>
-          <List.Item>SIM</List.Item>
+          <List.Item><Link to="/app/stock_management/device">Device</Link></List.Item>
+          <List.Item><Link to="/app/stock_management/sim">SIM</Link></List.Item>
         </List>
       </div>
     </div>
@@ -66,8 +67,7 @@ export const HeaderNav = (props) => {
     <div style={{ maxWidth: 300 }}>
       <div>
         <List size="small" itemLayout="horizontal">
-          <List.Item>Licence</List.Item>
-          <List.Item>Point</List.Item>
+          <List.Item><Link to="/app/points">Point</Link></List.Item>
         </List>
       </div>
     </div>
