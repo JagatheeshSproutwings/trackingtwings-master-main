@@ -4,7 +4,7 @@ import { Card, Row, Col } from "antd";
 import { useSelector } from "react-redux";
 
 const backgroundStyle = {
-  backgroundImage: "url(/img/others/img-17.jpg)",
+  backgroundImage: "url(/img/login_gif.gif)",
   backgroundRepeat: "no-repeat",
   backgroundSize: "cover",
 };
@@ -15,7 +15,7 @@ const Login = (props) => {
     <div className="h-100" style={backgroundStyle}>
       <div className="container d-flex flex-column justify-content-center h-100">
         <Row justify="center">
-          <Col xs={20} sm={20} md={20} lg={7}>
+          <Col col-offset={18} xs={20} sm={20} md={20} lg={7}>
             <Card>
               <div className="my-4">
                 <div className="text-center">
