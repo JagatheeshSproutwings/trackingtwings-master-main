@@ -127,7 +127,6 @@ export const HeaderNav = (props) => {
               <SearchInput mode={navMode} isMobile={isMobile} />
             </div>
           </NavEdge>
-          <NavEdge>kkkkkkkk</NavEdge>
 
           <NavEdge right>
             {role_id != 6 && (
