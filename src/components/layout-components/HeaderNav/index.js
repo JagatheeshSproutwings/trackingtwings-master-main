@@ -2,18 +2,22 @@
 import { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { TEMPLATE } from "constants/ThemeConstant";
-import { MenuFoldOutlined, MenuUnfoldOutlined,SearchOutlined } from "@ant-design/icons";
+import {
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import Logo from "../Logo";
 import NavProfile from "../NavProfile";
 import Header from "./Header";
 import HeaderWrapper from "./HeaderWrapper";
 import Nav from "./Nav";
-import NavNotification from '../NavNotification';
-import NavSearch  from '../NavSearch';
-import SearchInput from '../NavSearch/SearchInput';
+import NavNotification from "../NavNotification";
+import NavSearch from "../NavSearch";
+import SearchInput from "../NavSearch/SearchInput";
 import NavEdge from "./NavEdge";
 import NavItem from "../NavItem";
-import { Button, List,Popover, Space } from "antd";
+import { Button, List, Popover, Space } from "antd";
 import { toggleCollapsedNav, onMobileNavToggle } from "store/slices/themeSlice";
 import {
   NAV_TYPE_TOP,
@@ -26,8 +30,8 @@ export const HeaderNav = (props) => {
   const { isMobile } = props;
 
   const [searchActive, setSearchActive] = useState(false);
-  const token = useSelector(state => state.auth);
-  
+  const token = useSelector((state) => state.auth);
+
   const role_id = token?.user_info?.role_id;
   const dispatch = useDispatch();
 
@@ -48,22 +52,26 @@ export const HeaderNav = (props) => {
       dispatch(onMobileNavToggle(!mobileNav));
     }
   };
-  const topMenuList = (<div style={{maxWidth: 300}}>
-    <div>
-    <List size="small" itemLayout="horizontal">
-    <List.Item>Device</List.Item>
-    <List.Item>SIM</List.Item>
-    </List>
+  const topMenuList = (
+    <div style={{ maxWidth: 300 }}>
+      <div>
+        <List size="small" itemLayout="horizontal">
+          <List.Item>Device</List.Item>
+          <List.Item>SIM</List.Item>
+        </List>
+      </div>
     </div>
-  </div>);
-  const topLicenceMenuList = (<div style={{maxWidth: 300}}>
-    <div>
-    <List size="small" itemLayout="horizontal">
-    <List.Item>Licence</List.Item>
-    <List.Item>Point</List.Item>
-    </List>
+  );
+  const topLicenceMenuList = (
+    <div style={{ maxWidth: 300 }}>
+      <div>
+        <List size="small" itemLayout="horizontal">
+          <List.Item>Licence</List.Item>
+          <List.Item>Point</List.Item>
+        </List>
+      </div>
     </div>
-  </div>);
+  );
   const isNavTop = navType === NAV_TYPE_TOP;
   const isDarkTheme = currentTheme === "dark";
 
@@ -115,14 +123,28 @@ export const HeaderNav = (props) => {
                 </div>
               </NavItem>
             )}
-            <div className="ant-menu-item ant-menu-item-only-child"><SearchInput mode={navMode} isMobile={isMobile} /></div>
+            <div className="ant-menu-item ant-menu-item-only-child">
+              <SearchInput mode={navMode} isMobile={isMobile} />
+            </div>
           </NavEdge>
-          
 
           <NavEdge right>
-            {role_id!=6 &&
-            <><Space wrap><Popover content={topMenuList}><Button size="small" type="primary" >Stock Management</Button></Popover><Popover content={topLicenceMenuList}><Button type="primary" size="small">Licence Management</Button></Popover></Space></>
-          }
+            {role_id != 6 && (
+              <>
+                <Space wrap>
+                  <Popover content={topMenuList}>
+                    <Button size="small" type="primary">
+                      Stock Management
+                    </Button>
+                  </Popover>
+                  <Popover content={topLicenceMenuList}>
+                    <Button type="primary" size="small">
+                      Licence Management
+                    </Button>
+                  </Popover>
+                </Space>
+              </>
+            )}
             {/* <NavNotification mode={navMode} /> */}
             <NavProfile mode={navMode} />
           </NavEdge>
