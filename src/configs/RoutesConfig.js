@@ -92,36 +92,11 @@ export const protectedRoutes = [
     component: React.lazy(() => import("views/app-views/points")),
   },
   {
-    key: "user_management.roles",
-    path: `${APP_PREFIX_PATH}/user_management/roles`,
-    component: React.lazy(() =>
-      import("views/app-views/user_management/roles")
-    ),
-  },
-  {
-    key: "user_management.permissions", // unique value in key
-    path: `${APP_PREFIX_PATH}/user_management/permissions`, // path in ui
-    component: React.lazy(() =>
-      import("views/app-views/user_management/permissions")
-    ), // component path
-  },
-  {
-    key: "user_management.customer",
-    path: `${APP_PREFIX_PATH}/user_management/customer`,
-    component: React.lazy(() =>
-      import("views/app-views/user_management/customer")
-    ),
-  },
-  {
     key: "user_management.user",
     path: `${APP_PREFIX_PATH}/user_management/user`,
     component: React.lazy(() => import("views/app-views/user_management/user")),
   },
-  // {
-  //   key: "settings",
-  //   path: `${APP_PREFIX_PATH}/settings`,
-  //   component: React.lazy(() => import("views/app-views/settings")),
-  // },
+
   {
     key: "stock_management.sim",
     path: `${APP_PREFIX_PATH}/stock_management/sim`,
