@@ -8,7 +8,7 @@ import { GREEN_BASE } from "constants/ThemeConstant";
 const { TextArea } = Input;
 const { Option } = Select;
 
-const Report = () => {
+const Report = (props) => {
   const [form] = Form.useForm();
 
   const [password, setPassword] = useState("");
@@ -58,6 +58,7 @@ const Report = () => {
     try {
       await api.post("user/store", values);
       form.resetFields();
+      props.parentFunction();
       alert("Data Saved Successfully");
 
     } catch (error) {

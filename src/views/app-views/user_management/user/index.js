@@ -16,6 +16,7 @@ export const User = () => {
   const [isCreateVisible, setIsCreateVisible] = useState(false);
   const [isEditVisible, setIsEditVisible] = useState(false);
   const [editdata, setEditData] = useState("");
+  const [newData,SetNewData] = useState(0);
 
   const handleCreateCard = () => {
     setIsCreateVisible(true);
@@ -37,7 +38,14 @@ export const User = () => {
   };
   const role = getRole();
 
-  const loadUsers = async (setUserList) => {
+    const parentFunction = () => {
+      console.log(userList);
+      loadUsers();
+    };
+
+
+
+  const loadUsers = async () => {
     const data = { user_id: user, role_id: role };
     try {
       const response = await api.post("user_list", data);
@@ -83,11 +91,11 @@ export const User = () => {
     // Set isEditVisible to true
     setIsEditVisible(true);
     setIsCreateVisible(false);
-    loadUsers(setUserList);
+    loadUsers();
   }
 
   useEffect(() => {
-    loadUsers(setUserList);
+    loadUsers();
   }, []);
 
   const tableColumns = [
@@ -187,7 +195,7 @@ export const User = () => {
           </Card>
         </Col>
         <Col sm={24} md={10} lg={10}>
-          {isCreateVisible && <Create />}
+          {isCreateVisible && <Create parentFunction={parentFunction}/>}
           {isEditVisible && <Edit key={editdata[0]} parentToChild={editdata} />}
         </Col>
       </Row>

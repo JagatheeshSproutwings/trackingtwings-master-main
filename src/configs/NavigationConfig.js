@@ -356,8 +356,6 @@ const reportNavTree = [
 const navigationConfig = [
   ...dashBoardNavTree,
   ...userManagementNavTree,
-  ...stockManagementNavTree,
-  ...pointNavTree,
   ...deviceNavTree,
   ...reportNavTree,
 ];

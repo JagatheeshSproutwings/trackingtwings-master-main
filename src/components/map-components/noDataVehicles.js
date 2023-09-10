@@ -1,22 +1,17 @@
 import React,{useState,useEffect} from 'react'
 import {Table,Row,Col,List,Avatar,Badge,Skeleton} from 'antd'
 import { CarFilled,WifiOutlined } from '@ant-design/icons';
-import { BLUE_BASE, GOLD_BASE, GRAY_DARK,RED_BASE, GREEN_BASE } from 'constants/ThemeConstant';
+import { BLUE_BASE, GOLD_BASE, GRAY_DARK, GREEN_BASE } from 'constants/ThemeConstant';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import 'assets/styles/multi_dashboard.css'
 import api from 'configs/apiConfig'
 import { faEllipsisVertical,faLocationCrosshairs } from '@fortawesome/free-solid-svg-icons'
 
-const MovingVehicles = () => {
+const NoDataVehicles = () => {
   const [multi_idle_vehicles,setIdleVehicles] = useState([]);
-  const [vehicle_status,setvehicleStatus] = useState(3);
+  const [vehicle_status,setvehicleStatus] = useState(4);
   useEffect(()=>{
-    const interval = setInterval(() => {
-      idle_vehicle_list();
-    }, 1000);
-    return () => {
-      clearInterval(interval);
-    };
+    idle_vehicle_list();
     console.log(vehicle_status);
   },[])
 
@@ -33,7 +28,7 @@ const MovingVehicles = () => {
           id:item?.id,
           title: item?.vehicle_name||"TEST",
           description:item?.device_updatedtime|| "0000-00-00 00:00:00",
-          color:GREEN_BASE,
+          color:GOLD_BASE,
           speed:item?.speed||0,
           gps_count:20,
           gsm_count:15,
@@ -66,7 +61,7 @@ const MovingVehicles = () => {
             <h6>{item.speed} KMPH</h6>
           </Col >
           <Col className='ml-2'>
-            <WifiOutlined style={{fontSize: '15px',color:RED_BASE}} />
+            <WifiOutlined style={{fontSize: '15px',color:GREEN_BASE}} />
           </Col>
           <Col className='ml-2'>
             <FontAwesomeIcon icon={faLocationCrosshairs} style={{fontSize: '15px',color:GREEN_BASE}}/>
@@ -79,4 +74,4 @@ const MovingVehicles = () => {
   )
 }
 
-export default MovingVehicles
+export default NoDataVehicles

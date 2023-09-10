@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button, Card, Select, Input, Form, Row, Col, Space } from "antd";
 import Flex from "components/shared-components/Flex";
 import api from "configs/apiConfig";
+import { GREEN_BASE } from "constants/ThemeConstant";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -217,20 +218,22 @@ export default function Edit({ parentToChild }) {
                       </Form.Item>
                     </Col>
                   </Row>
-                  <Row align={"middle"}>
+                  <Row align={"right"}>
                     <Col span={12}>
                       <Form.Item>
                         <Space wrap>
+                        <Button type="primary" shape="round">
+                            Back
+                          </Button>
                           <Button
-                            type="primary"
+                            type="primary" style={{backgroundColor:GREEN_BASE}}
+                            success
                             shape="round"
                             htmlType="submit"
                           >
-                            Register
+                            Update
                           </Button>
-                          <Button type="primary" shape="round">
-                            Back
-                          </Button>
+                          
                         </Space>
                       </Form.Item>
                     </Col>
