@@ -72,7 +72,7 @@ export const Admin = () => {
 
   return (
     <>
-      <Row gutter={16} style={{padding:0,margin:0}} >
+    <Row gutter={16} style={{padding:0,margin:0}} >
     <Col span={4} style={{padding:0,margin:0}}>
       <Card title="All" size='small' headStyle={{ backgroundColor: '#5c6cfa', color: '#ffffff' }} bodyStyle={{ backgroundColor: '#c2c2be',color: '#ffffff' }} bordered={false} align="center">
         {VehicleDetail?.data?.total_vehicles}
@@ -103,14 +103,16 @@ export const Admin = () => {
       {VehicleDetail?.data?.inactive}
       </Card>
     </Col>
-
     </Row>
-      <Row>
-        <Col span={24} >
+    <Row gutter={6}>
+      <Col span={24} >
+      <Row gutter={6}>
+        <Col span={24}>
         <Table></Table>
         </Col>
-        
       </Row>
+      </Col>
+    </Row>
       {/* <Row>
         <Col span={24}>
           <MapContainer center={position} zoom={13} scrollWheelZoom={true}>

@@ -237,7 +237,6 @@ const Report = () => {
   };
   // on change Dealer
   const DealerChange = async (value, option) => {
-    alert("Dealer Change");
 
     SetSubdealerList([]);
     SetCurrentCustomer("");
@@ -281,7 +280,7 @@ const Report = () => {
     SetCustomerList(customer_list?.data?.data?.user_list);
   };
   const CustomerChange = async (value, option) => {
-    alert("Customer Change");
+    
     SetCurrentCustomer(value);
     // form.setFieldValue('');
     // const user_get_data = {user_id:value};
