@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import {Link,useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { TEMPLATE } from "constants/ThemeConstant";
 import {
   MenuFoldOutlined,
@@ -33,7 +33,7 @@ export const HeaderNav = (props) => {
 
   const [searchActive, setSearchActive] = useState(false);
   const token = useSelector((state) => state.auth);
-  
+
   const role_id = token?.user_info?.role_id;
   const dispatch = useDispatch();
 
@@ -120,7 +120,6 @@ export const HeaderNav = (props) => {
     if (!isMobile) {
       onSearchClose();
     }
-    
   });
 
   return (
@@ -165,7 +164,7 @@ export const HeaderNav = (props) => {
                 </Space>
               </>
             )}
-            {role_id == 6 && (
+            {/* {role_id == 6 && (
               <>
                 <Space wrap>
                   <Popover content={settings}>
@@ -175,7 +174,7 @@ export const HeaderNav = (props) => {
                   </Popover>
                 </Space>
               </>
-            )}
+            )} */}
             {/* <NavNotification mode={navMode} /> */}
             <NavProfile mode={navMode} />
           </NavEdge>

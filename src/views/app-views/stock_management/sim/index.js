@@ -10,10 +10,12 @@ import Edit from "./edit";
 import Assign from "../demo/index";
 
 export const Sim = () => {
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
 
   const [simList, setSimList] = useState([]);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [mainsimList, seMainSimList] = useState([]);
+
   const [isCreateVisible, setIsCreateVisible] = useState(false);
   const [isEditVisible, setIsEditVisible] = useState(false);
   const [isAssignVisible, setIsAssignVisible] = useState(false);
@@ -57,6 +59,7 @@ export const Sim = () => {
           valid_to: item.valid_to,
         }));
         setSimList(processedData);
+        seMainSimList(processedData);
       } else {
         console.error("API request was not successful");
       }
@@ -96,7 +99,7 @@ export const Sim = () => {
   }
 
   useEffect(() => {
-    loadSims(setSimList);
+    loadSims();
   }, []);
 
   const tableColumns = [
@@ -143,12 +146,13 @@ export const Sim = () => {
   ];
 
   const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const searchArray = e.currentTarget.value ? simList : [];
-    const data = utils.wildCardSearch(searchArray, value);
-    setSimList(data);
+    const searchValue = e.currentTarget.value;
+    const searchArray = searchValue ? simList : mainsimList; // Use a different source if needed
+    const filteredUserList = utils.wildCardSearch(searchArray, searchValue);
+    setSimList(filteredUserList);
     setSelectedRowKeys([]);
   };
+
   const rowSelection = {
     onChange: (key, rows) => {
       setSelectedRows(rows);

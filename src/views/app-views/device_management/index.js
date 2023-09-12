@@ -15,8 +15,16 @@ import {
 import { PlusOutlined } from "@ant-design/icons";
 import api from "configs/apiConfig";
 import { Space, Menu, Dropdown, message } from "antd";
-import { DownOutlined, EditOutlined, SettingOutlined } from "@ant-design/icons";
+import Flex from "components/shared-components/Flex";
+
+import {
+  DownOutlined,
+  EditOutlined,
+  SettingOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import Config from "./config";
+import utils from "utils";
 
 const { Option } = Select;
 
@@ -43,6 +51,7 @@ const Device = () => {
   };
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]);
 
   const [adminList, SetAdminList] = useState([]);
   const [distributorList, SetDistributorList] = useState([]);
@@ -62,6 +71,7 @@ const Device = () => {
   const [simList, SetSimList] = useState([]);
   const [simData, SetSimData] = useState("");
   const [vehicleList, setVehicleList] = useState([]);
+  const [mainvehicleList, setMainVehicleList] = useState([]);
 
   const [deviceList, SetDeviceList] = useState([]);
   const [deviceData, SetDeviceData] = useState("");
@@ -471,6 +481,7 @@ const Device = () => {
           client_name: item.client_name,
         }));
         setVehicleList(processedData);
+        setMainVehicleList(processedData);
       } else {
         console.error("API request was not successful");
       }
@@ -512,13 +523,13 @@ const Device = () => {
   }
 
   useEffect(() => {
-    loadVehicles(setVehicleList);
-    loadPlans(SetPlanList);
-    loadsims(SetSimList);
-    loaddevices(SetDeviceList);
+    loadVehicles();
+    loadPlans();
+    loadsims();
+    loaddevices();
   }, []);
 
-  async function loadPlans(SetPlanList) {
+  const loadPlans = async () => {
     SetPlanList([]);
 
     const data = { user_id: currentUser };
@@ -531,15 +542,23 @@ const Device = () => {
       .catch((err) => {
         return err;
       });
-    SetPlanList(plan_list?.data.data);
-  }
+    SetPlanList(plan_list?.data?.data);
+  };
+
+  const onSearch = (e) => {
+    const searchValue = e.currentTarget.value;
+    const searchArray = searchValue ? vehicleList : mainvehicleList; // Use a different source if needed
+    const filteredUserList = utils.wildCardSearch(searchArray, searchValue);
+    setVehicleList(filteredUserList);
+    setSelectedRowKeys([]);
+  };
 
   const rowSelection = {
     onChange: (key, rows) => {
+      setSelectedRows(rows);
       setSelectedRowKeys(key);
     },
   };
-
   const parentFunction = () => {
     setIsComponentVisible(false);
   };
@@ -551,6 +570,17 @@ const Device = () => {
       )}
       <Card title="Vehicle List">
         <Row>
+          <Flex className="mb-1" mobileFlex={false}>
+            <div className="mr-md-3 mb-3">
+              <Input
+                placeholder="Search"
+                prefix={<SearchOutlined />}
+                onChange={(e) => onSearch(e)}
+              />
+            </div>
+
+            <div className="mb-3"></div>
+          </Flex>
           <Col span={4}>
             <Button type="primary" onClick={showDrawer} icon={<PlusOutlined />}>
               Add Vehicle

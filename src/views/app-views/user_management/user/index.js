@@ -9,7 +9,8 @@ import Edit from "./edit";
 import Create from "./create";
 
 export const User = () => {
-  const [userList, setUserList] = useState([]);
+  const [userList, setUserList] = useState();
+  const [mainuserList, setMainUserList] = useState();
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -59,6 +60,7 @@ export const User = () => {
 
         console.log(processedData);
         setUserList(processedData);
+        setMainUserList(processedData);
       } else {
         console.error("API request was not successful");
       }
@@ -127,12 +129,13 @@ export const User = () => {
   ];
 
   const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const searchArray = e.currentTarget.value ? userList : [];
-    const data = utils.wildCardSearch(searchArray, value);
-    setUserList(data);
+    const searchValue = e.currentTarget.value;
+    const searchArray = searchValue ? userList : mainuserList; // Use a different source if needed
+    const filteredUserList = utils.wildCardSearch(searchArray, searchValue);
+    setUserList(filteredUserList);
     setSelectedRowKeys([]);
   };
+
   const rowSelection = {
     onChange: (key, rows) => {
       setSelectedRows(rows);

@@ -1,5 +1,14 @@
-import React,{useState,useEffect} from 'react'
-import { Card,Table, Button, Select, Input, Form, Space, DatePicker } from "antd";
+import React, { useState, useEffect } from "react";
+import {
+  Card,
+  Table,
+  Button,
+  Select,
+  Input,
+  Form,
+  Space,
+  DatePicker,
+} from "antd";
 import api from "configs/apiConfig";
 import Flex from "components/shared-components/Flex";
 import { FileExcelOutlined, SearchOutlined } from "@ant-design/icons";
@@ -44,10 +53,18 @@ function Idlereport({}) {
     },
   ];
 
+  const getUser = () => {
+    return localStorage.getItem("id");
+  };
+
+  const user = getUser();
+
   useEffect(() => {
     async function fetchVehicleOptions() {
       try {
-        const response = await api.get("vehicle_list");
+        const data = { user_id: user };
+
+        const response = await api.post("vehicle_list", data);
         if (response.data.success) {
           setVehicleOptions(response.data.data);
         } else {
@@ -73,7 +90,7 @@ function Idlereport({}) {
     console.log("Selected Date Range:", selectedDateRange);
     if (selectedDateRange) {
       const [startDate, endDate] = selectedDateRange;
-      console.log("Start Date:", startDate.format("YYYY-MM-DD"));  
+      console.log("Start Date:", startDate.format("YYYY-MM-DD"));
       console.log("End Date:", endDate.format("YYYY-MM-DD"));
     }
     console.log("Selected Vehicle ID:", selectedVehicleId);
@@ -137,7 +154,7 @@ function Idlereport({}) {
   return (
     <div>
       <Card title="Idle Report">
-      <Flex
+        <Flex
           alignItems="center"
           justifyContent="space-between"
           mobileFlex={false}
@@ -176,7 +193,7 @@ function Idlereport({}) {
                 )}
               </Select>
             </div>
-            
+
             <div className="mb-3 mr-3">
               <Button
                 type="primary"
@@ -198,13 +215,15 @@ function Idlereport({}) {
             </div>
           </Flex>
         </Flex>
-        <Table bordered rowKey="id" columns={tableColumns} dataSource={idleList}>
-
-        </Table>
+        <Table
+          bordered
+          rowKey="id"
+          columns={tableColumns}
+          dataSource={idleList}
+        ></Table>
       </Card>
-      
     </div>
-  )
+  );
 }
 
-export default Idlereport
+export default Idlereport;

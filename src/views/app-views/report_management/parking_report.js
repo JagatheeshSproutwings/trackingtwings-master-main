@@ -15,10 +15,18 @@ export const ParkingReport = () => {
   const [selectedVehicleId, setSelectedVehicleId] = useState("All");
   const [vehicleOptions, setVehicleOptions] = useState([]);
 
+  const getUser = () => {
+    return localStorage.getItem("id");
+  };
+
+  const user = getUser();
+
   useEffect(() => {
     async function fetchVehicleOptions() {
       try {
-        const response = await api.get("vehicle_list");
+        const data = { user_id: user };
+
+        const response = await api.post("vehicle_list", data);
         if (response.data.success) {
           setVehicleOptions(response.data.data);
         } else {
