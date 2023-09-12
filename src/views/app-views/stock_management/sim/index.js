@@ -36,8 +36,12 @@ export const Sim = () => {
     setIsEditVisible(false);
     setIsAssignVisible(true);
   };
+  const parentFunction = () => {
+    console.log(simList);
+    loadSims();
+  };
 
-  async function loadSims(setSimList) {
+  const loadSims = async () => {
     try {
       const response = await api.post("sim_list");
 
@@ -59,7 +63,7 @@ export const Sim = () => {
     } catch (error) {
       console.error("Error fetching users:", error);
     }
-  }
+  };
 
   function handleEditClick(record) {
     setEditData([
@@ -67,6 +71,7 @@ export const Sim = () => {
       record.network_id,
       record.network_provider_name,
       record.sim_imei_no,
+      record.sim_mob_no1,
       record.sim_mob_no2,
       record.valid_form,
       record.valid_to,
@@ -200,9 +205,22 @@ export const Sim = () => {
           </Card>
         </Col>
         <Col sm={24} md={10} lg={10}>
-          {isCreateVisible && <Create />}
-          {isEditVisible && <Edit key={editdata[0]} parentToChild={editdata} />}
-          {isAssignVisible && <Assign parentToChild={assigndata} />}
+          {isCreateVisible && <Create parentFunction={parentFunction} />}
+
+          {isAssignVisible && (
+            <Assign
+              key={assigndata[0]}
+              parentToChild={assigndata}
+              parentFunction={parentFunction}
+            />
+          )}
+          {isEditVisible && (
+            <Edit
+              key={editdata[0]}
+              parentToChild={editdata}
+              parentFunction={parentFunction}
+            />
+          )}
         </Col>
       </Row>
     </>

@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Row, Col, Card, Select, Form, Button } from "antd";
+import { Row, Col, Card, Select, Form, Button, notification } from "antd";
 import api from "configs/apiConfig";
-import Input from "antd/es/input/Input";
 import Flex from "components/shared-components/Flex";
 const { Option } = Select;
 
-const Assign = ({ parentToChild }) => {
+const Assign = ({ parentToChild, ...props }) => {
   const [form] = Form.useForm();
   const [isComponentVisible, setIsComponentVisible] = useState(true);
 
@@ -17,12 +16,19 @@ const Assign = ({ parentToChild }) => {
   const toggleComponentVisibility = () => {
     setIsComponentVisible(!isComponentVisible);
   };
+
   const [currentUser, SetCurrentUser] = useState(
     localStorage.getItem("id") || ""
   );
   const [currentRole, SetCurrentRole] = useState(
     localStorage.getItem("role") || ""
   );
+  const openNotification = (type, message, description) => {
+    notification[type]({
+      message,
+      description,
+    });
+  };
 
   const getUserList = async () => {
     const user_data = { user_id: currentUser };
@@ -117,28 +123,21 @@ const Assign = ({ parentToChild }) => {
   }, []);
 
   const onFinish = async (values) => {
-    console.log(values["type"]);
-    values["id"] = parentToChild[0];
     if (parentToChild[1] == "Sim") {
-      const form_data = await api
-        .post("sim_transfer", values)
-        .then((res) => {
-          return alert("Sim Transfered Successfuly");
-        })
-        .catch((err) => {
-          return [];
-        });
+      values["id"] = parentToChild[0];
+      await api.post("sim_transfer", values);
+      form.resetFields();
+      props.parentFunction();
+      openNotification("success", "Device", "Sim Transfered Successfully!");
+
       toggleComponentVisibility();
     } else if (parentToChild[1] == "Device") {
       values["id"] = parentToChild[0];
-      const form_data = await api
-        .post("device_transfer", values)
-        .then((res) => {
-          return alert("Device Transfered Successfuly");
-        })
-        .catch((err) => {
-          return [];
-        });
+      await api.post("device_transfer", values);
+      form.resetFields();
+      props.parentFunction();
+      openNotification("success", "Device", "Device Transfered Successfully!");
+
       toggleComponentVisibility();
     }
   };

@@ -16,15 +16,10 @@ export const User = () => {
   const [isCreateVisible, setIsCreateVisible] = useState(false);
   const [isEditVisible, setIsEditVisible] = useState(false);
   const [editdata, setEditData] = useState("");
-  const [newData,SetNewData] = useState(0);
 
   const handleCreateCard = () => {
     setIsCreateVisible(true);
     setIsEditVisible(false);
-  };
-  const handleEditCard = () => {
-    setIsCreateVisible(false);
-    setIsEditVisible(true);
   };
 
   const getUser = () => {
@@ -38,12 +33,10 @@ export const User = () => {
   };
   const role = getRole();
 
-    const parentFunction = () => {
-      console.log(userList);
-      loadUsers();
-    };
-
-
+  const parentFunction = () => {
+    console.log(userList);
+    loadUsers();
+  };
 
   const loadUsers = async () => {
     const data = { user_id: user, role_id: role };
@@ -195,8 +188,14 @@ export const User = () => {
           </Card>
         </Col>
         <Col sm={24} md={10} lg={10}>
-          {isCreateVisible && <Create parentFunction={parentFunction}/>}
-          {isEditVisible && <Edit key={editdata[0]} parentToChild={editdata} />}
+          {isCreateVisible && <Create parentFunction={parentFunction} />}
+          {isEditVisible && (
+            <Edit
+              key={editdata[0]}
+              parentToChild={editdata}
+              parentFunction={parentFunction}
+            />
+          )}
         </Col>
       </Row>
     </>

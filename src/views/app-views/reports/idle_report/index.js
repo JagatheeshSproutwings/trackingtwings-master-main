@@ -18,7 +18,7 @@ export const IdleReport = () => {
   useEffect(() => {
     async function fetchVehicleOptions() {
       try {
-        const response = await api.get("vehicle_list");
+        const response = await api.post("vehicle_list");
         if (response.data.success) {
           setVehicleOptions(response.data.data);
         } else {
@@ -45,7 +45,7 @@ export const IdleReport = () => {
     console.log("Selected Date Range:", selectedDateRange);
     if (selectedDateRange) {
       const [startDate, endDate] = selectedDateRange;
-      console.log("Start Date:", startDate.format("YYYY-MM-DD"));  
+      console.log("Start Date:", startDate.format("YYYY-MM-DD"));
       console.log("End Date:", endDate.format("YYYY-MM-DD"));
     }
     console.log("Selected Vehicle ID:", selectedVehicleId);

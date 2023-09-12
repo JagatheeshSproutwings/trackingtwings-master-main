@@ -32,7 +32,12 @@ export const Device = () => {
     setIsAssignVisible(true);
   };
 
-  async function loadDevices(setDeviceList) {
+  const parentFunction = () => {
+    console.log(deviceList);
+    loadDevices();
+  };
+
+  const loadDevices = async () => {
     try {
       const response = await api.post("device_list");
 
@@ -56,7 +61,7 @@ export const Device = () => {
     } catch (error) {
       console.error("Error fetching users:", error);
     }
-  }
+  };
 
   function handleEditClick(record) {
     setEditData([
@@ -200,9 +205,21 @@ export const Device = () => {
           </Card>
         </Col>
         <Col sm={24} md={10} lg={10}>
-          {isCreateVisible && <Create />}
-          {isAssignVisible && <Assign parentToChild={assigndata} />}
-          {isEditVisible && <Edit key={editdata[0]} parentToChild={editdata} />}
+          {isCreateVisible && <Create parentFunction={parentFunction} />}
+          {isAssignVisible && (
+            <Assign
+              key={assigndata[0]}
+              parentToChild={assigndata}
+              parentFunction={parentFunction}
+            />
+          )}
+          {isEditVisible && (
+            <Edit
+              key={editdata[0]}
+              parentToChild={editdata}
+              parentFunction={parentFunction}
+            />
+          )}
         </Col>
       </Row>
     </>

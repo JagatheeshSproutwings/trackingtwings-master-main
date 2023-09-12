@@ -18,7 +18,7 @@ export const ParkingReport = () => {
   useEffect(() => {
     async function fetchVehicleOptions() {
       try {
-        const response = await api.get("vehicle_list");
+        const response = await api.post("vehicle_list");
         if (response.data.success) {
           setVehicleOptions(response.data.data);
         } else {
