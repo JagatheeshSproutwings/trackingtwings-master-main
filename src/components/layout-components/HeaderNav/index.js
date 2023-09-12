@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import {Link } from "react-router-dom";
+import {Link,useNavigate } from "react-router-dom";
 import { TEMPLATE } from "constants/ThemeConstant";
 import {
   MenuFoldOutlined,
@@ -28,11 +28,12 @@ import {
 import utils from "utils";
 
 export const HeaderNav = (props) => {
+  const navigate = useNavigate();
   const { isMobile } = props;
 
   const [searchActive, setSearchActive] = useState(false);
   const token = useSelector((state) => state.auth);
-
+  
   const role_id = token?.user_info?.role_id;
   const dispatch = useDispatch();
 
@@ -101,6 +102,7 @@ export const HeaderNav = (props) => {
     if (!isMobile) {
       onSearchClose();
     }
+    
   });
 
   return (
@@ -124,7 +126,7 @@ export const HeaderNav = (props) => {
               </NavItem>
             )}
             <div className="ant-menu-item ant-menu-item-only-child">
-              <SearchInput mode={navMode} isMobile={isMobile} />
+              <SearchInput size="small" mode={navMode} isMobile={isMobile} />
             </div>
           </NavEdge>
 

@@ -47,12 +47,12 @@ const IdleVehicles = () => {
     itemLayout="horizontal"
     size='small'
     dataSource={multi_idle_vehicles}
-    pagination={{
-      onChange: page => {
-        console.log(page);
-      },
-      pageSize: 5,
-    }}
+    // pagination={{
+    //   onChange: page => {
+    //     console.log(page);
+    //   },
+    //   pageSize: 5,
+    // }}
     renderItem={item => (
       <List.Item  actions={[ <a key="list-loadmore-more"><FontAwesomeIcon icon={faEllipsisVertical} style={{fontSize: '15px',padding:'0',color:GREEN_BASE}}/></a>]}>
         <List.Item.Meta

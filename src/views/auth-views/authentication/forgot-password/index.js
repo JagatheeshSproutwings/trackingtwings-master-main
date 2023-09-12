@@ -4,11 +4,14 @@ import { MailOutlined } from '@ant-design/icons';
 import { useSelector } from 'react-redux';
 
 const backgroundStyle = {
+	
 	backgroundImage: 'url(/img/others/img-17.jpg)',
 	backgroundRepeat: 'no-repeat',
 	backgroundSize: 'cover'
 }
-
+const cardStyle = {
+	background:'none'
+}
 const ForgotPassword = () => {
 	const [form] = Form.useForm();
 	const [loading, setLoading] = useState(false);
@@ -28,7 +31,7 @@ const ForgotPassword = () => {
 			<div className="container d-flex flex-column justify-content-center h-100">
 				<Row justify="center">
 					<Col xs={20} sm={20} md={20} lg={9}>
-						<Card>
+						<Card style={cardStyle}>
 							<div className="my-2">
 								<div className="text-center">
 									<img className="img-fluid" src={`/img/${theme === 'light' ? 'logo.png': 'logo-white.png'}`} alt="" />

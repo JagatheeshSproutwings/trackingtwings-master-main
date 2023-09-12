@@ -103,7 +103,7 @@ export const LoginForm = (props) => {
       >
         <Alert type="error" showIcon message={message}></Alert>
       </motion.div>
-      <Form layout="vertical" name="login-form" onFinish={onLogin}>
+      <Form layout="vertical" name="login-form" onFinish={onLogin} style={{backgroundColor:'none'}}>
         <Form.Item
           name="email"
           label="Email/Username"
@@ -127,14 +127,7 @@ export const LoginForm = (props) => {
               }`}
             >
               <span>Password</span>
-              {showForgetPassword && (
-                <span
-                  onClick={() => onForgetPasswordClick}
-                  className="cursor-pointer font-size-sm font-weight-normal text-muted"
-                >
-                  Forget Password?
-                </span>
-              )}
+              
             </div>
           }
           rules={[
@@ -151,6 +144,17 @@ export const LoginForm = (props) => {
             Sign In
           </Button>
         </Form.Item>
+        
+        <span className="cursor-pointer font-size-sm font-weight-normal text-muted"> Remember Password</span>
+        {showForgetPassword && (
+              
+                <span
+                  onClick={() => onForgetPasswordClick}
+                  className="cursor-pointer font-size-sm font-weight-normal text-muted float-right"
+                >
+                  Forget Password?
+                </span>
+              )}
         {/* {
 					otherSignIn ? renderOtherSignIn : null
 				} */}
@@ -168,7 +172,7 @@ LoginForm.propTypes = {
 
 LoginForm.defaultProps = {
   otherSignIn: true,
-  showForgetPassword: false,
+  showForgetPassword: true,
 };
 
 const mapStateToProps = ({ auth }) => {

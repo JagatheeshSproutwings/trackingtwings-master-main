@@ -123,7 +123,7 @@ const [vehicle_status,setvehicleStatus] = useState("");
 
   useEffect(()=>{
     const interval = setInterval(() => {
-      vehicle_list();
+      //vehicle_list();
     }, 1000);
     return () => {
       clearInterval(interval);
@@ -169,12 +169,6 @@ const [vehicle_status,setvehicleStatus] = useState("");
     itemLayout="horizontal"
     size='small'
     dataSource={multipleVehicles}
-    pagination={{
-      onChange: page => {
-        console.log(page);
-      },
-      pageSize: 5,
-    }}
     renderItem={item => (
       <List.Item  value={item?.id} actions={[ <a key="list-loadmore-more"><FontAwesomeIcon icon={faEllipsisVertical} style={{fontSize: '15px',padding:'0',color:GREEN_BASE}}/></a>]}>
         <List.Item.Meta

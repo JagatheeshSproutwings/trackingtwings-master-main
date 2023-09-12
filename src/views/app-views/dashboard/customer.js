@@ -9,7 +9,7 @@ import MovingVehicles from 'components/map-components/movingVehicles';
 import ParkingVehicles from 'components/map-components/parkingVehicles';
 import NoNetworkVehicles from 'components/map-components/noNetworkVehicles';
 import ExpiryVehicles from 'components/map-components/expiryVehicles';
-
+const { Option } = Select
 
 export const Customer = () => {
     // const mapStyle = {
@@ -52,10 +52,46 @@ export const Customer = () => {
     
 return(
     <>
-        {/* <Row style={{height:'600','margin':'0','padding':'0'}}>
+        <Row style={{height:'600','margin':'0','padding':'0'}}>
             <Col xs={24} sm={24} md={24} lg={24} style={{padding:0,margin:0}}>
                 <Row gutter={6} style={{padding:0,margin:0}}>
                     <Col sm={12} md={6} lg={6}  style={{padding:0,margin:0}}>
+                    <Form name="customer-form" layout="inline" size="small">
+                            <Col xs={12}>
+                            <Form.Item name="dealer_id" size="small" rules={[{required:true,message:'Dealer Value is Required!'}]}>
+                                <Select showSearch onChange={handleChange} placeholder="Dealer/Reseller">
+                                    <Option value="1" selected>Acute</Option>
+                                </Select>
+                            </Form.Item>
+                            </Col>
+                            <Col xs={12}>
+                            <Form.Item name="customer_id" size="small" rules={[{required:true,message:'Customer Value is Required!'}]}>
+                                <Select showSearch onChange={handleChange} placeholder="Customer">
+                                    <Option value="1">Customer 1</Option>
+                                    <Option value="2">Customer 2</Option>
+                                    <Option value="3">Customer 3</Option>
+                                    <Option value="4">Customer 4</Option>
+                                </Select>
+                            </Form.Item>
+                            </Col>
+                            <Col xs={12}>
+                            <Form.Item name="dealer_id"  rules={[{required:true,message:'Dealer Value is Required!'}]}>
+                                <Select showSearch onChange={handleChange} placeholder="Dealer/Reseller">
+                                    <Option value="1" selected>Acute</Option>
+                                </Select>
+                            </Form.Item>
+                            </Col>
+                            <Col xs={12}>
+                            <Form.Item name="customer_id"  rules={[{required:true,message:'Customer Value is Required!'}]}>
+                                <Select showSearch onChange={handleChange} placeholder="Customer">
+                                    <Option value="1">Customer 1</Option>
+                                    <Option value="2">Customer 2</Option>
+                                    <Option value="3">Customer 3</Option>
+                                    <Option value="4">Customer 4</Option>
+                                </Select>
+                            </Form.Item>
+                            </Col>
+                        </Form>
                         <Card style={{padding:0,margin:0}}>
                             <StickyContainer style={{padding:0,margin:0}}>
                                 <Tabs defaultActiveKey="1"  items={[
@@ -141,8 +177,8 @@ return(
                     </Col>
                 </Row>
             </Col>
-        </Row> */}
-         <Row>
+        </Row>
+         {/* <Row>
             <Col xs={24} sm={24} md={24} lg={24}>
                 <Row gutter={6} style={{padding:0,margin:0}}>
                     <Col sm={12} md={5} lg={5}>
@@ -227,7 +263,7 @@ return(
                     </Col>
                 </Row>
             </Col> 
-        </Row>                          
+        </Row>                           */}
         {/* <MapContainer center={center} zoom={13} scrollWheelZoom={true}>
         <LayersControl>
                                     <BaseLayer checked name="OpenStreetMap">
