@@ -1,43 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { Row, Col, Card, Select, Form, Button, Input,Space,notification } from "antd";
+import {
+  Row,
+  Col,
+  Card,
+  Select,
+  Form,
+  Button,
+  Input,
+  Space,
+  notification,
+} from "antd";
 import api from "configs/apiConfig";
 import Flex from "components/shared-components/Flex";
-import ButtonGroup from "antd/es/button/button-group";
 import { GREEN_BASE } from "constants/ThemeConstant";
 
 const { TextArea } = Input;
 const { Option } = Select;
 
-const Report = (props) => {
+const Create = (props) => {
   const [form] = Form.useForm();
-
   const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-
-  function handlePassword(event) {
-    let new_pass = event.target.value;
-    setPassword(new_pass);
-
-    // Regular expressions to validate password
-    var lowerCase = /[a-z]/g;
-    var upperCase = /[A-Z]/g;
-    var numbers = /[0-9]/g;
-    var symbols = /[!@#$%^&*()_+{}\[\]:;<>,.?~\\-]/g;
-
-    if (!new_pass.match(lowerCase)) {
-      setErrorMessage("Should contain lowercase letters!");
-    } else if (!new_pass.match(upperCase)) {
-      setErrorMessage("Should contain uppercase letters!");
-    } else if (!new_pass.match(numbers)) {
-      setErrorMessage("Should contain numbers!");
-    } else if (!new_pass.match(symbols)) {
-      setErrorMessage("Should contain at least one symbol!");
-    } else if (new_pass.length < 10) {
-      setErrorMessage("length should be more than 10.");
-    } else {
-      setErrorMessage("Password is strong!");
-    }
-  }
 
   const [adminList, SetAdminList] = useState([]);
   const [distributorList, SetDistributorList] = useState([]);
@@ -50,39 +32,77 @@ const Report = (props) => {
   const [selectedCountryId, setSelectedCountryId] = useState();
   const [countryOptions, setCountryOptions] = useState([]);
 
+  const openNotification = (type, message, description) => {
+    notification[type]({
+      message,
+      description,
+    });
+  };
+
+  function handlePassword(event) {
+    let new_pass = event;
+    setPassword(new_pass);
+
+    // Regular expressions to validate password
+    var lowerCase = /[a-z]/g;
+    var upperCase = /[A-Z]/g;
+    var numbers = /[0-9]/g;
+    var symbols = /[!@#$%^&*()_+{}\[\]:;<>,.?~\\-]/g;
+
+    if (!new_pass.match(lowerCase)) {
+      openNotification("info", "Password", "Should contain lowercase letters!");
+    } else if (!new_pass.match(upperCase)) {
+      openNotification("info", "Password", "Should contain uppercase letters!");
+    } else if (!new_pass.match(numbers)) {
+      openNotification("info", "Password", "Should contain numbers!");
+    } else if (!new_pass.match(symbols)) {
+      openNotification("info", "Password", "Should contain one symbol!");
+    } else if (new_pass.length < 10) {
+      openNotification("info", "Password", "length should be more than 10");
+    } else {
+      return "OK";
+    }
+  }
+
   const onFinish = async (values) => {
-    document.getElementById("name_er_span").textContent = "";
-    document.getElementById("email_er_span").textContent = "";
-    document.getElementById("mobile_er_span").textContent = "";
-
-    try {
-      await api.post("user/store", values);
-      form.resetFields();
-      props.parentFunction();
-      alert("Data Saved Successfully");
-
-    } catch (error) {
-      if (error.response && error.response.status === 403) {
-        const errorData = error.response.data;
-        if (errorData.message && typeof errorData.message === "object") {
-          const validationErrors = errorData.message;
-          if (validationErrors.hasOwnProperty("name")) {
-            console.log(validationErrors.name);
-            document.getElementById("name_er_span").textContent =
-              validationErrors.name;
-          }
-          if (validationErrors.hasOwnProperty("email")) {
-            console.log(validationErrors.email);
-            document.getElementById("email_er_span").textContent =
-              validationErrors.email;
-          }
-          if (validationErrors.hasOwnProperty("mobile_no")) {
-            console.log(validationErrors.mobile_no);
-            document.getElementById("mobile_er_span").textContent =
-              validationErrors.mobile_no;
+    const res = handlePassword(values["password"]);
+    if (res == "OK") {
+      try {
+        await api.post("user/store", values);
+        form.resetFields();
+        props.parentFunction();
+        openNotification("success", "User", "User Created Successfully!");
+      } catch (error) {
+        if (error.response && error.response.status === 403) {
+          const errorData = error.response.data;
+          if (errorData.message && typeof errorData.message === "object") {
+            const validationErrors = errorData.message;
+            if (validationErrors.hasOwnProperty("name")) {
+              openNotification("info", "Name", "Given Name is Already Exists");
+            }
+            if (validationErrors.hasOwnProperty("email")) {
+              openNotification(
+                "info",
+                "E-Mail ID",
+                "Given E-Mail ID is Already Exists"
+              );
+            }
+            if (validationErrors.hasOwnProperty("mobile_no")) {
+              openNotification(
+                "info",
+                "Mobile No",
+                "Given Mobile No is Already Exists"
+              );
+            }
           }
         }
       }
+    } else {
+      openNotification(
+        "error",
+        "Password",
+        "Password Should be as per the rules"
+      );
     }
   };
 
@@ -525,7 +545,6 @@ const Report = (props) => {
                     <Col sm={12} md={12} lg={12}>
                       <Form.Item
                         value={password}
-                        onChange={handlePassword}
                         label="Password"
                         name="password"
                         rules={[
@@ -651,46 +670,23 @@ const Report = (props) => {
                         <TextArea rows={4} maxLength={100} />
                       </Form.Item>
                     </Col>
-                    
-                    
-                    <span
-                      id="name_er_span"
-                      style={{
-                        color: "red",
-                        fontSize: "12px",
-                        fontWeight: "bold",
-                        fontFamily: "sans-serif",
-                      }}
-                    ></span>
-                    <span
-                      id="email_er_span"
-                      style={{
-                        color: "red",
-                        fontSize: "12px",
-                        fontWeight: "bold",
-                        fontFamily: "sans-serif",
-                      }}
-                    ></span>
-                    <span
-                      id="mobile_er_span"
-                      style={{
-                        color: "red",
-                        fontSize: "12px",
-                        fontWeight: "bold",
-                        fontFamily: "sans-serif",
-                      }}
-                    ></span>
                   </Row>
                   <Row>
-                  <Col col-offset={18} sm={24} md={24} lg={24}>
-                    <Space wrap>
-                      <Button type="primary" danger shape="round">
-                        Reset
-                      </Button>
-                      <Button type="primary" style={{backgroundColor:GREEN_BASE}}success shape="round" htmlType="submit">
-                        Save
-                      </Button>
-                    </Space>
+                    <Col col-offset={18} sm={24} md={24} lg={24}>
+                      <Space wrap>
+                        <Button type="primary" danger shape="round">
+                          Reset
+                        </Button>
+                        <Button
+                          type="primary"
+                          style={{ backgroundColor: GREEN_BASE }}
+                          success
+                          shape="round"
+                          htmlType="submit"
+                        >
+                          Save
+                        </Button>
+                      </Space>
                     </Col>
                   </Row>
                 </Form>
@@ -703,4 +699,4 @@ const Report = (props) => {
   );
 };
 
-export default Report;
+export default Create;

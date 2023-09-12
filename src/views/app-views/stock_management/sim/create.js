@@ -9,6 +9,7 @@ import {
   Col,
   Space,
   DatePicker,
+  notification,
 } from "antd";
 import Flex from "components/shared-components/Flex";
 import api from "configs/apiConfig";
@@ -17,7 +18,7 @@ const dateFormat = "YYYY-MM-DD";
 
 const { Option } = Select;
 
-export default function Create() {
+const Create = (props) => {
   const [form] = Form.useForm();
 
   const [selectedNetworkId, setselectedNetworkId] = useState();
@@ -31,11 +32,14 @@ export default function Create() {
     fetchNetworkOptions(setNetworkOptions);
   }, []);
 
-  const onFinish = async (values) => {
-    document.getElementById("imei_er_span").textContent = "";
-    document.getElementById("mob1_er_span").textContent = "";
-    document.getElementById("mob2_er_span").textContent = "";
+  const openNotification = (type, message, description) => {
+    notification[type]({
+      message,
+      description,
+    });
+  };
 
+  const onFinish = async (values) => {
     const validFrom = moment(values.valid_from).format("YYYY-MM-DD");
     const validTo = moment(values.valid_to).format("YYYY-MM-DD");
 
@@ -55,34 +59,27 @@ export default function Create() {
       values["valid_to"] = valid_to.toISOString().split("T")[0];
 
       await api.post("sim/store", data);
-
-      alert("Sim Saved Successfully");
-
       form.resetFields();
-
-      document.getElementById("sim_mob_no1").value = "";
-      document.getElementById("sim_mob_no2").value = "";
-      document.getElementById("valid_from").value = "";
-      document.getElementById("valid_to").value = "";
+      props.parentFunction();
+      openNotification("success", "Sim", "Sim Inserted Successfully!");
     } catch (error) {
       if (error.response && error.response.status === 403) {
         const errorData = error.response.data;
         if (errorData.message && typeof errorData.message === "object") {
           const validationErrors = errorData.message;
           if (validationErrors.hasOwnProperty("sim_imei_no")) {
-            console.log(validationErrors.name);
-            document.getElementById("imei_er_span").textContent =
-              validationErrors.sim_imei_no;
+            openNotification(
+              "info",
+              "Sim IMEI",
+              "Given Sim IMEI No is Already Exists"
+            );
           }
           if (validationErrors.hasOwnProperty("sim_mob_no1")) {
-            console.log(validationErrors.email);
-            document.getElementById("mob1_er_span").textContent =
-              validationErrors.sim_mob_no1;
-          }
-          if (validationErrors.hasOwnProperty("sim_mob_no2")) {
-            console.log(validationErrors.mobile_no);
-            document.getElementById("mob2_er_span").textContent =
-              validationErrors.sim_mob_no2;
+            openNotification(
+              "info",
+              "Sim Mobile Number-1",
+              "Given Sim Mobile Number-1 is Already Exists"
+            );
           }
         }
       }
@@ -235,36 +232,6 @@ export default function Create() {
                     </Form.Item>
                   </Col>
                 </Row>
-
-                <span
-                  id="imei_er_span"
-                  style={{
-                    color: "red",
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                    fontFamily: "sans-serif",
-                  }}
-                ></span>
-
-                <span
-                  id="mob1_er_span"
-                  style={{
-                    color: "red",
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                    fontFamily: "sans-serif",
-                  }}
-                ></span>
-
-                <span
-                  id="mob2_er_span"
-                  style={{
-                    color: "red",
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                    fontFamily: "sans-serif",
-                  }}
-                ></span>
               </Form>
             </div>
           </Flex>
@@ -272,4 +239,6 @@ export default function Create() {
       </Col>
     </Row>
   );
-}
+};
+
+export default Create;

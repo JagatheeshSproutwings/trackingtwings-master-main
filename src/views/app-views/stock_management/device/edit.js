@@ -4,20 +4,18 @@ import {
   Card,
   Select,
   Input,
-  Alert,
   Form,
   Row,
   Col,
   Space,
-  DatePicker,
+  notification,
 } from "antd";
 import Flex from "components/shared-components/Flex";
 import api from "configs/apiConfig";
-import moment from "moment";
 
 const { Option } = Select;
 
-export default function Edit({ parentToChild }) {
+const Edit = ({ parentToChild, ...props }) => {
   const [form] = Form.useForm();
 
   const [selectedSupplierId, setselectedSupplierId] = useState();
@@ -27,19 +25,25 @@ export default function Edit({ parentToChild }) {
   const [selectedModelId, setselectedModelId] = useState();
   const [modelOptions, setModelOptions] = useState([]);
   const [isComponentVisible, setIsComponentVisible] = useState(true);
+
   const toggleComponentVisibility = () => {
     setIsComponentVisible(!isComponentVisible);
   };
-
   const handleSupplierIdChange = (roleID) => {
     setselectedSupplierId(roleID);
   };
   const handleMakeIdChange = (roleID) => {
     setselectedMakeId(roleID);
   };
-
   const handleModelIdChange = (roleID) => {
     setselectedModelId(roleID);
+  };
+
+  const openNotification = (type, message, description) => {
+    notification[type]({
+      message,
+      description,
+    });
   };
 
   useEffect(() => {
@@ -49,8 +53,6 @@ export default function Edit({ parentToChild }) {
   }, []);
 
   const onFinish = async (values) => {
-    document.getElementById("imei_er_span").textContent = "";
-
     const data = {
       id: parentToChild[0],
       supplier_id: values.supplier_id,
@@ -64,7 +66,8 @@ export default function Edit({ parentToChild }) {
     try {
       await api.post("device/update", data);
       form.resetFields();
-      alert("Sim Updated Successfully");
+      props.parentFunction();
+      openNotification("success", "Device", "Device Updated Successfully!");
       toggleComponentVisibility();
     } catch (error) {
       if (error.response && error.response.status === 403) {
@@ -72,9 +75,11 @@ export default function Edit({ parentToChild }) {
         if (errorData.message && typeof errorData.message === "object") {
           const validationErrors = errorData.message;
           if (validationErrors.hasOwnProperty("device_imei_no")) {
-            console.log(validationErrors.name);
-            document.getElementById("imei_er_span").textContent =
-              validationErrors.device_imei_no;
+            openNotification(
+              "info",
+              "Device IMEI No",
+              "Device IMEI No is Already Exists"
+            );
           }
         }
       }
@@ -307,16 +312,6 @@ export default function Edit({ parentToChild }) {
                       </Form.Item>
                     </Col>
                   </Row>
-
-                  <span
-                    id="imei_er_span"
-                    style={{
-                      color: "red",
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      fontFamily: "sans-serif",
-                    }}
-                  ></span>
                 </Form>
               </div>
             </Flex>
@@ -325,4 +320,6 @@ export default function Edit({ parentToChild }) {
       )}
     </Row>
   );
-}
+};
+
+export default Edit;

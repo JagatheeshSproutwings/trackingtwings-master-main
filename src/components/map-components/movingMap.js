@@ -22,7 +22,7 @@ const MySimpleMap = () => {
     iconSize: [40, 40],
     iconAnchor: [18, 18],
     popupAnchor: [0, -10],
-    shadowAnchor: [10, 10]
+    shadowAnchor: [10, 10],
   });
 
   const myfun = () => {

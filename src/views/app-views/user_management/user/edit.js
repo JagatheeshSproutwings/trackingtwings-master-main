@@ -1,13 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { Button, Card, Select, Input, Form, Row, Col, Space } from "antd";
+import {
+  Button,
+  Card,
+  Select,
+  Input,
+  Form,
+  Row,
+  Col,
+  Space,
+  notification,
+} from "antd";
 import Flex from "components/shared-components/Flex";
 import api from "configs/apiConfig";
 import { GREEN_BASE } from "constants/ThemeConstant";
 
-const { TextArea } = Input;
 const { Option } = Select;
 
-export default function Edit({ parentToChild }) {
+const Edit = ({ parentToChild, ...props }) => {
+  const [form] = Form.useForm();
+
   const [isComponentVisible, setIsComponentVisible] = useState(true);
 
   const toggleComponentVisibility = () => {
@@ -24,36 +35,41 @@ export default function Edit({ parentToChild }) {
     fetchCountryOptions(setCountryOptions);
   }, []);
 
-  const onFinish = async (values) => {
-    document.getElementById("name_er_span").textContent = "";
-    document.getElementById("email_er_span").textContent = "";
-    document.getElementById("mobile_er_span").textContent = "";
+  const openNotification = (type, message, description) => {
+    notification[type]({
+      message,
+      description,
+    });
+  };
 
+  const onFinish = async (values) => {
     try {
       await api.post("user/update", values);
-      // window.location.reload(true);
-      // setIsSubmitted(true);
+      form.resetFields();
+      props.parentFunction();
+      openNotification("success", "User", "User Updated Successfully!");
       toggleComponentVisibility();
-      alert("User Updated Successfully");
     } catch (error) {
       if (error.response && error.response.status === 403) {
         const errorData = error.response.data;
         if (errorData.message && typeof errorData.message === "object") {
           const validationErrors = errorData.message;
           if (validationErrors.hasOwnProperty("name")) {
-            console.log(validationErrors.name);
-            document.getElementById("name_er_span").textContent =
-              validationErrors.name;
+            openNotification("info", "Name", "Given Name is Already Exists");
           }
           if (validationErrors.hasOwnProperty("email")) {
-            console.log(validationErrors.email);
-            document.getElementById("email_er_span").textContent =
-              validationErrors.email;
+            openNotification(
+              "info",
+              "E-Mail ID",
+              "Given E-Mail ID is Already Exists"
+            );
           }
           if (validationErrors.hasOwnProperty("mobile_no")) {
-            console.log(validationErrors.mobile_no);
-            document.getElementById("mobile_er_span").textContent =
-              validationErrors.mobile_no;
+            openNotification(
+              "info",
+              "Mobile No",
+              "Given Mobile No is Already Exists"
+            );
           }
         }
       }
@@ -81,6 +97,7 @@ export default function Edit({ parentToChild }) {
             <Flex>
               <div className="container">
                 <Form
+                  form={form}
                   size="small"
                   name="registrationForm"
                   onFinish={onFinish}
@@ -181,22 +198,6 @@ export default function Edit({ parentToChild }) {
                         </Select>
                       </Form.Item>
                     </Col>
-                    <Col sm={24} md={24} lg={24}>
-                      <Form.Item
-                        size="small"
-                        label="Address"
-                        name="address"
-                        initialValue={parentToChild[9]}
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please enter a Address",
-                          },
-                        ]}
-                      >
-                        <TextArea rows={4} maxLength={100} />
-                      </Form.Item>
-                    </Col>
                   </Row>
                   <Row align={"middle"}>
                     <Col sm={12} md={12} lg={12}>
@@ -222,52 +223,22 @@ export default function Edit({ parentToChild }) {
                     <Col span={12}>
                       <Form.Item>
                         <Space wrap>
-                        <Button type="primary" shape="round">
+                          <Button type="primary" shape="round">
                             Back
                           </Button>
                           <Button
-                            type="primary" style={{backgroundColor:GREEN_BASE}}
+                            type="primary"
+                            style={{ backgroundColor: GREEN_BASE }}
                             success
                             shape="round"
                             htmlType="submit"
                           >
                             Update
                           </Button>
-                          
                         </Space>
                       </Form.Item>
                     </Col>
                   </Row>
-
-                  <span
-                    id="name_er_span"
-                    style={{
-                      color: "red",
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      fontFamily: "sans-serif",
-                    }}
-                  ></span>
-
-                  <span
-                    id="email_er_span"
-                    style={{
-                      color: "red",
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      fontFamily: "sans-serif",
-                    }}
-                  ></span>
-
-                  <span
-                    id="mobile_er_span"
-                    style={{
-                      color: "red",
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      fontFamily: "sans-serif",
-                    }}
-                  ></span>
                 </Form>
               </div>
             </Flex>
@@ -276,4 +247,6 @@ export default function Edit({ parentToChild }) {
       )}
     </Row>
   );
-}
+};
+
+export default Edit;

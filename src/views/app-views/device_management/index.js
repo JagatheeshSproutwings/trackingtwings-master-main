@@ -10,22 +10,38 @@ import {
   Select,
   Input,
   DatePicker,
+  notification,
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import api from "configs/apiConfig";
+import { Space, Menu, Dropdown, message } from "antd";
+import { DownOutlined, EditOutlined, SettingOutlined } from "@ant-design/icons";
+import Config from "./config";
 
 const { Option } = Select;
 
 const Device = () => {
   const [form] = Form.useForm();
-  const [open, setOpen] = useState(false);
+  const [isComponentVisible, setIsComponentVisible] = useState(false);
+
+  const [editdata, setEditData] = useState("");
+
   const dateFormat = "YYYY-MM-DD";
+  const [open, setOpen] = useState(false);
   const showDrawer = () => {
     setOpen(true);
   };
   const onClose = () => {
     setOpen(false);
   };
+
+  const openNotification = (type, message, description) => {
+    notification[type]({
+      message,
+      description,
+    });
+  };
+
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
   const [adminList, SetAdminList] = useState([]);
@@ -35,6 +51,7 @@ const Device = () => {
   const [customerList, SetCustomerList] = useState([]);
 
   const [planList, SetPlanList] = useState([]);
+
   //For Dealer and SubDealer Direct
   const [userValue, setUserValue] = useState(localStorage.getItem("id") || "");
 
@@ -73,24 +90,19 @@ const Device = () => {
 
     // Super Admin
     if (currentRole == 1) {
-      console.log("Super Admin");
       SetAdminList(vehicle_data?.data?.data?.user_list);
     }
     if (currentRole == 2) {
-      console.log("Admin");
       SetDistributorList(vehicle_data?.data?.data?.user_list);
     }
     if (currentRole == 3) {
-      console.log("Distributor");
       SetDealerList(vehicle_data?.data?.data?.user_list);
     }
     if (currentRole == 4) {
-      console.log("Dealer");
       SetCustomerList(vehicle_data?.data?.data?.user_list);
       SetSubdealerList(vehicle_data?.data?.data?.subdealer_list);
     }
     if (currentRole == 5) {
-      console.log("Subdealer");
       SetCustomerList(vehicle_data?.data?.data?.user_list);
     }
   };
@@ -322,8 +334,10 @@ const Device = () => {
         .toISOString()
         .split("T")[0];
       await api.post("vehicle", values);
-      alert("Vehicle Saved Successfully");
       form.resetFields();
+
+      openNotification("success", "Vehicle", "Vehicle Added Successfully!");
+      loadVehicles();
       SetSimData("");
       SetDeviceData("");
       SetMakeData("");
@@ -337,6 +351,10 @@ const Device = () => {
   };
 
   const tableColumns = [
+    {
+      title: "id",
+      dataIndex: "id",
+    },
     {
       title: "Type",
       dataIndex: "vehicle_type",
@@ -369,9 +387,73 @@ const Device = () => {
       title: "Client Name",
       dataIndex: "client_name",
     },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (text, record) => (
+        <Space size="middle">
+          <Dropdown overlay={getMenu(record)} placement="bottomLeft">
+            <Button>
+              Actions <DownOutlined />
+            </Button>
+          </Dropdown>
+        </Space>
+      ),
+    },
   ];
 
-  async function loadVehicles(setVehicleList) {
+  const getMenu = (record) => (
+    <Menu>
+      <Menu.Item
+        key="edit"
+        icon={<EditOutlined />}
+        onClick={() => handleEdit(record)}
+      >
+        Edit
+      </Menu.Item>
+      <Menu.Item
+        key="config"
+        icon={<SettingOutlined />}
+        onClick={() => handleSetting(record)}
+      >
+        Settings
+      </Menu.Item>
+    </Menu>
+  );
+
+  const handleEdit = (record) => {
+    message.success(`Editing ${record.vehicle_name}`);
+  };
+
+  const handleSetting = async (record) => {
+    try {
+      const data = {
+        vehicle_id: record.id,
+        device_imei: record.device_imei,
+      };
+      const response = await api.post("config/show", data);
+      console.log("API Response:", response);
+
+      if (response.status === 200) {
+        const responseData = response.data; // Assuming the data is directly under response.data
+        if (responseData.success) {
+          const configurationData = responseData.data; // Access the data property
+          setEditData(configurationData); // Set the data in setEditData
+          setIsComponentVisible(true);
+        } else {
+          alert(
+            "API request was successful, but the response indicates an error."
+          );
+        }
+      } else {
+        alert("API request failed with status code: " + response.status);
+      }
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
+
+  const loadVehicles = async () => {
     try {
       const user_data = { user_id: currentUser };
       const response = await api.post("vehicle_list", user_data);
@@ -395,7 +477,7 @@ const Device = () => {
     } catch (error) {
       console.error("Error fetching users:", error);
     }
-  }
+  };
   async function loadsims(SetSimList) {
     try {
       SetSimList([]);
@@ -458,8 +540,15 @@ const Device = () => {
     },
   };
 
+  const parentFunction = () => {
+    setIsComponentVisible(false);
+  };
+
   return (
     <div>
+      {isComponentVisible && (
+        <Config parentToChild={editdata} parentFunction={parentFunction} />
+      )}
       <Card title="Vehicle List">
         <Row>
           <Col span={4}>
@@ -484,411 +573,407 @@ const Device = () => {
             />
           </div>
         </Row>
-        <Drawer
-          placement="right"
-          closable={false}
-          onClose={onClose}
-          width={850}
-          open={open}
-          title="Add Vehicle"
-        >
-          <Form form={form} name="device_form" onFinish={onFinish}>
-            <h5>Users Details:</h5>
-            <Row gutter={[10, 10]}>
-              {currentRole == 1 && (
-                <Col sm={2} md={4} lg={4} xxl={4}>
-                  <Form.Item name="admin_id">
-                    <Select
-                      showSearch
-                      allowClear
-                      optionFilterProp="children"
-                      onChange={AdminChange}
-                      placeholder="Select Admin"
-                    >
-                      {Array.isArray(adminList) ? (
-                        adminList.map((admin) => (
-                          <Select.Option
-                            key={admin?.id}
-                            role_id="2"
-                            value={admin?.id}
-                          >
-                            {admin?.name}
-                          </Select.Option>
-                        ))
-                      ) : (
-                        <Select.Option role_id="2" value=""></Select.Option>
-                      )}
-                    </Select>
-                  </Form.Item>
-                </Col>
-              )}
-              {(currentRole == 1 || currentRole == 2) && (
-                <Col sm={2} md={4} lg={4} xxl={4}>
-                  <Form.Item name="distributor_id">
-                    <Select
-                      showSearch
-                      allowClear
-                      optionFilterProp="children"
-                      onChange={DistributorChange}
-                      placeholder="Select Distributor"
-                    >
-                      {Array.isArray(distributorList) ? (
-                        distributorList.map((distributor) => (
-                          <Option
-                            key={distributor?.id}
-                            role_id="3"
-                            value={distributor?.id}
-                          >
-                            {distributor?.name}
-                          </Option>
-                        ))
-                      ) : (
-                        <Option role_id="3" value=""></Option>
-                      )}
-                    </Select>
-                  </Form.Item>
-                </Col>
-              )}
-              {(currentRole == 1 || currentRole == 2 || currentRole == 3) && (
-                <Col sm={2} md={4} lg={4} xxl={4}>
-                  <Form.Item name="dealer_id">
-                    <Select
-                      showSearch
-                      allowClear
-                      optionFilterProp="children"
-                      onChange={DealerChange}
-                      placeholder="Select Dealer"
-                    >
-                      {Array.isArray(dealerList) ? (
-                        dealerList.map((dealer) => (
-                          <Option
-                            key={dealer?.id}
-                            role_id="4"
-                            value={dealer?.id}
-                          >
-                            {dealer?.name}
-                          </Option>
-                        ))
-                      ) : (
-                        <Option role_id="4" value=""></Option>
-                      )}
-                    </Select>
-                  </Form.Item>
-                </Col>
-              )}
-              {(currentRole == 1 ||
-                currentRole == 2 ||
-                currentRole == 3 ||
-                currentRole == 4) && (
-                <Col sm={2} md={4} lg={4} xxl={4}>
-                  <Form.Item name="subdealer_id">
-                    <Select
-                      showSearch
-                      allowClear
-                      optionFilterProp="children"
-                      onChange={SubDealerChange}
-                      placeholder="Select SubDealer"
-                    >
-                      {Array.isArray(subdealerList) &&
-                      subdealerList.length > 0 ? (
-                        subdealerList.map((subdealer) => (
-                          <Option
-                            key={subdealer?.id}
-                            role_id="5"
-                            value={subdealer?.id}
-                          >
-                            {subdealer?.name}
-                          </Option>
-                        ))
-                      ) : (
-                        <Option></Option>
-                      )}
-                    </Select>
-                  </Form.Item>
-                </Col>
-              )}
-              {(currentRole == 1 ||
-                currentRole == 2 ||
-                currentRole == 3 ||
-                currentRole == 4 ||
-                currentRole == 5) && (
-                <Col sm={2} md={4} lg={4} xxl={4}>
-                  <Form.Item
-                    name="client_id"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please Select Client Name",
-                      },
-                    ]}
-                  >
-                    <Select
-                      showSearch
-                      allowClear
-                      optionFilterProp="children"
-                      onChange={CustomerChange}
-                      placeholder="Select Client"
-                    >
-                      {Array.isArray(customerList) ? (
-                        customerList.map((customer) => (
-                          <Option
-                            key={customer?.id}
-                            role_id="6"
-                            value={customer?.id}
-                          >
-                            {customer?.name}
-                          </Option>
-                        ))
-                      ) : (
-                        <Option role_id="6" value=""></Option>
-                      )}
-                    </Select>
-                  </Form.Item>
-                </Col>
-              )}
-            </Row>
-            <h5>Licence Details:</h5>
-            <Row gutter={6}>
-              <Col sm={5} md={10} lg={10} xxl={10}>
-                <Form.Item
-                  name="plan_id"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please Select Plan",
-                    },
-                  ]}
-                >
-                  <Select
-                    showSearch
-                    allowClear
-                    placeholder="Select Plan"
-                    onChange={PlanChange}
-                  >
-                    {Array.isArray(planList) ? (
-                      planList.map((plan) => (
-                        <Select.Option key={plan?.id} value={plan?.id}>
-                          {plan?.package_name}
-                        </Select.Option>
-                      ))
-                    ) : (
-                      <Select.Option value=""></Select.Option>
-                    )}
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col sm={5} md={10} lg={10} xxl={10}>
-                <Form.Item
-                  name="license_id"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please Select License",
-                    },
-                  ]}
-                >
-                  <Select
-                    showSearch
-                    allowClear
-                    placeholder="Select License"
-                    optionFilterProp="children"
-                    filterOption={(input, option) =>
-                      option.children
-                        .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                  >
-                    {Array.isArray(licenseList) ? (
-                      licenseList.map((license) => (
-                        <Select.Option key={license?.id} value={license?.id}>
-                          {license?.license_no}
-                        </Select.Option>
-                      ))
-                    ) : (
-                      <Select.Option role_id="2" value=""></Select.Option>
-                    )}
-                  </Select>
-                </Form.Item>
-              </Col>
-            </Row>
-            <h5>Device Details :</h5>
-            <Row gutter={6}>
-              <Col sm={3} md={6} lg={6} xxl={6}>
-                <Form.Item
-                  name="device_id"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please Select Device IMEI",
-                    },
-                  ]}
-                >
-                  <Select
-                    showSearch
-                    allowClear
-                    onChange={DeviceChange}
-                    placeholder="Select Device IMEI"
-                    optionFilterProp="children"
-                    filterOption={(input, option) =>
-                      option.children
-                        .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                  >
-                    {Array.isArray(deviceList) ? (
-                      deviceList.map((device) => (
-                        <Select.Option key={device?.id} value={device?.id}>
-                          {device?.device_imei_no}
-                        </Select.Option>
-                      ))
-                    ) : (
-                      <Select.Option role_id="2" value=""></Select.Option>
-                    )}
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col sm={3} md={6} lg={6} xxl={6}>
-                <Form.Item>
-                  <Input type="text" value={deviceData}></Input>
-                </Form.Item>
-              </Col>
-              <Col sm={4} md={8} lg={8} xxl={8}>
-                <input
-                  type="text"
-                  name="device_make_id"
-                  hidden
-                  value={makeIdData}
-                ></input>
-                <input
-                  type="text"
-                  name="device_model_id"
-                  hidden
-                  value={modelIdData}
-                ></input>
-                <Form.Item>
-                  <Input
-                    type="textarea"
-                    value={makeData + "-" + modelData}
-                  ></Input>
-                </Form.Item>
-              </Col>
-            </Row>
-            <h5>SIM Details :</h5>
-            <Row gutter={6}>
-              <Col sm={5} md={10} lg={10} xxl={10}>
-                <Form.Item
-                  name="sim_id"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please Select Sim Mobile No",
-                    },
-                  ]}
-                >
-                  <Select
-                    showSearch
-                    allowClear
-                    placeholder="Select Sim"
-                    optionFilterProp="children"
-                    onChange={SimChange}
-                    filterOption={(input, option) =>
-                      option.children
-                        .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                  >
-                    {Array.isArray(simList) ? (
-                      simList.map((sim) => (
-                        <Select.Option key={sim?.id} value={sim?.id}>
-                          {sim?.sim_mob_no1}
-                        </Select.Option>
-                      ))
-                    ) : (
-                      <Select.Option role_id="2" value=""></Select.Option>
-                    )}
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Form.Item>
-                <Input type="text" value={simData}></Input>
-              </Form.Item>
-            </Row>
-            <h5>Vehicle Details :</h5>
-            <Row gutter={6}>
-              <Col sm={5} md={10} lg={10} xxl={10}>
-                <Form.Item
-                  name="vehicle_type_id"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please Select Vehicle Type",
-                    },
-                  ]}
-                >
-                  <Select
-                    showSearch
-                    allowClear
-                    placeholder="Select Vehicle Type"
-                    optionFilterProp="children"
-                    filterOption={(input, option) =>
-                      option.children
-                        .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                  >
-                    {Array.isArray(vehicleTypeList) ? (
-                      vehicleTypeList.map((vehicletype) => (
-                        <Select.Option
-                          key={vehicletype?.id}
-                          value={vehicletype?.id}
-                        >
-                          {vehicletype?.vehicle_type}
-                        </Select.Option>
-                      ))
-                    ) : (
-                      <Select.Option></Select.Option>
-                    )}
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col sm={4} md={8} lg={8} xxl={8}>
-                <Form.Item
-                  name="vehicle_name"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please Enter Vehicle Name",
-                    },
-                  ]}
-                >
-                  <Input
-                    type="text"
-                    name="vehicle_name"
-                    placeholder="Vehicle Name"
-                  ></Input>
-                </Form.Item>
-              </Col>
-              <Col sm={4} md={8} lg={8} xxl={8}>
-                <Form.Item name="installation_date">
-                  <DatePicker
-                    required
-                    allowClear={false}
-                    format={dateFormat}
-                    placeholder="Installation Date"
-                  ></DatePicker>
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row>
-              <Form.Item>
-                <Button type="primary" htmlType="submit">
-                  Save
-                </Button>
-              </Form.Item>
-            </Row>
-          </Form>
-        </Drawer>
       </Card>
+      <Drawer
+        placement="right"
+        closable={false}
+        onClose={onClose}
+        width={850}
+        open={open}
+        title="Add Vehicle"
+      >
+        <Form form={form} name="device_form" onFinish={onFinish}>
+          <h5>Users Details:</h5>
+          <Row gutter={[10, 10]}>
+            {currentRole == 1 && (
+              <Col sm={2} md={4} lg={4} xxl={4}>
+                <Form.Item name="admin_id">
+                  <Select
+                    showSearch
+                    allowClear
+                    optionFilterProp="children"
+                    onChange={AdminChange}
+                    placeholder="Select Admin"
+                  >
+                    {Array.isArray(adminList) ? (
+                      adminList.map((admin) => (
+                        <Select.Option
+                          key={admin?.id}
+                          role_id="2"
+                          value={admin?.id}
+                        >
+                          {admin?.name}
+                        </Select.Option>
+                      ))
+                    ) : (
+                      <Select.Option role_id="2" value=""></Select.Option>
+                    )}
+                  </Select>
+                </Form.Item>
+              </Col>
+            )}
+            {(currentRole == 1 || currentRole == 2) && (
+              <Col sm={2} md={4} lg={4} xxl={4}>
+                <Form.Item name="distributor_id">
+                  <Select
+                    showSearch
+                    allowClear
+                    optionFilterProp="children"
+                    onChange={DistributorChange}
+                    placeholder="Select Distributor"
+                  >
+                    {Array.isArray(distributorList) ? (
+                      distributorList.map((distributor) => (
+                        <Option
+                          key={distributor?.id}
+                          role_id="3"
+                          value={distributor?.id}
+                        >
+                          {distributor?.name}
+                        </Option>
+                      ))
+                    ) : (
+                      <Option role_id="3" value=""></Option>
+                    )}
+                  </Select>
+                </Form.Item>
+              </Col>
+            )}
+            {(currentRole == 1 || currentRole == 2 || currentRole == 3) && (
+              <Col sm={2} md={4} lg={4} xxl={4}>
+                <Form.Item name="dealer_id">
+                  <Select
+                    showSearch
+                    allowClear
+                    optionFilterProp="children"
+                    onChange={DealerChange}
+                    placeholder="Select Dealer"
+                  >
+                    {Array.isArray(dealerList) ? (
+                      dealerList.map((dealer) => (
+                        <Option key={dealer?.id} role_id="4" value={dealer?.id}>
+                          {dealer?.name}
+                        </Option>
+                      ))
+                    ) : (
+                      <Option role_id="4" value=""></Option>
+                    )}
+                  </Select>
+                </Form.Item>
+              </Col>
+            )}
+            {(currentRole == 1 ||
+              currentRole == 2 ||
+              currentRole == 3 ||
+              currentRole == 4) && (
+              <Col sm={2} md={4} lg={4} xxl={4}>
+                <Form.Item name="subdealer_id">
+                  <Select
+                    showSearch
+                    allowClear
+                    optionFilterProp="children"
+                    onChange={SubDealerChange}
+                    placeholder="Select SubDealer"
+                  >
+                    {Array.isArray(subdealerList) &&
+                    subdealerList.length > 0 ? (
+                      subdealerList.map((subdealer) => (
+                        <Option
+                          key={subdealer?.id}
+                          role_id="5"
+                          value={subdealer?.id}
+                        >
+                          {subdealer?.name}
+                        </Option>
+                      ))
+                    ) : (
+                      <Option></Option>
+                    )}
+                  </Select>
+                </Form.Item>
+              </Col>
+            )}
+            {(currentRole == 1 ||
+              currentRole == 2 ||
+              currentRole == 3 ||
+              currentRole == 4 ||
+              currentRole == 5) && (
+              <Col sm={2} md={4} lg={4} xxl={4}>
+                <Form.Item
+                  name="client_id"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please Select Client Name",
+                    },
+                  ]}
+                >
+                  <Select
+                    showSearch
+                    allowClear
+                    optionFilterProp="children"
+                    onChange={CustomerChange}
+                    placeholder="Select Client"
+                  >
+                    {Array.isArray(customerList) ? (
+                      customerList.map((customer) => (
+                        <Option
+                          key={customer?.id}
+                          role_id="6"
+                          value={customer?.id}
+                        >
+                          {customer?.name}
+                        </Option>
+                      ))
+                    ) : (
+                      <Option role_id="6" value=""></Option>
+                    )}
+                  </Select>
+                </Form.Item>
+              </Col>
+            )}
+          </Row>
+          <h5>Licence Details:</h5>
+          <Row gutter={6}>
+            <Col sm={5} md={10} lg={10} xxl={10}>
+              <Form.Item
+                name="plan_id"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please Select Plan",
+                  },
+                ]}
+              >
+                <Select
+                  showSearch
+                  allowClear
+                  placeholder="Select Plan"
+                  onChange={PlanChange}
+                >
+                  {Array.isArray(planList) ? (
+                    planList.map((plan) => (
+                      <Select.Option key={plan?.id} value={plan?.id}>
+                        {plan?.package_name}
+                      </Select.Option>
+                    ))
+                  ) : (
+                    <Select.Option value=""></Select.Option>
+                  )}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col sm={5} md={10} lg={10} xxl={10}>
+              <Form.Item
+                name="license_id"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please Select License",
+                  },
+                ]}
+              >
+                <Select
+                  showSearch
+                  allowClear
+                  placeholder="Select License"
+                  optionFilterProp="children"
+                  filterOption={(input, option) =>
+                    option.children
+                      .toLowerCase()
+                      .indexOf(input.toLowerCase()) >= 0
+                  }
+                >
+                  {Array.isArray(licenseList) ? (
+                    licenseList.map((license) => (
+                      <Select.Option key={license?.id} value={license?.id}>
+                        {license?.license_no}
+                      </Select.Option>
+                    ))
+                  ) : (
+                    <Select.Option role_id="2" value=""></Select.Option>
+                  )}
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+          <h5>Device Details :</h5>
+          <Row gutter={6}>
+            <Col sm={3} md={6} lg={6} xxl={6}>
+              <Form.Item
+                name="device_id"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please Select Device IMEI",
+                  },
+                ]}
+              >
+                <Select
+                  showSearch
+                  allowClear
+                  onChange={DeviceChange}
+                  placeholder="Select Device IMEI"
+                  optionFilterProp="children"
+                  filterOption={(input, option) =>
+                    option.children
+                      .toLowerCase()
+                      .indexOf(input.toLowerCase()) >= 0
+                  }
+                >
+                  {Array.isArray(deviceList) ? (
+                    deviceList.map((device) => (
+                      <Select.Option key={device?.id} value={device?.id}>
+                        {device?.device_imei_no}
+                      </Select.Option>
+                    ))
+                  ) : (
+                    <Select.Option role_id="2" value=""></Select.Option>
+                  )}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col sm={3} md={6} lg={6} xxl={6}>
+              <Form.Item>
+                <Input type="text" value={deviceData}></Input>
+              </Form.Item>
+            </Col>
+            <Col sm={4} md={8} lg={8} xxl={8}>
+              <input
+                type="text"
+                name="device_make_id"
+                hidden
+                value={makeIdData}
+              ></input>
+              <input
+                type="text"
+                name="device_model_id"
+                hidden
+                value={modelIdData}
+              ></input>
+              <Form.Item>
+                <Input
+                  type="textarea"
+                  value={makeData + "-" + modelData}
+                ></Input>
+              </Form.Item>
+            </Col>
+          </Row>
+          <h5>SIM Details :</h5>
+          <Row gutter={6}>
+            <Col sm={5} md={10} lg={10} xxl={10}>
+              <Form.Item
+                name="sim_id"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please Select Sim Mobile No",
+                  },
+                ]}
+              >
+                <Select
+                  showSearch
+                  allowClear
+                  placeholder="Select Sim"
+                  optionFilterProp="children"
+                  onChange={SimChange}
+                  filterOption={(input, option) =>
+                    option.children
+                      .toLowerCase()
+                      .indexOf(input.toLowerCase()) >= 0
+                  }
+                >
+                  {Array.isArray(simList) ? (
+                    simList.map((sim) => (
+                      <Select.Option key={sim?.id} value={sim?.id}>
+                        {sim?.sim_mob_no1}
+                      </Select.Option>
+                    ))
+                  ) : (
+                    <Select.Option role_id="2" value=""></Select.Option>
+                  )}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Form.Item>
+              <Input type="text" value={simData}></Input>
+            </Form.Item>
+          </Row>
+          <h5>Vehicle Details :</h5>
+          <Row gutter={6}>
+            <Col sm={5} md={10} lg={10} xxl={10}>
+              <Form.Item
+                name="vehicle_type_id"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please Select Vehicle Type",
+                  },
+                ]}
+              >
+                <Select
+                  showSearch
+                  allowClear
+                  placeholder="Select Vehicle Type"
+                  optionFilterProp="children"
+                  filterOption={(input, option) =>
+                    option.children
+                      .toLowerCase()
+                      .indexOf(input.toLowerCase()) >= 0
+                  }
+                >
+                  {Array.isArray(vehicleTypeList) ? (
+                    vehicleTypeList.map((vehicletype) => (
+                      <Select.Option
+                        key={vehicletype?.id}
+                        value={vehicletype?.id}
+                      >
+                        {vehicletype?.vehicle_type}
+                      </Select.Option>
+                    ))
+                  ) : (
+                    <Select.Option></Select.Option>
+                  )}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col sm={4} md={8} lg={8} xxl={8}>
+              <Form.Item
+                name="vehicle_name"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please Enter Vehicle Name",
+                  },
+                ]}
+              >
+                <Input
+                  type="text"
+                  name="vehicle_name"
+                  placeholder="Vehicle Name"
+                ></Input>
+              </Form.Item>
+            </Col>
+            <Col sm={4} md={8} lg={8} xxl={8}>
+              <Form.Item name="installation_date">
+                <DatePicker
+                  required
+                  allowClear={false}
+                  format={dateFormat}
+                  placeholder="Installation Date"
+                ></DatePicker>
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row>
+            <Form.Item>
+              <Button type="primary" htmlType="submit">
+                Save
+              </Button>
+            </Form.Item>
+          </Row>
+        </Form>
+      </Drawer>
     </div>
   );
 };

@@ -1,11 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { Button, Card, Select, Input, Form, Row, Col, Space } from "antd";
+import {
+  Button,
+  Card,
+  Select,
+  Input,
+  Form,
+  Row,
+  Col,
+  Space,
+  notification,
+} from "antd";
 import Flex from "components/shared-components/Flex";
 import api from "configs/apiConfig";
 
 const { Option } = Select;
 
-export default function Create() {
+const Create = (props) => {
   const [form] = Form.useForm();
 
   const [selectedSupplierId, setselectedSupplierId] = useState();
@@ -26,6 +36,13 @@ export default function Create() {
     setselectedModelId(roleID);
   };
 
+  const openNotification = (type, message, description) => {
+    notification[type]({
+      message,
+      description,
+    });
+  };
+
   useEffect(() => {
     fetchSupplierOptions(setSupplierOptions);
     fetchMakeOptions(setMakeOptions);
@@ -33,8 +50,6 @@ export default function Create() {
   }, []);
 
   const onFinish = async (values) => {
-    document.getElementById("imei_er_span").textContent = "";
-
     const data = {
       supplier_id: values.supplier_id,
       device_make_id: values.device_make_id,
@@ -47,16 +62,19 @@ export default function Create() {
     try {
       await api.post("device/store", data);
       form.resetFields();
-      alert("Device Inserted Successfully");
+      props.parentFunction();
+      openNotification("success", "Device", "Device Inserted Successfully!");
     } catch (error) {
       if (error.response && error.response.status === 403) {
         const errorData = error.response.data;
         if (errorData.message && typeof errorData.message === "object") {
           const validationErrors = errorData.message;
           if (validationErrors.hasOwnProperty("device_imei_no")) {
-            console.log(validationErrors.name);
-            document.getElementById("imei_er_span").textContent =
-              validationErrors.device_imei_no;
+            openNotification(
+              "info",
+              "Device IMEI No",
+              "Device IMEI No is Already Exists"
+            );
           }
         }
       }
@@ -275,16 +293,6 @@ export default function Create() {
                     </Form.Item>
                   </Col>
                 </Row>
-
-                <span
-                  id="imei_er_span"
-                  style={{
-                    color: "red",
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                    fontFamily: "sans-serif",
-                  }}
-                ></span>
               </Form>
             </div>
           </Flex>
@@ -292,4 +300,5 @@ export default function Create() {
       </Col>
     </Row>
   );
-}
+};
+export default Create;

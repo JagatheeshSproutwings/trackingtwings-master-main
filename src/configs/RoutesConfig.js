@@ -92,6 +92,12 @@ export const protectedRoutes = [
     component: React.lazy(() => import("views/app-views/points")),
   },
   {
+    key: "notifications",
+    path: `${APP_PREFIX_PATH}/notifications`,
+    component: React.lazy(() => import("views/app-views/notifications")),
+  },
+
+  {
     key: "user_management.user",
     path: `${APP_PREFIX_PATH}/user_management/user`,
     component: React.lazy(() => import("views/app-views/user_management/user")),
