@@ -223,8 +223,8 @@ const Edit = ({ parentToChild, ...props }) => {
                     <Col span={12}>
                       <Form.Item>
                         <Space wrap>
-                          <Button type="primary" shape="round">
-                            Back
+                          <Button type="primary" danger shape="round">
+                            Reset
                           </Button>
                           <Button
                             type="primary"

@@ -1,28 +1,44 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Card, Drawer, Select, Input, Alert, Form } from "antd";
+import {
+  Table,
+  Button,
+  Card,
+  Drawer,
+  Select,
+  Input,
+  Form,
+  notification,
+} from "antd";
 import Flex from "components/shared-components/Flex";
 import api from "configs/apiConfig";
 
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import utils from "utils";
-import OrderListData from "assets/data/order-list.data.json";
-import userData from "assets/data/user-list.data.json";
 
 const { Option } = Select;
 export const User = () => {
   const [form] = Form.useForm();
-  const [list, setList] = useState(userData);
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [open, setOpen] = useState(false);
 
   const [pointList, setPointList] = useState([]);
+  const [mainpointList, setMainPointList] = useState([]);
+
   const [userList, setUserList] = useState([]);
   const [selectedPlanId, setselectedPlanId] = useState();
   const [PlanOptions, setPlanOptions] = useState([]);
   const [currentRole, SetCurrentRole] = useState(
     localStorage.getItem("role") || ""
   );
+
+  const openNotification = (type, message, description) => {
+    notification[type]({
+      message,
+      description,
+    });
+  };
+
   useEffect(() => {
     SetCurrentRole(role());
   }, []);
@@ -70,28 +86,25 @@ export const User = () => {
       role_id,
     };
 
-    console.log("Form values:", updatedValues);
-
     try {
       await api.post("point", updatedValues);
-
       form.resetFields();
-      alert("Point Saved Successfully");
-
-      // Handle successful response here if needed
+      openNotification("success", "Point", "Point Saved Successfully!");
+      loadPoints();
+      onClose();
     } catch (error) {
       if (error.response && error.response.status === 403) {
         const errorData = error.response.data;
-        alert(errorData.message);
+        openNotification("error", "Point", errorData.message);
         if (errorData.message && typeof errorData.message === "object") {
           const validationErrors = errorData.message;
-          alert(validationErrors);
+          openNotification("error", "Point", validationErrors);
         }
       }
     }
   };
 
-  async function fetchPlanOptions(setPlanOptions) {
+  async function fetchPlanOptions() {
     try {
       const response = await api.get("plan");
       if (response.data.success) {
@@ -104,7 +117,7 @@ export const User = () => {
     }
   }
 
-  async function loadUsers(setUserList) {
+  async function loadUsers() {
     const data = { user_id: created_by, role_id: role_id };
 
     try {
@@ -120,7 +133,7 @@ export const User = () => {
     }
   }
 
-  async function loadPoints(setPointList) {
+  async function loadPoints() {
     try {
       const data = { user_id: created_by, role_id: role_id };
       const response = await api.post("point_stock_list", data);
@@ -139,6 +152,7 @@ export const User = () => {
 
         console.log(processedData);
         setPointList(processedData);
+        setMainPointList(processedData);
       } else {
         console.error("API request was not successful");
       }
@@ -149,9 +163,9 @@ export const User = () => {
 
   // Inside your component
   useEffect(() => {
-    fetchPlanOptions(setPlanOptions);
-    loadUsers(setUserList);
-    loadPoints(setPointList);
+    fetchPlanOptions();
+    loadUsers();
+    loadPoints();
   }, []);
 
   const handlePlanIdChange = (countryId) => {
@@ -191,17 +205,10 @@ export const User = () => {
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = e.currentTarget.value ? list : OrderListData;
+    const searchArray = e.currentTarget.value ? pointList : mainpointList;
     const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
+    setPointList(data);
     setSelectedRowKeys([]);
-  };
-
-  const rowSelection = {
-    onChange: (key, rows) => {
-      setSelectedRows(rows);
-      setSelectedRowKeys(key);
-    },
   };
 
   return (
@@ -242,17 +249,11 @@ export const User = () => {
             columns={tableColumns}
             dataSource={pointList}
             rowKey="id"
-            rowSelection={{
-              selectedRowKeys: selectedRowKeys,
-              type: "checkbox",
-              preserveSelectedRowKeys: false,
-              ...rowSelection,
-            }}
           />
         </div>
       </Card>
 
-      <Drawer placement="right" closable={false} onClose={onClose} open={open}>
+      <Drawer placement="left" closable={false} onClose={onClose} open={open}>
         <div className="container">
           <h2>Point Info</h2>
           <Form
@@ -342,16 +343,6 @@ export const User = () => {
             </Form.Item>
           </Form>
         </div>
-
-        <span
-          id="pnt_span"
-          style={{
-            color: "red",
-            fontSize: "12px",
-            fontWeight: "bold",
-            fontFamily: "sans-serif",
-          }}
-        ></span>
       </Drawer>
     </>
   );

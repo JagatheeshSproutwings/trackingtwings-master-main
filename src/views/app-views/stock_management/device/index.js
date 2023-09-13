@@ -6,10 +6,14 @@ import api from "configs/apiConfig";
 import Create from "./create";
 import Edit from "./edit";
 import Assign from "../demo/index";
+import utils from "utils";
 
 export const Device = () => {
   const [deviceList, setDeviceList] = useState([]);
+  const [maindeviceList, setMainDeviceList] = useState([]);
+
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]);
   const [isCreateVisible, setIsCreateVisible] = useState(false);
   const [isEditVisible, setIsEditVisible] = useState(false);
   const [isAssignVisible, setIsAssignVisible] = useState(false);
@@ -55,10 +59,15 @@ export const Device = () => {
           device_model: item.device_model,
         }));
         setDeviceList(processedData);
+        setMainDeviceList(processedData);
       } else {
+        setDeviceList("");
+        setMainDeviceList("");
         console.error("API request was not successful");
       }
     } catch (error) {
+      setDeviceList("");
+      setMainDeviceList("");
       console.error("Error fetching users:", error);
     }
   };
@@ -96,7 +105,7 @@ export const Device = () => {
   }
 
   useEffect(() => {
-    loadDevices(setDeviceList);
+    loadDevices();
   }, []);
 
   const tableColumns = [
@@ -119,6 +128,7 @@ export const Device = () => {
     {
       title: "Edit",
       dataIndex: "edit",
+      fixed: "right",
       render: (_, record) => (
         <span
           style={{ cursor: "pointer" }}
@@ -131,6 +141,7 @@ export const Device = () => {
     {
       title: "Assign",
       dataIndex: "edit",
+      fixed: "right",
       render: (_, record) => (
         <span
           style={{ cursor: "pointer" }}
@@ -142,18 +153,12 @@ export const Device = () => {
     },
   ];
 
-  // const onSearch = (e) => {
-  //   const value = e.currentTarget.value;
-  //   const searchArray = e.currentTarget.value ? deviceList : OrderListData;
-  //   const data = utils.wildCardSearch(searchArray, value);
-  //   setDeviceList(data);
-  //   setSelectedRowKeys([]);
-  // };
-
-  const rowSelection = {
-    onChange: (key, rows) => {
-      setSelectedRowKeys(key);
-    },
+  const onSearch = (e) => {
+    const searchValue = e.currentTarget.value;
+    const searchArray = searchValue ? deviceList : maindeviceList; // Use a different source if needed
+    const filteredUserList = utils.wildCardSearch(searchArray, searchValue);
+    setDeviceList(filteredUserList);
+    setSelectedRowKeys([]);
   };
 
   return (
@@ -171,7 +176,7 @@ export const Device = () => {
                   <Input
                     placeholder="Search"
                     prefix={<SearchOutlined />}
-                    // onChange={(e) => onSearch(e)}
+                    onChange={(e) => onSearch(e)}
                   />
                 </div>
 
@@ -194,12 +199,6 @@ export const Device = () => {
                 columns={tableColumns}
                 dataSource={deviceList}
                 rowKey="id"
-                rowSelection={{
-                  selectedRowKeys: selectedRowKeys,
-                  type: "checkbox",
-                  preserveSelectedRowKeys: false,
-                  ...rowSelection,
-                }}
               />
             </div>
           </Card>
