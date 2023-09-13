@@ -211,13 +211,6 @@ export const User = () => {
     setSelectedRowKeys([]);
   };
 
-  const rowSelection = {
-    onChange: (key, rows) => {
-      setSelectedRows(rows);
-      setSelectedRowKeys(key);
-    },
-  };
-
   return (
     <>
       <Card title="Points">
@@ -256,12 +249,6 @@ export const User = () => {
             columns={tableColumns}
             dataSource={pointList}
             rowKey="id"
-            rowSelection={{
-              selectedRowKeys: selectedRowKeys,
-              type: "checkbox",
-              preserveSelectedRowKeys: false,
-              ...rowSelection,
-            }}
           />
         </div>
       </Card>

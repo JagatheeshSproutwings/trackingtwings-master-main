@@ -61,9 +61,13 @@ export const Sim = () => {
         setSimList(processedData);
         seMainSimList(processedData);
       } else {
+        setSimList("");
+        seMainSimList("");
         console.error("API request was not successful");
       }
     } catch (error) {
+      setSimList("");
+      seMainSimList("");
       console.error("Error fetching users:", error);
     }
   };
@@ -122,6 +126,8 @@ export const Sim = () => {
     {
       title: "Edit",
       dataIndex: "edit",
+      fixed: "right",
+
       render: (_, record) => (
         <span
           style={{ cursor: "pointer" }}
@@ -134,6 +140,8 @@ export const Sim = () => {
     {
       title: "Assign",
       dataIndex: "edit",
+      fixed: "right",
+
       render: (_, record) => (
         <span
           style={{ cursor: "pointer" }}
@@ -151,13 +159,6 @@ export const Sim = () => {
     const filteredUserList = utils.wildCardSearch(searchArray, searchValue);
     setSimList(filteredUserList);
     setSelectedRowKeys([]);
-  };
-
-  const rowSelection = {
-    onChange: (key, rows) => {
-      setSelectedRows(rows);
-      setSelectedRowKeys(key);
-    },
   };
 
   return (
@@ -198,12 +199,6 @@ export const Sim = () => {
                 columns={tableColumns}
                 dataSource={simList}
                 rowKey="id"
-                rowSelection={{
-                  selectedRowKeys: selectedRowKeys,
-                  type: "checkbox",
-                  preserveSelectedRowKeys: false,
-                  ...rowSelection,
-                }}
               />
             </div>
           </Card>

@@ -61,9 +61,13 @@ export const Device = () => {
         setDeviceList(processedData);
         setMainDeviceList(processedData);
       } else {
+        setDeviceList("");
+        setMainDeviceList("");
         console.error("API request was not successful");
       }
     } catch (error) {
+      setDeviceList("");
+      setMainDeviceList("");
       console.error("Error fetching users:", error);
     }
   };
@@ -124,6 +128,7 @@ export const Device = () => {
     {
       title: "Edit",
       dataIndex: "edit",
+      fixed: "right",
       render: (_, record) => (
         <span
           style={{ cursor: "pointer" }}
@@ -136,6 +141,7 @@ export const Device = () => {
     {
       title: "Assign",
       dataIndex: "edit",
+      fixed: "right",
       render: (_, record) => (
         <span
           style={{ cursor: "pointer" }}
@@ -153,13 +159,6 @@ export const Device = () => {
     const filteredUserList = utils.wildCardSearch(searchArray, searchValue);
     setDeviceList(filteredUserList);
     setSelectedRowKeys([]);
-  };
-
-  const rowSelection = {
-    onChange: (key, rows) => {
-      setSelectedRows(rows);
-      setSelectedRowKeys(key);
-    },
   };
 
   return (
@@ -200,12 +199,6 @@ export const Device = () => {
                 columns={tableColumns}
                 dataSource={deviceList}
                 rowKey="id"
-                rowSelection={{
-                  selectedRowKeys: selectedRowKeys,
-                  type: "checkbox",
-                  preserveSelectedRowKeys: false,
-                  ...rowSelection,
-                }}
               />
             </div>
           </Card>

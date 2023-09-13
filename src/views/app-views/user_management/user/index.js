@@ -117,6 +117,7 @@ export const User = () => {
     {
       title: "Edit",
       dataIndex: "edit",
+      fixed: "right",
       render: (_, record) => (
         <span
           style={{ cursor: "pointer" }}
@@ -134,13 +135,6 @@ export const User = () => {
     const filteredUserList = utils.wildCardSearch(searchArray, searchValue);
     setUserList(filteredUserList);
     setSelectedRowKeys([]);
-  };
-
-  const rowSelection = {
-    onChange: (key, rows) => {
-      setSelectedRows(rows);
-      setSelectedRowKeys(key);
-    },
   };
 
   return (
@@ -180,12 +174,6 @@ export const User = () => {
                 columns={tableColumns}
                 dataSource={userList}
                 rowKey="id"
-                rowSelection={{
-                  selectedRowKeys: selectedRowKeys,
-                  type: "checkbox",
-                  preserveSelectedRowKeys: false,
-                  ...rowSelection,
-                }}
               />
             </div>
           </Card>

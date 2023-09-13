@@ -28,7 +28,7 @@ import utils from "utils";
 
 const { Option } = Select;
 
-const Device = () => {
+const Vehicle = () => {
   const [form] = Form.useForm();
   const [isComponentVisible, setIsComponentVisible] = useState(false);
 
@@ -127,6 +127,10 @@ const Device = () => {
     SetCurrentUser(user());
     SetCurrentRole(role());
     getUserList();
+    loadVehicles();
+    loadPlans();
+    loadsims();
+    loaddevices();
   }, []);
 
   // on change Admin
@@ -136,135 +140,192 @@ const Device = () => {
     SetDealerList([]);
     SetSubdealerList([]);
     SetCustomerList([]);
-    const user_get_data = { user_id: value };
-    const distributor_list = await api
-      .post("role_based_user_list", user_get_data)
-      .then((res) => {
-        return res;
-      })
-      .catch((err) => {
-        return err;
-      });
-    SetDistributorList(distributor_list?.data?.data?.user_list);
+    if (value != null) {
+      const user_get_data = { user_id: value };
+      const distributor_list = await api
+        .post("role_based_user_list", user_get_data)
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err;
+        });
+      SetDistributorList(distributor_list?.data?.data?.user_list);
+    }
   };
   // On change Distributor
   const DistributorChange = async (value) => {
     form.setFieldValue("");
     SetDealerList("");
     SetSubdealerList("");
-    SetCustomerList([]);
-    const user_get_data = { user_id: value };
-    const dealer_list = await api
-      .post("role_based_user_list", user_get_data)
-      .then((res) => {
-        return res;
-      })
-      .catch((err) => {
-        return err;
-      });
-    SetDealerList(dealer_list?.data?.data?.user_list);
+    SetCustomerList("");
+    if (value != null) {
+      const user_get_data = { user_id: value };
+      const dealer_list = await api
+        .post("role_based_user_list", user_get_data)
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err;
+        });
+      SetDealerList(dealer_list?.data?.data?.user_list);
+    }
   };
   // on change Dealer
   const DealerChange = async (value) => {
     form.setFieldValue("");
     SetSubdealerList([]);
     SetCustomerList([]);
-    const user_get_data = { user_id: value };
-    const subdealer_list = await api
-      .post("role_based_user_list", user_get_data)
-      .then((res) => {
-        return res;
-      })
-      .catch((err) => {
-        return err;
-      });
-    SetCustomerList(subdealer_list?.data?.data?.user_list);
-    SetSubdealerList(subdealer_list?.data?.data?.subdealer_list);
-
     SetPlanList([]);
-    setUserValue(value);
-    const plan_list = await api
-      .post("user_plan_list", user_get_data)
-      .then((res) => {
-        return res;
-      })
-      .catch((err) => {
-        return err;
-      });
-    SetPlanList(plan_list?.data.data);
-
     SetSimList([]);
-    const sim_list = await api
-      .post("sim_stock_list", user_get_data)
-      .then((res) => {
-        return res;
-      })
-      .catch((err) => {
-        return err;
-      });
-    SetSimList(sim_list?.data.data);
-
     SetDeviceList([]);
-    const device_list = await api
-      .post("device_stock_list", user_get_data)
-      .then((res) => {
-        return res;
-      })
-      .catch((err) => {
-        return err;
-      });
-    SetDeviceList(device_list?.data.data);
+
+    if (value != null) {
+      const user_get_data = { user_id: value };
+      const subdealer_list = await api
+        .post("role_based_user_list", user_get_data)
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err;
+        });
+      SetCustomerList(subdealer_list?.data?.data?.user_list);
+      SetSubdealerList(subdealer_list?.data?.data?.subdealer_list);
+
+      setUserValue(value);
+      const plan_list = await api
+        .post("user_plan_list", user_get_data)
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err;
+        });
+      SetPlanList(plan_list?.data.data);
+
+      const sim_list = await api
+        .post("sim_stock_list", user_get_data)
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err;
+        });
+      SetSimList(sim_list?.data.data);
+
+      const device_list = await api
+        .post("device_stock_list", user_get_data)
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err;
+        });
+      SetDeviceList(device_list?.data.data);
+    }
   };
   // on change SubDealer
   const SubDealerChange = async (value) => {
     form.setFieldValue("");
-    SetCustomerList([]);
-    const user_get_data = { user_id: value };
-    const customer_list = await api
-      .post("role_based_user_list", user_get_data)
-      .then((res) => {
-        return res;
-      })
-      .catch((err) => {
-        return err;
-      });
-    SetCustomerList(customer_list?.data?.data?.user_list);
 
-    SetPlanList([]);
+    SetCustomerList("");
+    SetPlanList("");
+    SetLicenseList("");
+    SetSimList("");
+    SetDeviceList("");
+    SetDeviceData("");
+    SetMakeData("");
+    SetModelData("");
+    SetSimData("");
 
-    setUserValue(value);
+    if (value != null) {
+      const user_get_data = { user_id: value };
+      const customer_list = await api
+        .post("role_based_user_list", user_get_data)
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err;
+        });
+      SetCustomerList(customer_list?.data?.data?.user_list);
+      setUserValue(value);
+      const plan_list = await api
+        .post("user_plan_list", user_get_data)
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err;
+        });
+      SetPlanList(plan_list?.data.data);
+      const sim_list = await api
+        .post("sim_stock_list", user_get_data)
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err;
+        });
+      SetSimList(sim_list?.data.data);
+      const device_list = await api
+        .post("device_stock_list", user_get_data)
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err;
+        });
+      SetDeviceList(device_list?.data.data);
+    } else {
+      alert(currentRole);
+      alert(currentUser);
+      if (currentRole == 4) {
+        const user_get_data = { user_id: currentUser };
+        const subdealer_list = await api
+          .post("role_based_user_list", user_get_data)
+          .then((res) => {
+            return res;
+          })
+          .catch((err) => {
+            return err;
+          });
+        SetCustomerList(subdealer_list?.data?.data?.user_list);
+        SetSubdealerList(subdealer_list?.data?.data?.subdealer_list);
+        setUserValue(currentUser);
+        const plan_list = await api
+          .post("user_plan_list", user_get_data)
+          .then((res) => {
+            return res;
+          })
+          .catch((err) => {
+            return err;
+          });
+        SetPlanList(plan_list?.data.data);
 
-    const plan_list = await api
-      .post("user_plan_list", user_get_data)
-      .then((res) => {
-        return res;
-      })
-      .catch((err) => {
-        return err;
-      });
-    SetPlanList(plan_list?.data.data);
+        const sim_list = await api
+          .post("sim_stock_list", user_get_data)
+          .then((res) => {
+            return res;
+          })
+          .catch((err) => {
+            return err;
+          });
+        SetSimList(sim_list?.data.data);
 
-    SetSimList([]);
-    const sim_list = await api
-      .post("sim_stock_list", user_get_data)
-      .then((res) => {
-        return res;
-      })
-      .catch((err) => {
-        return err;
-      });
-    SetSimList(sim_list?.data.data);
-
-    SetDeviceList([]);
-    const device_list = await api
-      .post("device_stock_list", user_get_data)
-      .then((res) => {
-        return res;
-      })
-      .catch((err) => {
-        return err;
-      });
-    SetDeviceList(device_list?.data.data);
+        const device_list = await api
+          .post("device_stock_list", user_get_data)
+          .then((res) => {
+            return res;
+          })
+          .catch((err) => {
+            return err;
+          });
+        SetDeviceList(device_list?.data.data);
+      }
+    }
   };
 
   const CustomerChange = async () => {
@@ -282,16 +343,21 @@ const Device = () => {
 
   const PlanChange = async (value) => {
     SetLicenseList([]);
-    const data = { user_id: userValue, plan_id: value };
-    const license_list = await api
-      .post("user_license_list", data)
-      .then((res) => {
-        return res;
-      })
-      .catch((err) => {
-        return err;
-      });
-    SetLicenseList(license_list?.data.data);
+
+    if (value != null) {
+      const data = { user_id: userValue, plan_id: value };
+      const license_list = await api
+        .post("user_license_list", data)
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err;
+        });
+      SetLicenseList(license_list?.data.data);
+    } else {
+      alert("s");
+    }
   };
 
   const DeviceChange = async (value) => {
@@ -400,6 +466,8 @@ const Device = () => {
     {
       title: "Actions",
       key: "actions",
+      fixed: "right",
+
       render: (text, record) => (
         <Space size="middle">
           <Dropdown overlay={getMenu(record)} placement="bottomLeft">
@@ -414,13 +482,13 @@ const Device = () => {
 
   const getMenu = (record) => (
     <Menu>
-      <Menu.Item
+      {/* <Menu.Item
         key="edit"
         icon={<EditOutlined />}
         onClick={() => handleEdit(record)}
       >
         Edit
-      </Menu.Item>
+      </Menu.Item> */}
       <Menu.Item
         key="config"
         icon={<SettingOutlined />}
@@ -489,7 +557,8 @@ const Device = () => {
       console.error("Error fetching users:", error);
     }
   };
-  async function loadsims(SetSimList) {
+
+  const loadsims = async () => {
     try {
       SetSimList([]);
 
@@ -504,8 +573,8 @@ const Device = () => {
     } catch (error) {
       console.error("Error fetching users:", error);
     }
-  }
-  async function loaddevices(SetDeviceList) {
+  };
+  const loaddevices = async () => {
     try {
       SetDeviceList([]);
 
@@ -520,15 +589,7 @@ const Device = () => {
     } catch (error) {
       console.error("Error fetching users:", error);
     }
-  }
-
-  useEffect(() => {
-    loadVehicles();
-    loadPlans();
-    loadsims();
-    loaddevices();
-  }, []);
-
+  };
   const loadPlans = async () => {
     SetPlanList([]);
 
@@ -553,12 +614,6 @@ const Device = () => {
     setSelectedRowKeys([]);
   };
 
-  const rowSelection = {
-    onChange: (key, rows) => {
-      setSelectedRows(rows);
-      setSelectedRowKeys(key);
-    },
-  };
   const parentFunction = () => {
     setIsComponentVisible(false);
   };
@@ -594,12 +649,6 @@ const Device = () => {
               columns={tableColumns}
               dataSource={vehicleList}
               rowKey="id"
-              rowSelection={{
-                selectedRowKeys: selectedRowKeys,
-                type: "checkbox",
-                preserveSelectedRowKeys: false,
-                ...rowSelection,
-              }}
             />
           </div>
         </Row>
@@ -1008,4 +1057,4 @@ const Device = () => {
   );
 };
 
-export default Device;
+export default Vehicle;
