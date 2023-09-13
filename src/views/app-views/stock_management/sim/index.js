@@ -39,7 +39,7 @@ export const Sim = () => {
     setIsAssignVisible(true);
   };
   const parentFunction = () => {
-    console.log(simList);
+    setIsEditVisible(false);
     loadSims();
   };
 

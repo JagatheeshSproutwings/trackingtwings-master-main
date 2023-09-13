@@ -223,9 +223,6 @@ const Edit = ({ parentToChild, ...props }) => {
                     <Col span={12}>
                       <Form.Item>
                         <Space wrap>
-                          <Button type="primary" danger shape="round">
-                            Reset
-                          </Button>
                           <Button
                             type="primary"
                             style={{ backgroundColor: GREEN_BASE }}
@@ -234,6 +231,9 @@ const Edit = ({ parentToChild, ...props }) => {
                             htmlType="submit"
                           >
                             Update
+                          </Button>
+                          <Button type="primary" shape="round">
+                            Back
                           </Button>
                         </Space>
                       </Form.Item>

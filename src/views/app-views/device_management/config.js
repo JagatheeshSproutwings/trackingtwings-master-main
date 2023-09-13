@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Row, Col, Button, Form, Input, Modal, notification, Card } from "antd";
+import { Row, Col, Button, Form, Input, Modal, notification } from "antd";
 import api from "configs/apiConfig";
 import Flex from "components/shared-components/Flex";
 
@@ -8,10 +8,12 @@ const Config = ({ parentToChild, ...props }) => {
   const [isModalOpen, setIsModalOpen] = useState(true);
 
   const handleOk = () => {
+    props.parentFunction();
     setIsModalOpen(false);
   };
 
   const handleCancel = () => {
+    props.parentFunction();
     setIsModalOpen(false);
   };
 

@@ -35,7 +35,8 @@ export const User = () => {
   const role = getRole();
 
   const parentFunction = () => {
-    console.log(userList);
+    setIsCreateVisible(false);
+    setIsEditVisible(false);
     loadUsers();
   };
 

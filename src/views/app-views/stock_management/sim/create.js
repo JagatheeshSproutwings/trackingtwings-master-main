@@ -188,12 +188,6 @@ const Create = (props) => {
                       size="small"
                       label="Secondary Mobile No"
                       name="sim_mob_no2"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please enter a Secondary Mobile No",
-                        },
-                      ]}
                     >
                       <Input />
                     </Form.Item>
