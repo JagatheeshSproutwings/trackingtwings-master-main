@@ -11,7 +11,6 @@ const ProtectedRoute = () => {
 	
 	const { token } = useSelector(state => state.auth)
 	const location = useLocation()
-	console.log("Routes Page"+token);
 	if (!token) {
 		return <Navigate to={`${AUTH_PREFIX_PATH}${UNAUTHENTICATED_ENTRY}`} replace />;
 	}

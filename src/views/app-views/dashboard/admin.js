@@ -69,7 +69,6 @@ export const Admin = () => {
       const distributor_list = await api.post("role_based_user_list",distributor_data).then((res) => { return res;}).catch((err) => { return [];});
       if(distributor_list?.data?.data?.user_list.length>0)
       {
-        console.log(distributor_list?.data?.data?.user_list[0].id);
         setSelectedDistributor(distributor_list?.data?.data?.user_list[0].id);
       }
       SetDistributorList(distributor_list?.data?.data?.user_list);
@@ -323,8 +322,8 @@ return(
                     </Col>
                     <Col sm={12} md={18} lg={18} style={{padding:0}}>
                         
-                        <TestMovement />
-                            {/* <MapContainer center={center} zoom={13} scrollWheelZoom={true}>
+                        {/* <TestMovement /> */}
+                            <MapContainer center={center} zoom={13} scrollWheelZoom={true}>
                                 <LayersControl>
                                     <BaseLayer checked name="OpenStreetMap">
                                         <TileLayer
@@ -348,24 +347,24 @@ return(
                                 </LayersControl>
                                       
                                 <Marker position={center}>
-                                    <Popup>
-                                        <Card size="small" style={{background:"lightblue"}} >
-                                            <Row>
-                                                <Col>
-                                                <div>Vehicle No: TN01AB1234</div>
-                                            <div>Status: MOVING</div>
-                                            <div>Speed: 30 km/hr</div>
-                                            <div>Battery: 25.86 volt</div>
-                                            <div>Last Updated on: 2023-08-02 13:56:47</div>
-                                            <div>Lat/Long: 10.7920,79.5656</div>
-                                                </Col>
-                                            </Row>
-                                        </Card>
-                                    </Popup>
+                                    {/* // <Popup>
+                                    //     <Card size="small" style={{background:"lightblue"}} >
+                                    //         <Row>
+                                    //             <Col>
+                                    //             <div>Vehicle No: TN01AB1234</div>
+                                    //         <div>Status: MOVING</div>
+                                    //         <div>Speed: 30 km/hr</div>
+                                    //         <div>Battery: 25.86 volt</div>
+                                    //         <div>Last Updated on: 2023-08-02 13:56:47</div>
+                                    //         <div>Lat/Long: 10.7920,79.5656</div>
+                                    //             </Col>
+                                    //         </Row>
+                                    //     </Card>
+                                    // </Popup> */}
                                 </Marker>
 
                                 <Polyline pathOptions={limeOptions} positions={polyline} />
-                            </MapContainer> */}
+                            </MapContainer>
                         
                     </Col>
                 </Row>
@@ -516,6 +515,7 @@ return(
                             </StickyContainer>
                 </div>
         </MapContainer> */}
+        
     </>
 )
 }

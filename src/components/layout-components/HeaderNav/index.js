@@ -33,7 +33,6 @@ export const HeaderNav = (props) => {
 
   const [searchActive, setSearchActive] = useState(false);
   const token = useSelector((state) => state.auth);
-  
   const role_id = token?.user_info?.role_id;
   const dispatch = useDispatch();
 
@@ -120,6 +119,10 @@ export const HeaderNav = (props) => {
     if (!isMobile) {
       onSearchClose();
     }
+    // if(!role_id)
+    // {
+    //   navigate('auth/logout');
+    // }
     
   });
 

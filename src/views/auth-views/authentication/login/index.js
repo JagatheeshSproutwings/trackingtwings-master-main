@@ -3,8 +3,9 @@ import LoginForm from "../../components/LoginForm";
 import { Card, Row, Col,Avatar } from "antd";
 import { useSelector } from "react-redux";
 import { UserOutlined } from '@ant-design/icons';
+import 'assets/styles/login.css'
 const backgroundStyle = {
-  backgroundImage: "url(/img/login_gif.gif)",
+  backgroundImage: "url(/img/login_new.jpg)",
   backgroundRepeat: "no-repeat",
   backgroundSize: "cover",
 };
@@ -32,11 +33,16 @@ const Login = (props) => {
                   <Col xs={24} sm={24} md={20} lg={20}>
                     <LoginForm {...props} />
                   </Col>
+                  
                 </Row>
+                
               </div>
             </Card>
+            
           </Col>
+          
         </Row>
+        
       </div>
     </div>
   );

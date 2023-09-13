@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Dropdown, Avatar } from 'antd';
 import { useDispatch,useSelector } from 'react-redux'
 import { 
@@ -78,8 +78,9 @@ const items = [
 ]
 
 export const NavProfile = ({mode}) => {
-	const token = useSelector(state => state.auth);
-	
+	const {token} = useSelector(state => state.auth);
+	const [username,setUsername] = useState(localStorage.getItem('name'));
+	const [useremail,setUseremail] = useState(localStorage.getItem('email_address'));
 	return (
 		
 		<Dropdown placement="bottomRight" menu={{items}} trigger={["click"]}>
