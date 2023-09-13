@@ -9,6 +9,7 @@ import {
   Input,
   Space,
   notification,
+  Spin,
 } from "antd";
 import api from "configs/apiConfig";
 import Flex from "components/shared-components/Flex";
@@ -19,6 +20,8 @@ const { Option } = Select;
 
 const Create = (props) => {
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
+
   const [password, setPassword] = useState("");
 
   const [adminList, SetAdminList] = useState([]);
@@ -65,14 +68,17 @@ const Create = (props) => {
   }
 
   const onFinish = async (values) => {
+    setLoading(true);
     const res = handlePassword(values["password"]);
     if (res == "OK") {
       try {
         await api.post("user/store", values);
         form.resetFields();
         props.parentFunction();
+        setLoading(false);
         openNotification("success", "User", "User Created Successfully!");
       } catch (error) {
+        setLoading(false);
         if (error.response && error.response.status === 403) {
           const errorData = error.response.data;
           if (errorData.message && typeof errorData.message === "object") {
@@ -275,424 +281,426 @@ const Create = (props) => {
     <>
       <Row gutter={6}>
         <Col>
-          <Card title="New User">
-            <Flex>
-              <div className="container">
-                <Form
-                  form={form}
-                  size="small"
-                  name="registrationForm"
-                  onFinish={onFinish}
-                  layout="vertical"
-                >
-                  <Row gutter={[8, 8]}>
-                    <Col sm={12} md={12} lg={12}>
-                      <Form.Item
-                        label="Role"
-                        name="role_id"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please Select a Role",
-                          },
-                        ]}
-                      >
-                        <Select
-                          showSearch
-                          allowClear
-                          optionFilterProp="children"
-                          onChange={handleRoleIdChange}
-                          value={selectedRoleId}
-                          filterOption={(input, option) =>
-                            option.children
-                              .toLowerCase()
-                              .indexOf(input.toLowerCase()) >= 0
-                          }
-                        >
-                          {Array.isArray(roleOptions) ? (
-                            roleOptions.map((role) => (
-                              <Option key={role.id} value={role.id}>
-                                {role.name}
-                              </Option>
-                            ))
-                          ) : (
-                            <Option value="Loading" disabled>
-                              Loading...
-                            </Option>
-                          )}
-                        </Select>
-                      </Form.Item>
-                    </Col>
-                    {currentRole == 1 && roleType >= "3" && (
+          <Spin spinning={loading} delay={500}>
+            <Card title="New User">
+              <Flex>
+                <div className="container">
+                  <Form
+                    form={form}
+                    size="small"
+                    name="registrationForm"
+                    onFinish={onFinish}
+                    layout="vertical"
+                  >
+                    <Row gutter={[8, 8]}>
                       <Col sm={12} md={12} lg={12}>
                         <Form.Item
-                          label="Admin"
-                          name="admin_id"
+                          label="Role"
+                          name="role_id"
                           rules={[
                             {
                               required: true,
-                              message: "Please Select a Admin",
+                              message: "Please Select a Role",
                             },
                           ]}
                         >
                           <Select
-                            onChange={AdminChange}
-                            allowClear
                             showSearch
+                            allowClear
                             optionFilterProp="children"
+                            onChange={handleRoleIdChange}
+                            value={selectedRoleId}
+                            filterOption={(input, option) =>
+                              option.children
+                                .toLowerCase()
+                                .indexOf(input.toLowerCase()) >= 0
+                            }
                           >
-                            {Array.isArray(adminList) ? (
-                              adminList.map((admin) => (
-                                <Select.Option
-                                  key={admin?.id}
-                                  role_id="2"
-                                  value={admin?.id}
-                                >
-                                  {admin?.name}
-                                </Select.Option>
+                            {Array.isArray(roleOptions) ? (
+                              roleOptions.map((role) => (
+                                <Option key={role.id} value={role.id}>
+                                  {role.name}
+                                </Option>
                               ))
                             ) : (
-                              <Select.Option
-                                role_id="2"
-                                value=""
-                              ></Select.Option>
+                              <Option value="Loading" disabled>
+                                Loading...
+                              </Option>
                             )}
                           </Select>
                         </Form.Item>
                       </Col>
-                    )}
-                    {(currentRole == 1 || currentRole == 2) &&
-                      roleType >= "4" && (
+                      {currentRole == 1 && roleType >= "3" && (
                         <Col sm={12} md={12} lg={12}>
                           <Form.Item
-                            label="Distributor"
-                            name="distributor_id"
+                            label="Admin"
+                            name="admin_id"
                             rules={[
                               {
                                 required: true,
-                                message: "Please Select Distributor",
+                                message: "Please Select a Admin",
                               },
                             ]}
                           >
                             <Select
-                              onChange={DistributorChange}
+                              onChange={AdminChange}
                               allowClear
                               showSearch
                               optionFilterProp="children"
                             >
-                              {Array.isArray(distributorList) ? (
-                                distributorList.map((distributor) => (
-                                  <Option
-                                    key={distributor?.id}
-                                    role_id="3"
-                                    value={distributor?.id}
+                              {Array.isArray(adminList) ? (
+                                adminList.map((admin) => (
+                                  <Select.Option
+                                    key={admin?.id}
+                                    role_id="2"
+                                    value={admin?.id}
                                   >
-                                    {distributor?.name}
-                                  </Option>
+                                    {admin?.name}
+                                  </Select.Option>
                                 ))
                               ) : (
-                                <Option role_id="3" value=""></Option>
+                                <Select.Option
+                                  role_id="2"
+                                  value=""
+                                ></Select.Option>
                               )}
                             </Select>
                           </Form.Item>
                         </Col>
                       )}
-                    {(currentRole == 1 ||
-                      currentRole == 2 ||
-                      currentRole == 3) &&
-                      roleType >= "5" && (
-                        <Col sm={12} md={12} lg={12}>
-                          <Form.Item
-                            label="Dealer"
-                            name="dealer_id"
-                            rules={[
-                              {
-                                required: true,
-                                message: "Please Select Dealer",
-                              },
-                            ]}
-                          >
-                            <Select
-                              onChange={DealerChange}
-                              allowClear
-                              showSearch
-                              optionFilterProp="children"
+                      {(currentRole == 1 || currentRole == 2) &&
+                        roleType >= "4" && (
+                          <Col sm={12} md={12} lg={12}>
+                            <Form.Item
+                              label="Distributor"
+                              name="distributor_id"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "Please Select Distributor",
+                                },
+                              ]}
                             >
-                              {Array.isArray(dealerList) ? (
-                                dealerList.map((dealer) => (
-                                  <Option
-                                    key={dealer?.id}
-                                    role_id="4"
-                                    value={dealer?.id}
-                                  >
-                                    {dealer?.name}
-                                  </Option>
-                                ))
-                              ) : (
-                                <Option role_id="4" value=""></Option>
-                              )}
-                            </Select>
-                          </Form.Item>
-                        </Col>
-                      )}
-                    {(currentRole == 1 ||
-                      currentRole == 2 ||
-                      currentRole == 3 ||
-                      currentRole == 4) &&
-                      roleType >= "6" && (
-                        <Col sm={12} md={12} lg={12}>
-                          <Form.Item label="Subdealer" name="subdealer_id">
-                            <Select
-                              onChange={SubDealerChange}
-                              allowClear
-                              showSearch
-                              optionFilterProp="children"
+                              <Select
+                                onChange={DistributorChange}
+                                allowClear
+                                showSearch
+                                optionFilterProp="children"
+                              >
+                                {Array.isArray(distributorList) ? (
+                                  distributorList.map((distributor) => (
+                                    <Option
+                                      key={distributor?.id}
+                                      role_id="3"
+                                      value={distributor?.id}
+                                    >
+                                      {distributor?.name}
+                                    </Option>
+                                  ))
+                                ) : (
+                                  <Option role_id="3" value=""></Option>
+                                )}
+                              </Select>
+                            </Form.Item>
+                          </Col>
+                        )}
+                      {(currentRole == 1 ||
+                        currentRole == 2 ||
+                        currentRole == 3) &&
+                        roleType >= "5" && (
+                          <Col sm={12} md={12} lg={12}>
+                            <Form.Item
+                              label="Dealer"
+                              name="dealer_id"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "Please Select Dealer",
+                                },
+                              ]}
                             >
-                              {Array.isArray(subdealerList) &&
-                              subdealerList.length > 0 ? (
-                                subdealerList.map((subdealer) => (
-                                  <Option
-                                    key={subdealer?.id}
-                                    role_id="6"
-                                    value={subdealer?.id}
-                                  >
-                                    {subdealer?.name}
-                                  </Option>
-                                ))
-                              ) : (
-                                <Option></Option>
-                              )}
-                            </Select>
-                          </Form.Item>
-                        </Col>
-                      )}
-                    {(currentRole == 1 ||
-                      currentRole == 2 ||
-                      currentRole == 3 ||
-                      currentRole == 4 ||
-                      currentRole == 5) &&
-                      roleType >= "7" && (
-                        <Col sm={12} md={12} lg={12}>
-                          <Form.Item
-                            label="Customer"
-                            name="customer_id"
-                            rules={[
-                              {
-                                required: true,
-                                message: "Please Select a Role",
-                              },
-                            ]}
-                          >
-                            <Select
-                              onChange={CustomerChange}
-                              allowClear
-                              showSearch
-                              optionFilterProp="children"
+                              <Select
+                                onChange={DealerChange}
+                                allowClear
+                                showSearch
+                                optionFilterProp="children"
+                              >
+                                {Array.isArray(dealerList) ? (
+                                  dealerList.map((dealer) => (
+                                    <Option
+                                      key={dealer?.id}
+                                      role_id="4"
+                                      value={dealer?.id}
+                                    >
+                                      {dealer?.name}
+                                    </Option>
+                                  ))
+                                ) : (
+                                  <Option role_id="4" value=""></Option>
+                                )}
+                              </Select>
+                            </Form.Item>
+                          </Col>
+                        )}
+                      {(currentRole == 1 ||
+                        currentRole == 2 ||
+                        currentRole == 3 ||
+                        currentRole == 4) &&
+                        roleType >= "6" && (
+                          <Col sm={12} md={12} lg={12}>
+                            <Form.Item label="Subdealer" name="subdealer_id">
+                              <Select
+                                onChange={SubDealerChange}
+                                allowClear
+                                showSearch
+                                optionFilterProp="children"
+                              >
+                                {Array.isArray(subdealerList) &&
+                                subdealerList.length > 0 ? (
+                                  subdealerList.map((subdealer) => (
+                                    <Option
+                                      key={subdealer?.id}
+                                      role_id="6"
+                                      value={subdealer?.id}
+                                    >
+                                      {subdealer?.name}
+                                    </Option>
+                                  ))
+                                ) : (
+                                  <Option></Option>
+                                )}
+                              </Select>
+                            </Form.Item>
+                          </Col>
+                        )}
+                      {(currentRole == 1 ||
+                        currentRole == 2 ||
+                        currentRole == 3 ||
+                        currentRole == 4 ||
+                        currentRole == 5) &&
+                        roleType >= "7" && (
+                          <Col sm={12} md={12} lg={12}>
+                            <Form.Item
+                              label="Customer"
+                              name="customer_id"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "Please Select a Role",
+                                },
+                              ]}
                             >
-                              {Array.isArray(customerList) ? (
-                                customerList.map((customer) => (
-                                  <Option
-                                    key={customer?.id}
-                                    role_id="6"
-                                    value={customer?.id}
-                                  >
-                                    {customer?.name}
-                                  </Option>
-                                ))
-                              ) : (
-                                <Option></Option>
-                              )}
-                            </Select>
-                          </Form.Item>
-                        </Col>
-                      )}
-                  </Row>
-                  <Row gutter={[8, 8]}>
-                    <Col sm={12} md={12} lg={12}>
-                      <Form.Item
-                        label="User Name"
-                        name="name"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please enter your name",
-                          },
-                        ]}
-                      >
-                        <Input />
-                      </Form.Item>
-                    </Col>
-                    <Col sm={12} md={12} lg={12}>
-                      <Form.Item
-                        label="E-Mail ID"
-                        name="email"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please enter your email",
-                          },
-                          {
-                            type: "email",
-                            message: "Please enter a valid email",
-                          },
-                        ]}
-                      >
-                        <Input />
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                  <Row gutter={[8, 8]}>
-                    <Col sm={12} md={12} lg={12}>
-                      <Form.Item
-                        value={password}
-                        label="Password"
-                        name="password"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please enter a password",
-                          },
-                        ]}
-                      >
-                        <Input.Password />
-                      </Form.Item>
-                    </Col>
-                    <Col sm={12} md={12} lg={12}>
-                      <Form.Item
-                        label="Confirm Password"
-                        name="c_password"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please confirm your password",
-                          },
-                          ({ getFieldValue }) => ({
-                            validator(_, value) {
-                              if (
-                                !value ||
-                                getFieldValue("password") === value
-                              ) {
-                                return Promise.resolve();
-                              }
-                              return Promise.reject(
-                                new Error("Passwords do not match")
-                              );
+                              <Select
+                                onChange={CustomerChange}
+                                allowClear
+                                showSearch
+                                optionFilterProp="children"
+                              >
+                                {Array.isArray(customerList) ? (
+                                  customerList.map((customer) => (
+                                    <Option
+                                      key={customer?.id}
+                                      role_id="6"
+                                      value={customer?.id}
+                                    >
+                                      {customer?.name}
+                                    </Option>
+                                  ))
+                                ) : (
+                                  <Option></Option>
+                                )}
+                              </Select>
+                            </Form.Item>
+                          </Col>
+                        )}
+                    </Row>
+                    <Row gutter={[8, 8]}>
+                      <Col sm={12} md={12} lg={12}>
+                        <Form.Item
+                          label="User Name"
+                          name="name"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please enter your name",
                             },
-                          }),
-                        ]}
-                      >
-                        <Input.Password />
-                      </Form.Item>
-                    </Col>
-                    {/* <div style={{ color: "red" }}>{errorMessage}</div> */}
-                    <span
-                      style={{
-                        fontSize: "11px",
-                        color: "green",
-                        fontWeight: "bold",
-                        fontFamily: "Segoe UI",
-                        fontStyle: "italic",
-                        marginTop: "-15px",
-                      }}
-                    >
-                      *[One UpperCase & LowerCase, One Number, One Symbol, Min.
-                      8 Characters Length]
-                    </span>
-                  </Row>
-                  <Row gutter={[8, 8]}>
-                    <Col sm={12} md={12} lg={12}>
-                      {" "}
-                      <Form.Item
-                        label="Mobile No"
-                        name="mobile_no"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please enter your mobile no",
-                          },
-                          {
-                            type: "text",
-                            message: "Please enter a valid mobile no",
-                          },
-                        ]}
-                      >
-                        <Input />
-                      </Form.Item>
-                    </Col>
-                    <Col sm={12} md={12} lg={12}>
-                      <Form.Item
-                        label="Country"
-                        name="country_id"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please select a country",
-                          },
-                        ]}
-                      >
-                        <Select
-                          showSearch
-                          allowClear
-                          optionFilterProp="children"
-                          onChange={handleCountryIdChange}
-                          value={selectedCountryId}
-                          filterOption={(input, option) =>
-                            option.children
-                              .toLowerCase()
-                              .indexOf(input.toLowerCase()) >= 0
-                          }
+                          ]}
                         >
-                          {Array.isArray(countryOptions) ? (
-                            countryOptions.map((country) => (
-                              <Option key={country.id} value={country.id}>
-                                {country.country_name}
-                              </Option>
-                            ))
-                          ) : (
-                            <Option value="Loading">Loading...</Option>
-                          )}
-                        </Select>
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                  <Row gutter={[8, 8]}>
-                    <Col sm={24} md={24} lg={24}>
-                      <Form.Item
-                        label="Address"
-                        name="address"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please enter your address",
-                          },
-                        ]}
-                      >
-                        <TextArea rows={4} maxLength={100} />
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col col-offset={18} sm={24} md={24} lg={24}>
-                      <Space wrap>
-                        <Button type="primary" danger shape="round">
-                          Reset
-                        </Button>
-                        <Button
-                          type="primary"
-                          style={{ backgroundColor: GREEN_BASE }}
-                          success
-                          shape="round"
-                          htmlType="submit"
+                          <Input />
+                        </Form.Item>
+                      </Col>
+                      <Col sm={12} md={12} lg={12}>
+                        <Form.Item
+                          label="E-Mail ID"
+                          name="email"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please enter your email",
+                            },
+                            {
+                              type: "email",
+                              message: "Please enter a valid email",
+                            },
+                          ]}
                         >
-                          Save
-                        </Button>
-                      </Space>
-                    </Col>
-                  </Row>
-                </Form>
-              </div>
-            </Flex>
-          </Card>
+                          <Input />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                    <Row gutter={[8, 8]}>
+                      <Col sm={12} md={12} lg={12}>
+                        <Form.Item
+                          value={password}
+                          label="Password"
+                          name="password"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please enter a password",
+                            },
+                          ]}
+                        >
+                          <Input.Password />
+                        </Form.Item>
+                      </Col>
+                      <Col sm={12} md={12} lg={12}>
+                        <Form.Item
+                          label="Confirm Password"
+                          name="c_password"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please confirm your password",
+                            },
+                            ({ getFieldValue }) => ({
+                              validator(_, value) {
+                                if (
+                                  !value ||
+                                  getFieldValue("password") === value
+                                ) {
+                                  return Promise.resolve();
+                                }
+                                return Promise.reject(
+                                  new Error("Passwords do not match")
+                                );
+                              },
+                            }),
+                          ]}
+                        >
+                          <Input.Password />
+                        </Form.Item>
+                      </Col>
+                      {/* <div style={{ color: "red" }}>{errorMessage}</div> */}
+                      <span
+                        style={{
+                          fontSize: "11px",
+                          color: "green",
+                          fontWeight: "bold",
+                          fontFamily: "Segoe UI",
+                          fontStyle: "italic",
+                          marginTop: "-15px",
+                        }}
+                      >
+                        *[One UpperCase & LowerCase, One Number, One Symbol,
+                        Min. 8 Characters Length]
+                      </span>
+                    </Row>
+                    <Row gutter={[8, 8]}>
+                      <Col sm={12} md={12} lg={12}>
+                        {" "}
+                        <Form.Item
+                          label="Mobile No"
+                          name="mobile_no"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please enter your mobile no",
+                            },
+                            {
+                              type: "text",
+                              message: "Please enter a valid mobile no",
+                            },
+                          ]}
+                        >
+                          <Input />
+                        </Form.Item>
+                      </Col>
+                      <Col sm={12} md={12} lg={12}>
+                        <Form.Item
+                          label="Country"
+                          name="country_id"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please select a country",
+                            },
+                          ]}
+                        >
+                          <Select
+                            showSearch
+                            allowClear
+                            optionFilterProp="children"
+                            onChange={handleCountryIdChange}
+                            value={selectedCountryId}
+                            filterOption={(input, option) =>
+                              option.children
+                                .toLowerCase()
+                                .indexOf(input.toLowerCase()) >= 0
+                            }
+                          >
+                            {Array.isArray(countryOptions) ? (
+                              countryOptions.map((country) => (
+                                <Option key={country.id} value={country.id}>
+                                  {country.country_name}
+                                </Option>
+                              ))
+                            ) : (
+                              <Option value="Loading">Loading...</Option>
+                            )}
+                          </Select>
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                    <Row gutter={[8, 8]}>
+                      <Col sm={24} md={24} lg={24}>
+                        <Form.Item
+                          label="Address"
+                          name="address"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please enter your address",
+                            },
+                          ]}
+                        >
+                          <TextArea rows={4} maxLength={100} />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col col-offset={18} sm={24} md={24} lg={24}>
+                        <Space wrap>
+                          <Button type="primary" danger shape="round">
+                            Reset
+                          </Button>
+                          <Button
+                            type="primary"
+                            style={{ backgroundColor: GREEN_BASE }}
+                            success
+                            shape="round"
+                            htmlType="submit"
+                          >
+                            Save
+                          </Button>
+                        </Space>
+                      </Col>
+                    </Row>
+                  </Form>
+                </div>
+              </Flex>
+            </Card>
+          </Spin>
         </Col>
       </Row>
     </>
