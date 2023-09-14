@@ -37,7 +37,7 @@ export const Device = () => {
   };
 
   const parentFunction = () => {
-    console.log(deviceList);
+    setIsEditVisible(false);
     loadDevices();
   };
 

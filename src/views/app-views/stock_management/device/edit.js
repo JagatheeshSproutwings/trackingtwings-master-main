@@ -275,7 +275,7 @@ const Edit = ({ parentToChild, ...props }) => {
                     </Col>
                     <Col sm={12} md={12} lg={12}>
                       <Form.Item
-                        initialValue={parentToChild[8]}
+                        initialValue={parentToChild[9]}
                         size="small"
                         label="Device UID"
                         name="uid"
@@ -285,7 +285,7 @@ const Edit = ({ parentToChild, ...props }) => {
                     </Col>
                     <Col sm={12} md={12} lg={12}>
                       <Form.Item
-                        initialValue={parentToChild[9]}
+                        initialValue={parentToChild[8]}
                         size="small"
                         label="Device CCID"
                         name="ccid"

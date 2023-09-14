@@ -48,19 +48,23 @@ const Create = (props) => {
 
     // Regular expressions to validate password
     var lowerCase = /[a-z]/g;
-    var upperCase = /[A-Z]/g;
+    // var upperCase = /[A-Z]/g;
     var numbers = /[0-9]/g;
-    var symbols = /[!@#$%^&*()_+{}\[\]:;<>,.?~\\-]/g;
+    // var symbols = /[!@#$%^&*()_+{}\[\]:;<>,.?~\\-]/g;
 
     if (!new_pass.match(lowerCase)) {
       openNotification("info", "Password", "Should contain lowercase letters!");
-    // } else if (!new_pass.match(upperCase)) {
+    }
+    // else if (!new_pass.match(upperCase)) {
     //   openNotification("info", "Password", "Should contain uppercase letters!");
-    } else if (!new_pass.match(numbers)) {
+    // }
+    else if (!new_pass.match(numbers)) {
       openNotification("info", "Password", "Should contain numbers!");
-    // } else if (!new_pass.match(symbols)) {
+    }
+    // else if (!new_pass.match(symbols)) {
     //   openNotification("info", "Password", "Should contain one symbol!");
-    } else if (new_pass.length < 8) {
+    // }
+    else if (new_pass.length < 8) {
       openNotification("info", "Password", "length should be minimum 8");
     } else {
       return "OK";
@@ -115,6 +119,7 @@ const Create = (props) => {
   const handleRoleIdChange = (roleID) => {
     setSelectedRoleId(roleID);
     SetroleType(roleID);
+    getUserList();
   };
   const handleCountryIdChange = (countryId) => {
     setSelectedCountryId(countryId);
@@ -247,7 +252,6 @@ const Create = (props) => {
   useEffect(() => {
     SetCurrentUser(user());
     SetCurrentRole(role());
-    getUserList();
   }, []);
 
   async function fetchRoleOptions(setRoleOptions) {
@@ -591,20 +595,6 @@ const Create = (props) => {
                           <Input.Password />
                         </Form.Item>
                       </Col>
-                      {/* <div style={{ color: "red" }}>{errorMessage}</div> */}
-                      <span
-                        style={{
-                          fontSize: "11px",
-                          color: "green",
-                          fontWeight: "bold",
-                          fontFamily: "Segoe UI",
-                          fontStyle: "italic",
-                          marginTop: "-15px",
-                        }}
-                      >
-                        *[One UpperCase & LowerCase, One Number, One Symbol,
-                        Min. 8 Characters Length]
-                      </span>
                     </Row>
                     <Row gutter={[8, 8]}>
                       <Col sm={12} md={12} lg={12}>
@@ -681,9 +671,6 @@ const Create = (props) => {
                     <Row>
                       <Col col-offset={18} sm={24} md={24} lg={24}>
                         <Space wrap>
-                          <Button type="primary" danger shape="round">
-                            Reset
-                          </Button>
                           <Button
                             type="primary"
                             style={{ backgroundColor: GREEN_BASE }}
@@ -692,6 +679,9 @@ const Create = (props) => {
                             htmlType="submit"
                           >
                             Save
+                          </Button>
+                          <Button type="primary" shape="round">
+                            Back
                           </Button>
                         </Space>
                       </Col>

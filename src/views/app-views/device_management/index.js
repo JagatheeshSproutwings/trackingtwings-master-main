@@ -17,10 +17,8 @@ import { PlusOutlined } from "@ant-design/icons";
 import api from "configs/apiConfig";
 import { Space, Menu, Dropdown, message } from "antd";
 import Flex from "components/shared-components/Flex";
-
 import {
   DownOutlined,
-  EditOutlined,
   SettingOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
@@ -38,6 +36,37 @@ const Vehicle = () => {
 
   const dateFormat = "YYYY-MM-DD";
   const [open, setOpen] = useState(false);
+
+  const [adminList, SetAdminList] = useState([]);
+  const [distributorList, SetDistributorList] = useState([]);
+  const [dealerList, SetDealerList] = useState([]);
+  const [subdealerList, SetSubdealerList] = useState([]);
+  const [customerList, SetCustomerList] = useState([]);
+
+  const [planList, SetPlanList] = useState([]);
+  const [licenseList, SetLicenseList] = useState([]);
+  const [vehicleTypeList, SetVehicleTypeList] = useState([]);
+
+  const [simList, SetSimList] = useState([]);
+  const [deviceList, SetDeviceList] = useState([]);
+  const [vehicleList, setVehicleList] = useState([]);
+  const [mainvehicleList, setMainVehicleList] = useState([]);
+
+  const [simData, SetSimData] = useState("");
+
+  const [deviceData, SetDeviceData] = useState("");
+  const [makeIdData, SetMakeIdData] = useState("");
+  const [modelIdData, SetModelIdData] = useState("");
+  const [makeData, SetMakeData] = useState("");
+  const [modelData, SetModelData] = useState("");
+
+  const [currentUser, SetCurrentUser] = useState(
+    localStorage.getItem("id") || ""
+  );
+  const [currentRole, SetCurrentRole] = useState(
+    localStorage.getItem("role") || ""
+  );
+
   const showDrawer = () => {
     setOpen(true);
   };
@@ -52,42 +81,7 @@ const Vehicle = () => {
     });
   };
 
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [selectedRows, setSelectedRows] = useState([]);
-
-  const [adminList, SetAdminList] = useState([]);
-  const [distributorList, SetDistributorList] = useState([]);
-  const [dealerList, SetDealerList] = useState([]);
-  const [subdealerList, SetSubdealerList] = useState([]);
-  const [customerList, SetCustomerList] = useState([]);
-
-  const [planList, SetPlanList] = useState([]);
-
-  //For Dealer and SubDealer Direct
   const [userValue, setUserValue] = useState(localStorage.getItem("id") || "");
-
-  const [licenseList, SetLicenseList] = useState([]);
-
-  const [vehicleTypeList, SetVehicleTypeList] = useState([]);
-
-  const [simList, SetSimList] = useState([]);
-  const [simData, SetSimData] = useState("");
-  const [vehicleList, setVehicleList] = useState([]);
-  const [mainvehicleList, setMainVehicleList] = useState([]);
-
-  const [deviceList, SetDeviceList] = useState([]);
-  const [deviceData, SetDeviceData] = useState("");
-  const [makeIdData, SetMakeIdData] = useState("");
-  const [modelIdData, SetModelIdData] = useState("");
-  const [makeData, SetMakeData] = useState("");
-  const [modelData, SetModelData] = useState("");
-
-  const [currentUser, SetCurrentUser] = useState(
-    localStorage.getItem("id") || ""
-  );
-  const [currentRole, SetCurrentRole] = useState(
-    localStorage.getItem("role") || ""
-  );
 
   const getUserList = async () => {
     const user_data = { user_id: currentUser };
@@ -282,8 +276,6 @@ const Vehicle = () => {
         });
       SetDeviceList(device_list?.data.data);
     } else {
-      alert(currentRole);
-      alert(currentUser);
       if (currentRole == 4) {
         const user_get_data = { user_id: currentUser };
         const subdealer_list = await api
@@ -357,8 +349,6 @@ const Vehicle = () => {
           return err;
         });
       SetLicenseList(license_list?.data.data);
-    } else {
-      alert("s");
     }
   };
 
@@ -371,20 +361,17 @@ const Vehicle = () => {
 
     try {
       const device_data = await api.get(`device/${value}`);
-      const deviceUid = device_data?.data?.data?.uid;
       const device_make_id = device_data?.data?.data?.device_make_id;
       const device_model_id = device_data?.data?.data?.device_model_id;
       const device_make = device_data?.data?.data?.device_make;
       const device_model = device_data?.data?.data?.device_model;
+      const deviceUid = device_data?.data?.data?.uid;
 
-      if (deviceUid) {
-        SetDeviceData(deviceUid);
-        SetMakeIdData(device_make_id);
-        SetModelIdData(device_model_id);
-        SetMakeData(device_make);
-        SetModelData(device_model);
-      } else {
-      }
+      SetDeviceData(deviceUid);
+      SetMakeIdData(device_make_id);
+      SetModelIdData(device_model_id);
+      SetMakeData(device_make);
+      SetModelData(device_model);
     } catch (error) {
       console.error("Error fetching device data:", error);
     }
@@ -422,6 +409,9 @@ const Vehicle = () => {
       SetDeviceData("");
       SetMakeData("");
       SetModelData("");
+
+      loadsims();
+      loaddevices();
       onClose();
     } catch (error) {
       setLoading(false);
@@ -432,10 +422,6 @@ const Vehicle = () => {
   };
 
   const tableColumns = [
-    {
-      title: "id",
-      dataIndex: "id",
-    },
     {
       title: "Type",
       dataIndex: "vehicle_type",
@@ -515,10 +501,8 @@ const Vehicle = () => {
         device_imei: record.device_imei,
       };
       const response = await api.post("config/show", data);
-      console.log("API Response:", response);
-
       if (response.status === 200) {
-        const responseData = response.data; // Assuming the data is directly under response.data
+        const responseData = response.data;
         if (responseData.success) {
           const configurationData = responseData.data; // Access the data property
           setEditData(configurationData); // Set the data in setEditData
@@ -562,7 +546,6 @@ const Vehicle = () => {
       console.error("Error fetching users:", error);
     }
   };
-
   const loadsims = async () => {
     try {
       SetSimList([]);
@@ -616,7 +599,6 @@ const Vehicle = () => {
     const searchArray = searchValue ? vehicleList : mainvehicleList; // Use a different source if needed
     const filteredUserList = utils.wildCardSearch(searchArray, searchValue);
     setVehicleList(filteredUserList);
-    setSelectedRowKeys([]);
   };
 
   const parentFunction = () => {
@@ -624,12 +606,19 @@ const Vehicle = () => {
   };
 
   return (
-    <div>
-      {isComponentVisible && (
-        <Config parentToChild={editdata} parentFunction={parentFunction} />
-      )}
+    <>
+      <div>
+        {isComponentVisible && (
+          <Config parentToChild={editdata} parentFunction={parentFunction} />
+        )}
+      </div>
+
       <Card title="Vehicle List">
-        <Row>
+        <Flex
+          alignItems="center"
+          justifyContent="space-between"
+          mobileFlex={false}
+        >
           <Flex className="mb-1" mobileFlex={false}>
             <div className="mr-md-3 mb-3">
               <Input
@@ -641,23 +630,29 @@ const Vehicle = () => {
 
             <div className="mb-3"></div>
           </Flex>
-          <Col span={4}>
-            <Button type="primary" onClick={showDrawer} icon={<PlusOutlined />}>
+
+          <div className="mb-3">
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={showDrawer}
+              ghost
+            >
               Add Vehicle
             </Button>
-          </Col>
-        </Row>
-        <Row>
-          <div className="table-responsive">
-            <Table
-              bordered
-              columns={tableColumns}
-              dataSource={vehicleList}
-              rowKey="id"
-            />
           </div>
-        </Row>
+        </Flex>
+
+        <div className="table-responsive">
+          <Table
+            bordered
+            columns={tableColumns}
+            dataSource={vehicleList}
+            rowKey="id"
+          />
+        </div>
       </Card>
+
       <Drawer
         placement="right"
         closable={false}
@@ -1064,7 +1059,7 @@ const Vehicle = () => {
           </Form>
         </Spin>
       </Drawer>
-    </div>
+    </>
   );
 };
 
