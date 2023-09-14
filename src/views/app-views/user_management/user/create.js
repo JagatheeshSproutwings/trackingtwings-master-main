@@ -54,14 +54,14 @@ const Create = (props) => {
 
     if (!new_pass.match(lowerCase)) {
       openNotification("info", "Password", "Should contain lowercase letters!");
-    } else if (!new_pass.match(upperCase)) {
-      openNotification("info", "Password", "Should contain uppercase letters!");
+    // } else if (!new_pass.match(upperCase)) {
+    //   openNotification("info", "Password", "Should contain uppercase letters!");
     } else if (!new_pass.match(numbers)) {
       openNotification("info", "Password", "Should contain numbers!");
-    } else if (!new_pass.match(symbols)) {
-      openNotification("info", "Password", "Should contain one symbol!");
-    } else if (new_pass.length < 10) {
-      openNotification("info", "Password", "length should be more than 10");
+    // } else if (!new_pass.match(symbols)) {
+    //   openNotification("info", "Password", "Should contain one symbol!");
+    } else if (new_pass.length < 8) {
+      openNotification("info", "Password", "length should be minimum 8");
     } else {
       return "OK";
     }

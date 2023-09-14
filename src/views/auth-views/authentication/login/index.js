@@ -3,7 +3,7 @@ import LoginForm from "../../components/LoginForm";
 import { Card, Row, Col,Avatar } from "antd";
 import { useSelector } from "react-redux";
 import { UserOutlined } from '@ant-design/icons';
-import 'assets/styles/login.css'
+import 'assets/styles/login_new.css'
 const backgroundStyle = {
   backgroundImage: "url(/img/login_new.jpg)",
   backgroundRepeat: "no-repeat",
@@ -16,7 +16,7 @@ const Login = (props) => {
     <div className="h-100" style={backgroundStyle}>
       <div className="container d-flex flex-column justify-content-center h-100" style={{float:'right'}}>
         <Row justify="center" style={{backgroundColor:'transparent'}}>
-          <Col xs={20} sm={20} md={20} lg={7}>
+          <Col xs={20} sm={20} md={20} lg={10}>
             <Card>
               <div className="my-4">
                 <div className="text-center">

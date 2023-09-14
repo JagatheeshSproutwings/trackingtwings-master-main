@@ -12,9 +12,8 @@ import NoNetworkVehicles from 'components/map-components/noNetworkVehicles';
 import ExpiryVehicles from 'components/map-components/expiryVehicles';
 import TrackingMarker from 'components/map-components/trackingMarker';
 import Dashboard_vehicles from 'components/map-components/dashboard_vehicles'
-import MovingVehicle from 'components/map-components/liveTrack'
 import api from 'configs/apiConfig';
-import TestMovement from 'components/map-components/smoothMovement';
+import TestMovement from 'components/map-components/TestLiveTrack';
 const { Option } = Select
 
 export const Admin = () => {
@@ -321,51 +320,7 @@ return(
                         </Card>
                     </Col>
                     <Col sm={12} md={18} lg={18} style={{padding:0}}>
-                        
-                        {/* <TestMovement /> */}
-                            <MapContainer center={center} zoom={13} scrollWheelZoom={true}>
-                                <LayersControl>
-                                    <BaseLayer checked name="OpenStreetMap">
-                                        <TileLayer
-                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                        />
-                                    </BaseLayer>
-                                    <BaseLayer name="Google-Street View">
-                                        <TileLayer
-                                            attribution="Google Maps"
-                                            url="https://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}"
-                                            />
-                                    </BaseLayer>
-                                    <BaseLayer checked name="Google-Satelite">
-                                    <TileLayer
-                                            url='https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
-                                            maxZoom= {20}
-                                            subdomains={['mt1','mt2','mt3']}
-                                        />
-                                    </BaseLayer>
-                                </LayersControl>
-                                      
-                                <Marker position={center}>
-                                    {/* // <Popup>
-                                    //     <Card size="small" style={{background:"lightblue"}} >
-                                    //         <Row>
-                                    //             <Col>
-                                    //             <div>Vehicle No: TN01AB1234</div>
-                                    //         <div>Status: MOVING</div>
-                                    //         <div>Speed: 30 km/hr</div>
-                                    //         <div>Battery: 25.86 volt</div>
-                                    //         <div>Last Updated on: 2023-08-02 13:56:47</div>
-                                    //         <div>Lat/Long: 10.7920,79.5656</div>
-                                    //             </Col>
-                                    //         </Row>
-                                    //     </Card>
-                                    // </Popup> */}
-                                </Marker>
-
-                                <Polyline pathOptions={limeOptions} positions={polyline} />
-                            </MapContainer>
-                        
+                        <TestMovement/>
                     </Col>
                 </Row>
             </Col>
@@ -455,7 +410,7 @@ return(
                     </Col>
                 </Row>
             </Col> 
-        </Row>                           */}
+        </Row>                           
         {/* <MapContainer center={center} zoom={13} scrollWheelZoom={true}>
         <LayersControl>
                                     <BaseLayer checked name="OpenStreetMap">

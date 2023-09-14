@@ -78,9 +78,9 @@ const items = [
 ]
 
 export const NavProfile = ({mode}) => {
-	const {token} = useSelector(state => state.auth);
-	const [username,setUsername] = useState(localStorage.getItem('name'));
-	const [useremail,setUseremail] = useState(localStorage.getItem('email_address'));
+	const token = useSelector(state => state.auth);
+	const [username,setUsername] = useState(localStorage.getItem('name') || token?.user_info?.name);
+	const [useremail,setUseremail] = useState(localStorage.getItem('email_address') || token?.user_info?.email);
 	return (
 		
 		<Dropdown placement="bottomRight" menu={{items}} trigger={["click"]}>
@@ -97,8 +97,8 @@ export const NavProfile = ({mode}) => {
       xxl: 40,
     }} icon={<UserOutlined />}  />
 					<UserInfo className="profile-text">
-						<Name>{token?.user_info?.name}</Name>
-						<Title>{token?.user_info?.email}</Title>
+						<Name>{username}</Name>
+						<Title>{useremail}</Title>
 					</UserInfo>
 				</Profile>
 			</NavItem>

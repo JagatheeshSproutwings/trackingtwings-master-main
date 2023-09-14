@@ -4,7 +4,7 @@ import DriftMarker from 'react-leaflet-drift-marker';
 import { LeafletTrackingMarker } from "react-leaflet-tracking-marker";
 import { Table,Row,Col,List,Avatar,Badge,Skeleton } from 'antd'
 import L from "leaflet";
-import 'assets/styles/login.css'
+
 const MapWithMovingMarker = () => {
   const [latLngData, setLatLngData] = useState([
     [51.505, -0.09,30],
