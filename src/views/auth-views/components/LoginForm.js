@@ -20,7 +20,7 @@ import { motion } from "framer-motion";
 
 export const LoginForm = (props) => {
   const navigate = useNavigate();
-
+  const currentDomain = window.location.hostname;
   const {
     otherSignIn,
     showForgetPassword,

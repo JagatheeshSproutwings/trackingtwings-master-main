@@ -2,6 +2,8 @@ import React, { useState,useEffect } from 'react'
 import { useSelector, useDispatch } from "react-redux";
 import {Form,Row,Col,Card,Table,Select,Input,Badge,Avatar,Divider,Tabs, List } from 'antd'
 import {MapContainer,TileLayer,Marker,Popup,LayersControl,Polyline} from 'react-leaflet'
+import { BLUE_BASE, GOLD_BASE, GRAY_DARK, GREEN_BASE,RED_BASE,ORANGE_BASE } from 'constants/ThemeConstant';
+
 import { WHITE } from 'constants/ThemeConstant'
 import { Sticky, StickyContainer } from 'react-sticky';
 import AllVehicles from 'components/map-components/allVehicles';
@@ -12,9 +14,11 @@ import NoNetworkVehicles from 'components/map-components/noNetworkVehicles';
 import ExpiryVehicles from 'components/map-components/expiryVehicles';
 import TrackingMarker from 'components/map-components/trackingMarker';
 import Dashboard_vehicles from 'components/map-components/dashboard_vehicles'
+import Multivehicles from 'components/map-components/multi_dashboard_vehicles'
 import api from 'configs/apiConfig';
 import TestMovement from 'components/map-components/TestLiveTrack';
 const { Option } = Select
+
 
 export const Admin = () => {
   const [currentRole,setCurrentRole] = useState(); 
@@ -31,11 +35,17 @@ export const Admin = () => {
   const [subdealerUser,setSubdealeruser] = useState(false);
   const [subcustomerUser,setCustomeruser] = useState(false);
   const [currentTrack, setCurrentTrack] = useState({});
+  const [vehicle_status,setVehicleStatus] = useState("");
   const token = useSelector((state) => state.auth);
   const role_id = token?.user_info?.role_id;
   const user_id = token?.user_info?.id;
-  
-  console.log(role_id);
+  const [activeKey, setActiveKey] = useState("1"); 
+  const [vehicleDisplayType,setvehicleDisplayType] = useState(1);
+  const [multiplevehiclesData,setMultiplevehiclesData] = useState([]);
+
+  const handleTabChange = (key) => {
+    setActiveKey(key);
+  };
   const user = () => {
     return localStorage.getItem("id");
   };
@@ -55,7 +65,6 @@ export const Admin = () => {
       {
         setDistributoruser(true);
         getDistributorList();
-        console.log(distributorList);
       }
     }
     const getAdminList = async () => {
@@ -103,11 +112,83 @@ export const Admin = () => {
       });
       
     }
-   
+    const vehicle_color = (value) => {
+      switch (value) {
+        case 1:
+          return  BLUE_BASE;
+          break;
+        case 2:
+          return GOLD_BASE;
+          break;
+        case 3:
+          return GREEN_BASE;
+          break;
+          case 4:
+            return RED_BASE;
+          break;
+          case 5:
+            return GRAY_DARK;
+          break;
+          case 6:
+            return  ORANGE_BASE;
+          break;
+        default:
+          return GRAY_DARK;
+          break;
+      }
+  
+    }
+    const  vehicle_list = async (status) =>{
+
+      const multiple_vehicles_data = await api.get("multi_dashboard").then((res) => { return res;}).catch((err) => {console.log(err)});
+      if(multiple_vehicles_data?.data?.data && vehicle_status!='')
+      {
+        const filteredItems = multiple_vehicles_data?.data?.data.filter(item => item.vehicle_current_status === vehicle_status);
+        
+          const processedData = filteredItems?.map((item) => ({
+            id:item?.id,
+            latitude:item.lattitute,
+            longtitude:item.longitute,
+            title: item?.vehicle_name||"TEST",
+            description:item?.device_updatedtime|| "0000-00-00 00:00:00",
+            color:vehicle_color(item?.vehicle_current_status),
+            speed:item?.speed||0,
+            gps_count:20,
+            gsm_count:15,
+          }));
+          setMultiplevehiclesData(processedData);
+      }
+      else{
+        const filteredItems = multiple_vehicles_data?.data?.data;
+        
+          const processedData = filteredItems?.map((item) => ({
+            id:item?.id,
+            latitude:item?.lattitute || 0.00000,
+            longtitude:item?.longitute || 0.00000,
+            title: item?.vehicle_name||"TEST",
+            description:item?.device_updatedtime|| "0000-00-00 00:00:00",
+            device_time:item?.device_updatedtime|| "0000-00-00 00:00:00",
+            color:vehicle_color(item?.vehicle_current_status),
+            vehicle_current_status:item?.vehicle_current_status,
+            speed:item?.speed||0,
+            gps_count:20,
+            gsm_count:15,
+          }));
+          setMultiplevehiclesData(processedData);
+      }
+    } 
+
     useEffect(()=>{
       setCurrentRole(role());
       setCurrentUser(user());
       RoleBasedUserList();
+      vehicle_list();
+      const interval = setInterval(() => {
+        vehicle_list();
+      }, 2000);
+      return () => {
+        clearInterval(interval);
+       };
     },[])
 
     const dataStory = [
@@ -156,11 +237,21 @@ export const Admin = () => {
             key: 'status',
           },
     ];
+
+    const tabs = [
+      { key: "1", tab: "All", content: <Dashboard_vehicles status=""/> },
+      { key: "2", tab: "Parking", content: <Dashboard_vehicles status={1}/> },
+      { key: "3", tab: "Idle", content: <Dashboard_vehicles status={2} />},
+      { key: "4", tab: "Moving", content: <Dashboard_vehicles status={3}/> },
+      { key: "5", tab: "No Data", content: <Dashboard_vehicles status={4}/> },
+      { key: "6", tab: "Inactive", content: <Dashboard_vehicles status={5}/> },
+      { key: "7", tab: "Expired", content: <Dashboard_vehicles status={6}/> },
+    ];
+
+
     const handleChange = (value,option) =>{
         const selected_user_id = value;
         const selected_role_id = option.role_id;
-        console.log(selected_user_id);
-        console.log(selected_role_id);
         switch (selected_role_id) {
           case 1:
             return getAdminList(selected_user_id);
@@ -254,12 +345,11 @@ return(
 }
 {(currentRole==1 || currentRole==2 || currentRole==3 || currentRole==4) &&
                             <Col xs={12}>
-                            <Form.Item name="subdealer_id"  rules={[{required:true,message:'SubDealer Value is Required!'}]}>
+                            <Form.Item name="subdealer_id">
                                 <Select showSearch onChange={handleChange} placeholder="SubDealer">
-                                    <Option value="1" role_id="5">Customer 1</Option>
-                                    <Option value="2" role_id="5">Customer 2</Option>
-                                    <Option value="3" role_id="5">Customer 3</Option>
-                                    <Option value="4" role_id="5">Customer 4</Option>
+                                    {Array.isArray(subdealerList) && subdealerList.map((subdealer) => {
+                                        <Option value="{subdealer?.id}" role_id="5">{subdealer?.name}</Option>
+                                    })}
                                 </Select>
                             </Form.Item>
                             </Col>
@@ -268,10 +358,9 @@ return(
                             <Col xs={12}>
                             <Form.Item name="client_id"  rules={[{required:true,message:'Customer Value is Required!'}]}>
                                 <Select showSearch onChange={handleChange} placeholder="Customer">
-                                    <Option value="1" role_id="6">Customer 1</Option>
-                                    <Option value="2" role_id="6">Customer 2</Option>
-                                    <Option value="3" role_id="6">Customer 3</Option>
-                                    <Option value="4" role_id="6">Customer 4</Option>
+                                {Array.isArray(customerList) && customerList.map((subdealer) => {
+                                        <Option value="{customerList?.id}" role_id="6">{customerList?.name}</Option>
+                                    })}
                                 </Select>
                             </Form.Item>
                             </Col>
@@ -279,198 +368,22 @@ return(
                         </Form>
                         <Card style={{padding:0,margin:0}}>
                             <StickyContainer style={{padding:0,margin:0}}>
-                                <Tabs defaultActiveKey="1" size='small'   items={[
-                                        {
-                                            label: `All`,
-                                            key: '1',
-                                            children: <Dashboard_vehicles/>,
-                                        },
-                                        {
-                                            label: `Moving`,
-                                            key: '2',
-                                            children: <AllVehicles/>,
-                                        },
-                                        {
-                                            label: `Idle`,
-                                            key: '3',
-                                            children: <AllVehicles/>,
-                                        },
-                                        {
-                                            label: `Parking`,
-                                            key: '4',
-                                            children: <AllVehicles/>,
-                                        },
-                                        {
-                                            label: `No Data`,
-                                            key: '5',
-                                            children: <AllVehicles/>,
-                                        },
-                                        {
-                                          label: `Inactive`,
-                                          key: '6',
-                                          children: <AllVehicles/>,
-                                      },
-                                        {
-                                            label: `Expired`,
-                                            key: '7',
-                                            children: <AllVehicles/>,
-                                        },
-                                    ]} />
-                            </StickyContainer>
+                            <Tabs activeKey={activeKey}  onChange={handleTabChange}>
+                              {tabs.map((tab) => (
+                                <Tabs key={tab.key} tab={tab.tab}>
+                                  {activeKey === tab.key && <div>{tab.content}</div>}
+                                </Tabs>
+                              ))}
+                            </Tabs>
+                          </StickyContainer>
                         </Card>
                     </Col>
                     <Col sm={12} md={18} lg={18} style={{padding:0}}>
-                        <TestMovement/>
+                    <Multivehicles data={multiplevehiclesData}/>
                     </Col>
                 </Row>
             </Col>
-        </Row>
-         {/* <Row>
-            <Col xs={24} sm={24} md={24} lg={24}>
-                <Row gutter={6} style={{padding:0,margin:0}}>
-                    <Col sm={12} md={5} lg={5}>
-                    <StickyContainer style={{padding:0,margin:0}}>
-                                <Tabs defaultActiveKey="1" size='small' style={{fontSize:'10px'}}  items={[
-                                        {
-                                            label: `All`,
-                                            key: '1',
-                                            children: <AllVehicles/>,
-                                        },
-                                        {
-                                            label: `Moving`,
-                                            key: '2',
-                                            children: <MovingVehicles/>,
-                                        },
-                                        {
-                                            label: `Idle`,
-                                            key: '3',
-                                            children: <IdleVehicles/>,
-                                        },
-                                        {
-                                            label: `Parking`,
-                                            key: '4',
-                                            children: <ParkingVehicles/>,
-                                        },
-                                        {
-                                            label: `OOC`,
-                                            key: '5',
-                                            children: <NoNetworkVehicles/>,
-                                        },
-                                        {
-                                            label: `Expired`,
-                                            key: '6',
-                                            children: <ExpiryVehicles/>,
-                                        },
-                                    ]} />
-                            </StickyContainer>
-                    </Col>
-                    <Col sm={12} md={19} lg={19}>
-                    <MapContainer center={center} zoom={13} scrollWheelZoom={true}>
-                                <LayersControl>
-                                    <BaseLayer checked name="OpenStreetMap">
-                                        <TileLayer
-                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                        />
-                                    </BaseLayer>
-                                    <BaseLayer name="Google-Street View">
-                                        <TileLayer
-                                            attribution="Google Maps"
-                                            url="https://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}"
-                                            />
-                                    </BaseLayer>
-                                    <BaseLayer checked name="Google-Satelite">
-                                    <TileLayer
-                                            url='https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
-                                            maxZoom= {20}
-                                            subdomains={['mt1','mt2','mt3']}
-                                        />
-                                    </BaseLayer>
-                                </LayersControl>
-
-                                <Marker position={center}>
-                                    <Popup>
-                                        <Card size="small" style={{background:"lightblue"}} >
-                                            <Row>
-                                                <Col>
-                                                <div>Vehicle No: TN01AB1234</div>
-                                            <div>Status: MOVING</div>
-                                            <div>Speed: 30 km/hr</div>
-                                            <div>Battery: 25.86 volt</div>
-                                            <div>Last Updated on: 2023-08-02 13:56:47</div>
-                                            <div>Lat/Long: 10.7920,79.5656</div>
-                                                </Col>
-                                            </Row>
-                                        </Card>
-                                    </Popup>
-                                </Marker>
-
-                                <Polyline pathOptions={limeOptions} positions={polyline} />
-                            </MapContainer>
-                    </Col>
-                </Row>
-            </Col> 
-        </Row>                           
-        {/* <MapContainer center={center} zoom={13} scrollWheelZoom={true}>
-        <LayersControl>
-                                    <BaseLayer checked name="OpenStreetMap">
-                                        <TileLayer
-                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                        />
-                                    </BaseLayer>
-                                    <BaseLayer name="Google-Street View">
-                                        <TileLayer
-                                            attribution="Google Maps"
-                                            url="https://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}"
-                                            />
-                                    </BaseLayer>
-                                    <BaseLayer checked name="Google-Satelite">
-                                    <TileLayer
-                                            url='https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
-                                            maxZoom= {20}
-                                            subdomains={['mt1','mt2','mt3']}
-                                        />
-                                    </BaseLayer>
-                                </LayersControl>
-                                <div style={tabViewStyle}>
-                                <StickyContainer style={{padding:0,margin:0}}>
-                                <Tabs defaultActiveKey="1"  items={[
-                                        {
-                                            label: `All`,
-                                            key: '1',
-                                            children: <AllVehicles/>,
-                                        },
-                                        {
-                                            label: `Moving`,
-                                            key: '2',
-                                            children: <MovingVehicles/>,
-                                        },
-                                        {
-                                            label: `Idle`,
-                                            key: '3',
-                                            children: <IdleVehicles/>,
-                                        },
-                                        {
-                                            label: `Parking`,
-                                            key: '4',
-                                            children: <ParkingVehicles/>,
-                                        },
-                                        {
-                                            label: `OOC`,
-                                            key: '5',
-                                            children: <NoNetworkVehicles/>,
-                                        },
-                                        {
-                                            label: `Expired`,
-                                            key: '6',
-                                            children: <ExpiryVehicles/>,
-                                        },
-                                    ]} />
-                            </StickyContainer>
-                </div>
-        </MapContainer> */}
-        
+        </Row>        
     </>
 )
 }
