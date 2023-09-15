@@ -175,6 +175,7 @@ export const Admin = () => {
             live_status:vehicle_live_status(item?.vehicle_current_status),
             latitude:item.lattitute,
             longtitude:item.longitute,
+            last_duration:item?.last_duration,
             title: item?.vehicle_name||"TEST",
             description:item?.device_updatedtime|| "0000-00-00 00:00:00",
             color:vehicle_color(item?.vehicle_current_status),
@@ -190,6 +191,7 @@ export const Admin = () => {
           const processedData = filteredItems?.map((item) => ({
             id:item?.id,
             live_status:vehicle_live_status(item?.vehicle_current_status),
+            last_duration:item?.last_duration,
             latitude:item?.lattitute || 0.00000,
             longtitude:item?.longitute || 0.00000,
             title: item?.vehicle_name||"TEST",
