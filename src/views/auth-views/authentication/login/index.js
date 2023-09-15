@@ -12,6 +12,7 @@ const backgroundStyle = {
 
 const Login = (props) => {
   const theme = useSelector((state) => state.theme.currentTheme);
+
   return (
     <div className="h-100" style={backgroundStyle}>
       <div className="container d-flex flex-column justify-content-center h-100" style={{float:'right'}}>
@@ -19,7 +20,7 @@ const Login = (props) => {
           <Col xs={20} sm={20} md={20} lg={10}>
             <Card>
               <div className="my-4">
-                <div className="text-center">
+                <div className="text-center">  
                 <Avatar size={100} icon={<UserOutlined />} />
                   {/* <img
                     className="img-fluid"

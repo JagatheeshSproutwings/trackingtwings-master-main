@@ -16,66 +16,77 @@ const tableProps = {
     loading,
     showHeader,
   };
-
   const handleSwitch = (condition) => {
     let output;
+
     switch (condition) {
       case "1":
-        return vehicle_icon_color = BLUE_BASE;
+        return  BLUE_BASE;
         break;
       case "2":
-        return vehicle_icon_color = GOLD_BASE;
+        return GOLD_BASE;
         break;
       case "3":
-        return vehicle_icon_color = GREEN_BASE;
+        return GREEN_BASE;
         break;
         case "4":
-          return  vehicle_icon_color = RED_BASE;
+          return RED_BASE;
         break;
         case "5":
-          return vehicle_icon_color = GRAY_DARK;
+          return GRAY_DARK;
         break;
         case "6":
-          return  vehicle_icon_color = ORANGE_BASE;
+          return  ORANGE_BASE;
         break;
       default:
-        return vehicle_icon_color = GRAY_DARK;
+        return GRAY_DARK;
         break;
     }
+
   };
-  
-  const vehicle_icon = async (value) => {
+  const vehicle_color = (value) => {
     switch (value) {
-          case 1:
-            return ;
-          break;
-          case 2:
-            return ;
-          break;
-          case 3:
-            return ;
-            break;
-          case 4:
-            return ;
-            break;
-          case 5:
-              return ;
-            break;
-          default:
-            break;
+      case 1:
+        return  BLUE_BASE;
+        break;
+      case 2:
+        return GOLD_BASE;
+        break;
+      case 3:
+        return GREEN_BASE;
+        break;
+        case 4:
+          return RED_BASE;
+        break;
+        case 5:
+          return GRAY_DARK;
+        break;
+        case 6:
+          return  ORANGE_BASE;
+        break;
+      default:
+        return GRAY_DARK;
+        break;
     }
+    // if(value==1)
+    // {
+    //   return BLUE_BASE;
+    // }
+    // if(value==4)
+    // {
+    //   return GRAY_DARK;
+    // }
+    // if(value==3)
+    // {
+    //   return GREEN_BASE;
+    // }
   }
-  const SingleVehicle = async (value) => {
-    if(value)
-    {
-      const singlevehicles_data = await api.get("single_dashboard/"+value).then((res) => { return res;}).catch((err) => {console.log(err)});
-    console.log(singlevehicles_data);
-    }
+  
+  const SingleVehicle = (value) => {
     console.log(value);
-    
   }
   const  vehicle_list = async (status) =>{
-    
+
     const multiple_vehicles_data = await api.get("multi_dashboard").then((res) => { return res;}).catch((err) => {console.log(err)});
     if(multiple_vehicles_data?.data?.data && vehicle_status!='')
     {
@@ -83,10 +94,9 @@ const tableProps = {
       
         const processedData = filteredItems?.map((item) => ({
           id:item?.id,
-          device_imei:item?.device_imei,
           title: item?.vehicle_name||"TEST",
           description:item?.device_updatedtime|| "0000-00-00 00:00:00",
-          color:handleSwitch(item?.vehicle_current_status),
+          color:vehicle_color(item?.vehicle_current_status),
           speed:item?.speed||0,
           gps_count:20,
           gsm_count:15,
@@ -95,12 +105,12 @@ const tableProps = {
     }
     else{
       const filteredItems = multiple_vehicles_data?.data?.data;
+      
         const processedData = filteredItems?.map((item) => ({
           id:item?.id,
-          device_imei:item?.device_imei,
           title: item?.vehicle_name||"TEST",
           description:item?.device_updatedtime|| "0000-00-00 00:00:00",
-          color:handleSwitch(item?.vehicle_current_status),
+          color:vehicle_color(item?.vehicle_current_status),
           speed:item?.speed||0,
           gps_count:20,
           gsm_count:15,
@@ -126,7 +136,7 @@ const tableProps = {
     size='small'
     dataSource={multipleVehicles}
     renderItem={item => (
-      <List.Item onClick={() => SingleVehicle(item?.device_imei)} value={item?.id} actions={[ <a key="list-loadmore-more"><FontAwesomeIcon icon={faEllipsisVertical} style={{fontSize: '15px',padding:'0',color:GREEN_BASE}}/></a>]}>
+      <List.Item  onClick={SingleVehicle} value={item?.id} actions={[ <a key="list-loadmore-more"><FontAwesomeIcon icon={faEllipsisVertical} style={{fontSize: '15px',padding:'0',color:GREEN_BASE}}/></a>]}>
         <List.Item.Meta
           avatar={ <Avatar size="small"  style={{backgroundColor:'transparent'}} icon={<CarFilled style={{ fontSize: '20px',padding:'0',color: item.color } }/>}/>}
           title={<span style={{fontSize:'12px'}}>{item.title}</span>}
@@ -134,7 +144,7 @@ const tableProps = {
         />
         <Row style={{padding:0}}>
           <Col className='ml-13'>
-            <h6>{item.speed} KMPH</h6>
+            <h6>{item.speed} KMPH </h6>
           </Col >
           <Col className='ml-2'>
             <WifiOutlined style={{fontSize: '15px',color:RED_BASE}} />
@@ -146,6 +156,7 @@ const tableProps = {
           <FontAwesomeIcon icon={faPlug} style={{fontSize: '15px',color: RED_BASE}} />
           </Col>
         </Row>
+        
       </List.Item>
 
     )}
