@@ -138,6 +138,31 @@ export const Admin = () => {
       }
   
     }
+    const vehicle_live_status = (value) => {
+      switch (value) {
+          case 1:
+            return  'Parking';
+            break;
+          case 2:
+            return 'Idle';
+            break;
+          case 3:
+            return 'Moving';
+            break;
+            case 4:
+              return 'No Data';
+            break;
+            case 5:
+              return 'Inactive';
+            break;
+            case 6:
+              return 'Expired';
+            break;
+          default:
+            return 'No Data';
+            break;
+        }
+  }
     const  vehicle_list = async (status) =>{
 
       const multiple_vehicles_data = await api.get("multi_dashboard").then((res) => { return res;}).catch((err) => {console.log(err)});
@@ -147,8 +172,10 @@ export const Admin = () => {
         
           const processedData = filteredItems?.map((item) => ({
             id:item?.id,
+            live_status:vehicle_live_status(item?.vehicle_current_status),
             latitude:item.lattitute,
             longtitude:item.longitute,
+            last_duration:item?.last_duration,
             title: item?.vehicle_name||"TEST",
             description:item?.device_updatedtime|| "0000-00-00 00:00:00",
             color:vehicle_color(item?.vehicle_current_status),
@@ -163,6 +190,8 @@ export const Admin = () => {
         
           const processedData = filteredItems?.map((item) => ({
             id:item?.id,
+            live_status:vehicle_live_status(item?.vehicle_current_status),
+            last_duration:item?.last_duration,
             latitude:item?.lattitute || 0.00000,
             longtitude:item?.longitute || 0.00000,
             title: item?.vehicle_name||"TEST",

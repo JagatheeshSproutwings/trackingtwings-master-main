@@ -75,10 +75,10 @@ function MultiDashboardVehicles({data}) {
             </BaseLayer>
         </LayersControl>
         {data?.map((marker) => (
-              <Marker key={marker.id} position={[marker?.latitude, marker?.longtitude]}>
+              <Marker key={marker.id} position={[marker?.latitude, marker?.longtitude]} keepCenter={true}>
                 <Popup>
                 <p style={{margin:0}}>Vehicle Name:{marker?.title}</p>
-                <p style={{margin:0}}>Status:{marker?.vehicle_current_status} </p>
+                <p style={{margin:0}}>Status:{marker?.live_status} ({marker?.last_duration}) </p>
                 <p style={{margin:0}}>Speed:{marker?.speed} KMPH</p>
                 <p style={{margin:0}}>Last Update:{marker?.device_time}</p>
                 </Popup>

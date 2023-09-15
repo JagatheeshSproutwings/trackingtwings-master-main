@@ -43,7 +43,31 @@ const tableProps = {
         break;
     }
   };
-  
+  const vehicle_live_status = (value) => {
+    switch (value) {
+        case 1:
+          return  'Parking';
+          break;
+        case 2:
+          return 'Idle';
+          break;
+        case 3:
+          return 'Moving';
+          break;
+          case 4:
+            return 'No Data';
+          break;
+          case 5:
+            return 'Inactive';
+          break;
+          case 6:
+            return 'Expired';
+          break;
+        default:
+          return 'No Data';
+          break;
+      }
+}
   const vehicle_icon = async (value) => {
     switch (value) {
           case 1:
@@ -83,6 +107,7 @@ const tableProps = {
       
         const processedData = filteredItems?.map((item) => ({
           id:item?.id,
+          live_status:vehicle_live_status(item?.vehicle_current_status),
           device_imei:item?.device_imei,
           title: item?.vehicle_name||"TEST",
           description:item?.device_updatedtime|| "0000-00-00 00:00:00",
@@ -98,6 +123,7 @@ const tableProps = {
         const processedData = filteredItems?.map((item) => ({
           id:item?.id,
           device_imei:item?.device_imei,
+          live_status:vehicle_live_status(item?.vehicle_current_status),
           title: item?.vehicle_name||"TEST",
           description:item?.device_updatedtime|| "0000-00-00 00:00:00",
           color:handleSwitch(item?.vehicle_current_status),
