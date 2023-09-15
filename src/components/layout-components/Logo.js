@@ -51,7 +51,7 @@ export const Logo = ({ mobileLogo, logoType }) => {
 		if (navCollapsed) {
 			return '/img/logo-sm.png'
 		}
-		return '/img/logo.png'
+		return '/img/logo-sm.png'
 	}
 
 	return (
