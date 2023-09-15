@@ -1005,7 +1005,7 @@ const Vehicle = () => {
             </Row>
             <h5>SIM Details :</h5>
             <Row gutter={6}>
-              <Col sm={5} md={10} lg={10} xxl={10}>
+              <Col sm={6} md={10} lg={10} xxl={10}>
                 <Form.Item
                   name="sim_id"
                   rules={[
@@ -1039,13 +1039,15 @@ const Vehicle = () => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Form.Item>
-                <Input type="text" value={simData}></Input>
-              </Form.Item>
+              <Col sm={6} md={10} lg={10} xxl={10}>
+                <Form.Item>
+                  <Input type="text" value={simData}></Input>
+                </Form.Item>
+              </Col>
             </Row>
             <h5>Vehicle Details :</h5>
             <Row gutter={6}>
-              <Col sm={5} md={10} lg={10} xxl={10}>
+              <Col sm={4} md={8} lg={8} xxl={8}>
                 <Form.Item
                   name="vehicle_type_id"
                   rules={[
@@ -1106,6 +1108,33 @@ const Vehicle = () => {
                     format={dateFormat}
                     placeholder="Installation Date"
                   ></DatePicker>
+                </Form.Item>
+              </Col>
+              <Col sm={3} md={6} lg={6} xxl={6}>
+                <Form.Item name="service_person_name">
+                  <Input
+                    type="text"
+                    name="service_person_name"
+                    placeholder="Service Person Name"
+                  ></Input>
+                </Form.Item>
+              </Col>
+              <Col sm={3} md={6} lg={6} xxl={6}>
+                <Form.Item name="install_person_name">
+                  <Input
+                    type="text"
+                    name="install_person_name"
+                    placeholder="Install Person Name"
+                  ></Input>
+                </Form.Item>
+              </Col>
+              <Col sm={4} md={8} lg={8} xxl={8}>
+                <Form.Item name="description">
+                  <Input
+                    type="text"
+                    name="description"
+                    placeholder="Description"
+                  ></Input>
                 </Form.Item>
               </Col>
             </Row>

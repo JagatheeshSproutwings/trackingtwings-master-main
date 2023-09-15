@@ -61,6 +61,7 @@ const Edit = ({ parentToChild, ...props }) => {
       device_imei_no: values.device_imei_no,
       uid: values.uid,
       ccid: values.ccid,
+      description: values.description,
     };
 
     try {
@@ -133,6 +134,7 @@ const Edit = ({ parentToChild, ...props }) => {
           <Card title="Edit Device">
             <Flex>
               <div className="container">
+                {parentToChild}
                 <Form
                   size="small"
                   name="registrationForm"
@@ -289,6 +291,16 @@ const Edit = ({ parentToChild, ...props }) => {
                         size="small"
                         label="Device CCID"
                         name="ccid"
+                      >
+                        <Input />
+                      </Form.Item>
+                    </Col>
+                    <Col sm={24} md={24} lg={24}>
+                      <Form.Item
+                        size="small"
+                        label="Description"
+                        name="description"
+                        initialValue={parentToChild[10]}
                       >
                         <Input />
                       </Form.Item>

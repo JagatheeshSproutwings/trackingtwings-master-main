@@ -57,6 +57,7 @@ const Create = (props) => {
       device_imei_no: values.device_imei_no,
       uid: values.uid,
       ccid: values.ccid,
+      description: values.description,
     };
 
     try {
@@ -268,6 +269,7 @@ const Create = (props) => {
                       <Input />
                     </Form.Item>
                   </Col>
+
                   <Col sm={12} md={12} lg={12}>
                     <Form.Item size="small" label="Device UID" name="uid">
                       <Input />
@@ -275,6 +277,16 @@ const Create = (props) => {
                   </Col>
                   <Col sm={12} md={12} lg={12}>
                     <Form.Item size="small" label="Device CCID" name="ccid">
+                      <Input />
+                    </Form.Item>
+                  </Col>
+
+                  <Col sm={24} md={24} lg={24}>
+                    <Form.Item
+                      size="small"
+                      label="Description"
+                      name="description"
+                    >
                       <Input />
                     </Form.Item>
                   </Col>

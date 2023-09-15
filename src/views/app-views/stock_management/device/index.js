@@ -57,6 +57,7 @@ export const Device = () => {
           device_model_id: item.device_model_id,
           device_make: item.device_make,
           device_model: item.device_model,
+          description: item.description,
         }));
         setDeviceList(processedData);
         setMainDeviceList(processedData);
@@ -84,6 +85,7 @@ export const Device = () => {
       record.device_imei_no,
       record.ccid,
       record.uid,
+      record.description,
     ]);
 
     // Set isEditVisible to true
