@@ -163,7 +163,7 @@ export const HeaderNav = (props) => {
                 </Space>
               </>
             )}
-            {/* {role_id == 6 && (
+            {role_id == 6 && (
               <>
                 <Space wrap>
                   <Popover content={settings}>
@@ -173,7 +173,7 @@ export const HeaderNav = (props) => {
                   </Popover>
                 </Space>
               </>
-            )} */}
+            )}
             {/* <NavNotification mode={navMode} /> */}
             <NavProfile mode={navMode} />
           </NavEdge>

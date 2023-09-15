@@ -1,78 +1,120 @@
 import React, { useEffect, useState } from "react";
-import { Checkbox, List, Card, Row, Col } from "antd";
-import Flex from "components/shared-components/Flex";
+import { Card, Table, Button, notification } from "antd";
 import api from "configs/apiConfig";
 
-const data = [
-  {
-    title: "Ant Design Title 1",
-  },
-  {
-    title: "Ant Design Title 2",
-  },
-  {
-    title: "Ant Design Title 3",
-  },
-  {
-    title: "Ant Design Title 4",
-  },
-];
-
 const App = () => {
-  const [checked, setChecked] = useState([]);
-  const [indeterminate, setIndeterminate] = useState(false);
-  const [checkAll, setCheckAll] = useState(false);
+  const [alerttypes, setAlertTypes] = useState([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
-  useEffect(() => {
-    setIndeterminate(checked.length && checked.length !== data.length);
-    setCheckAll(checked.length === data.length);
-  }, [checked]);
-
-  const onCheckAllChange = (e) => {
-    setChecked(e.target.checked ? data.map((item) => item.title) : []);
-    setCheckAll(e.target.checked);
+  const rowSelection = {
+    onChange: (selectedRowKeys) => {
+      setSelectedRowKeys(selectedRowKeys);
+    },
   };
 
+  const GetData = () => {
+    console.log(selectedRowKeys);
+    SaveAlertTypes(selectedRowKeys);
+  };
+
+  const openNotification = (type, message, description) => {
+    notification[type]({
+      message,
+      description,
+    });
+  };
+
+  const [currentUser, setCurrentUser] = useState(
+    localStorage.getItem("id") || ""
+  );
+
+  const loadAlertTypes = async () => {
+    try {
+      const user_data = { user_id: currentUser };
+      const response = await api.post("alert_notifications_list", user_data);
+
+      if (response.data && Array.isArray(response.data.data)) {
+        const processedData = response.data.data.map((item) => ({
+          alert_type_id: item.alert_type_id,
+          alert_type: item.alert_type,
+          user_status: item.user_status,
+          key: item.alert_type_id,
+        }));
+
+        // Create an array of alert_type_ids where user_status is 1
+        const selectedKeys = processedData
+          .filter((item) => item.user_status === 1)
+          .map((item) => item.alert_type_id);
+
+        setSelectedRowKeys(selectedKeys); // Set selectedRowKeys
+        setAlertTypes(processedData);
+      } else {
+        console.error("API request was not successful");
+      }
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
+
+  const SaveAlertTypes = async (selectedRowKeys) => {
+    try {
+      const user_data = {
+        user_id: currentUser,
+        alert_type_id: selectedRowKeys,
+      };
+      const response = await api.post("alert_notification/update", user_data);
+      openNotification(
+        "success",
+        "Alert",
+        "Alert Configuration Updated Successfully!"
+      );
+      loadAlertTypes();
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
+
+  const tableColumns = [
+    {
+      title: "Name",
+      dataIndex: "alert_type_id",
+      key: "alert_type_id",
+    },
+    {
+      title: "Mobile",
+      dataIndex: "alert_type",
+      key: "alert_type_id",
+    },
+    {
+      title: "Status",
+      dataIndex: "user_status",
+      render: (user_status) => (
+        <input type="checkbox" checked={user_status === 1} />
+      ),
+    },
+  ];
+
+  useEffect(() => {
+    setCurrentUser(localStorage.getItem("id") || "");
+    loadAlertTypes();
+  }, []);
+
   return (
-    <Card title="Edit Device">
-      <Flex>
-        <div className="container">
-          <Checkbox
-            indeterminate={indeterminate}
-            onChange={onCheckAllChange}
-            checked={checkAll}
-          >
-            Check all
-          </Checkbox>
-          <Row>
-            <Col sm={4} md={8} lg={8}>
-              <Checkbox.Group
-                style={{ width: "100%" }}
-                value={checked}
-                onChange={(checkedValues) => {
-                  setChecked(checkedValues);
-                }}
-              >
-                <List
-                  itemLayout="horizontal"
-                  dataSource={data}
-                  renderItem={(item) => (
-                    <List.Item>
-                      <List.Item.Meta
-                        avatar={<Checkbox value={item.title} />}
-                        title={<a href="https://ant.design">{item.title}</a>}
-                      />
-                    </List.Item>
-                  )}
-                />
-              </Checkbox.Group>
-            </Col>
-          </Row>
-          <div style={{ marginTop: 20 }}>
-            <b>Selecting:</b> {checked.join(", ")}
-          </div>
-        </div>
-      </Flex>
+    <Card title="Alert Configuration">
+      <Button onClick={GetData}>Update</Button>
+      <Table
+        size="small"
+        bordered
+        columns={tableColumns}
+        dataSource={alerttypes}
+        rowKey="key"
+        rowSelection={{
+          selectedRowKeys: selectedRowKeys,
+          type: "checkbox",
+          preserveSelectedRowKeys: false,
+          ...rowSelection,
+        }}
+      />
     </Card>
   );
 };

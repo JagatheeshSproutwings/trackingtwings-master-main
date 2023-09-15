@@ -23,6 +23,8 @@ import {
   SearchOutlined,
 } from "@ant-design/icons";
 import Config from "./config";
+import Configs from "./configs";
+
 import utils from "utils";
 
 const { Option } = Select;
@@ -31,6 +33,9 @@ const Vehicle = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [isComponentVisible, setIsComponentVisible] = useState(false);
+  const [isConfigVisible, setIsConfigVisible] = useState(false);
+
+  const [mulitiVehicles, setMulitiVehicles] = useState([]);
 
   const [editdata, setEditData] = useState("");
 
@@ -520,6 +525,14 @@ const Vehicle = () => {
     }
   };
 
+  const clickConfig = async () => {
+    if (mulitiVehicles.length !== 0) {
+      setIsConfigVisible(true);
+    } else {
+      openNotification("success", "Vehicle", "Please Select One Vehicles");
+    }
+  };
+
   const loadVehicles = async () => {
     try {
       const user_data = { user_id: currentUser };
@@ -603,6 +616,11 @@ const Vehicle = () => {
 
   const parentFunction = () => {
     setIsComponentVisible(false);
+    setIsConfigVisible(false);
+  };
+
+  const changeMutliVehicles = async (value) => {
+    setMulitiVehicles(value);
   };
 
   return (
@@ -611,6 +629,12 @@ const Vehicle = () => {
         {isComponentVisible && (
           <Config parentToChild={editdata} parentFunction={parentFunction} />
         )}
+        {isConfigVisible && (
+          <Configs
+            parentToChild={mulitiVehicles}
+            parentFunction={parentFunction}
+          />
+        )}
       </div>
 
       <Card title="Vehicle List">
@@ -618,20 +642,56 @@ const Vehicle = () => {
           alignItems="center"
           justifyContent="space-between"
           mobileFlex={false}
-        >
-          <Flex className="mb-1" mobileFlex={false}>
-            <div className="mr-md-3 mb-3">
-              <Input
-                placeholder="Search"
-                prefix={<SearchOutlined />}
-                onChange={(e) => onSearch(e)}
-              />
-            </div>
+        ></Flex>
 
-            <div className="mb-3"></div>
-          </Flex>
+        <Row>
+          <Col sm={3} md={6} lg={6}>
+            <Input
+              style={{
+                width: "70%",
+              }}
+              placeholder="Search"
+              prefix={<SearchOutlined />}
+              onChange={(e) => onSearch(e)}
+            />
+          </Col>
 
-          <div className="mb-3">
+          <Col sm={3} md={6} lg={6}>
+            <Select
+              mode="tags"
+              style={{
+                width: "95%",
+              }}
+              placeholder="Select Vehicle"
+              onChange={changeMutliVehicles}
+              allowClear
+              showSearch
+              filterOption={(input, option) =>
+                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+              }
+            >
+              {Array.isArray(vehicleList) ? (
+                vehicleList.map((vehicle) => (
+                  <Option key={vehicle.id} value={vehicle.id}>
+                    {vehicle.vehicle_name}
+                  </Option>
+                ))
+              ) : (
+                <Option value="Loading" disabled>
+                  Loading...
+                </Option>
+              )}
+            </Select>
+          </Col>
+
+          <Col sm={2} md={4} lg={4}>
+            <Button type="primary" ghost onClick={clickConfig}>
+              Config
+            </Button>
+          </Col>
+
+          <Col sm={2} md={4} lg={4}></Col>
+          <Col sm={2} md={4} lg={4}>
             <Button
               type="primary"
               icon={<PlusOutlined />}
@@ -640,8 +700,8 @@ const Vehicle = () => {
             >
               Add Vehicle
             </Button>
-          </div>
-        </Flex>
+          </Col>
+        </Row>
 
         <div className="table-responsive">
           <Table

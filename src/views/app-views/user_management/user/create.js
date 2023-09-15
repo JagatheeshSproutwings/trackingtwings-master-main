@@ -14,16 +14,13 @@ import {
 import api from "configs/apiConfig";
 import Flex from "components/shared-components/Flex";
 import { GREEN_BASE } from "constants/ThemeConstant";
-
 const { TextArea } = Input;
 const { Option } = Select;
 
 const Create = (props) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-
   const [password, setPassword] = useState("");
-
   const [adminList, SetAdminList] = useState([]);
   const [distributorList, SetDistributorList] = useState([]);
   const [dealerList, SetDealerList] = useState([]);
@@ -34,6 +31,8 @@ const Create = (props) => {
   const [roleOptions, setRoleOptions] = useState([]);
   const [selectedCountryId, setSelectedCountryId] = useState();
   const [countryOptions, setCountryOptions] = useState([]);
+
+  //File Upload Ends
 
   const openNotification = (type, message, description) => {
     notification[type]({
@@ -125,17 +124,13 @@ const Create = (props) => {
     setSelectedCountryId(countryId);
   };
 
-  useEffect(() => {
-    fetchRoleOptions(setRoleOptions);
-    fetchCountryOptions(setCountryOptions);
-  }, []);
-
   const [currentUser, SetCurrentUser] = useState(
     localStorage.getItem("id") || ""
   );
   const [currentRole, SetCurrentRole] = useState(
     localStorage.getItem("role") || ""
   );
+
   const [roleType, SetroleType] = useState("");
 
   const getUserList = async () => {
@@ -252,9 +247,11 @@ const Create = (props) => {
   useEffect(() => {
     SetCurrentUser(user());
     SetCurrentRole(role());
+    fetchRoleOptions();
+    fetchCountryOptions();
   }, []);
 
-  async function fetchRoleOptions(setRoleOptions) {
+  const fetchRoleOptions = async () => {
     try {
       const data = { role_id: currentRole };
       const response = await api.post("role_rights_list", data);
@@ -266,9 +263,9 @@ const Create = (props) => {
     } catch (error) {
       console.error("Error fetching roles:", error);
     }
-  }
+  };
 
-  async function fetchCountryOptions(setCountryOptions) {
+  const fetchCountryOptions = async () => {
     try {
       const response = await api.get("country");
       if (response.data.success) {
@@ -279,7 +276,7 @@ const Create = (props) => {
     } catch (error) {
       console.error("Error fetching countries:", error);
     }
-  }
+  };
 
   return (
     <>
@@ -294,6 +291,7 @@ const Create = (props) => {
                     size="small"
                     name="registrationForm"
                     onFinish={onFinish}
+                    encType="multipart/form-data"
                     layout="vertical"
                   >
                     <Row gutter={[8, 8]}>

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Card, Row, Col, Input } from "antd";
+import { Table, Button, Card, Row, Col, Input, Form, notification } from "antd";
 import { PlusOutlined, SearchOutlined, EditOutlined } from "@ant-design/icons";
 import Flex from "components/shared-components/Flex";
 import api from "configs/apiConfig";
 import utils from "utils";
+import { GREEN_BASE } from "constants/ThemeConstant";
 
 import Edit from "./edit";
 import Create from "./create";
@@ -17,10 +18,28 @@ export const User = () => {
   const [isCreateVisible, setIsCreateVisible] = useState(false);
   const [isEditVisible, setIsEditVisible] = useState(false);
   const [editdata, setEditData] = useState("");
+  const [domainname, setDomainName] = useState("");
+  const [loginimage, setLoginImage] = useState("");
+
+  const [isuploadvisible, setUploadVisible] = useState(false);
+
+  const openNotification = (type, message, description) => {
+    notification[type]({
+      message,
+      description,
+    });
+  };
 
   const handleCreateCard = () => {
     setIsCreateVisible(true);
     setIsEditVisible(false);
+    setUploadVisible(false);
+  };
+
+  const handleUploadCard = () => {
+    setIsCreateVisible(false);
+    setIsEditVisible(false);
+    setUploadVisible(true);
   };
 
   const getUser = () => {
@@ -37,6 +56,7 @@ export const User = () => {
   const parentFunction = () => {
     setIsCreateVisible(false);
     setIsEditVisible(false);
+    setUploadVisible(false);
     loadUsers();
   };
 
@@ -86,6 +106,7 @@ export const User = () => {
 
     // Set isEditVisible to true
     setIsEditVisible(true);
+    setUploadVisible(false);
     setIsCreateVisible(false);
     loadUsers();
   }
@@ -138,6 +159,35 @@ export const User = () => {
     setSelectedRowKeys([]);
   };
 
+  const myclick = async () => {
+    console.warn(domainname, loginimage);
+
+    const formData = new FormData();
+    formData.append("domain_name", domainname);
+    formData.append("login_image", loginimage);
+
+    try {
+      await api.post("login_image_save", formData);
+      openNotification("success", "Data", "Data Saved Successfully!");
+      setLoginImage("");
+      setDomainName("");
+      setUploadVisible(false);
+    } catch (error) {
+      if (error.response && error.response.status === 403) {
+        const errorData = error.response.data;
+        if (errorData.message && typeof errorData.message === "object") {
+          const validationErrors = errorData.message;
+          if (validationErrors.hasOwnProperty("domain_name")) {
+            openNotification("info", "Domain", "Domain Name Required");
+          }
+          if (validationErrors.hasOwnProperty("login_image")) {
+            openNotification("info", "Image", "Login Image Required");
+          }
+        }
+      }
+    }
+  };
+
   return (
     <>
       <Row gutter={6}>
@@ -158,6 +208,16 @@ export const User = () => {
                 </div>
                 <div className="mb-3"></div>
               </Flex>
+              <div className="mb-3">
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  ghost
+                  onClick={handleUploadCard}
+                >
+                  Upload Logo
+                </Button>
+              </div>
               <div className="mb-3">
                 <Button
                   type="primary"
@@ -187,6 +247,50 @@ export const User = () => {
               parentToChild={editdata}
               parentFunction={parentFunction}
             />
+          )}
+          {isuploadvisible && (
+            <Card>
+              <Flex>
+                <div className="container">
+                  <Row gutter={[8, 8]}>
+                    <Col sm={12} md={12} lg={12}>
+                      <Form.Item
+                        size="small"
+                        label="Domain Name"
+                        name="domain_name"
+                      >
+                        <Input
+                          type="text"
+                          onChange={(e) => setDomainName(e.target.value)}
+                        />
+                      </Form.Item>
+                    </Col>
+                    <Col sm={12} md={12} lg={12}>
+                      <Form.Item
+                        size="small"
+                        label="Login Image"
+                        name="login_image"
+                      >
+                        <Input
+                          type="file"
+                          onChange={(e) => setLoginImage(e.target.files[0])}
+                        ></Input>
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                  <Button
+                    size="small"
+                    type="primary"
+                    style={{ backgroundColor: GREEN_BASE }}
+                    success
+                    shape="round"
+                    onClick={myclick}
+                  >
+                    SAVE
+                  </Button>
+                </div>
+              </Flex>
+            </Card>
           )}
         </Col>
       </Row>
