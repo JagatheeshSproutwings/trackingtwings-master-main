@@ -1,5 +1,5 @@
 import React,{useState,useEffect} from 'react'
-import { Table,Row,Col,List,Avatar,Badge,Skeleton } from 'antd'
+import { Table,Row,Col,List,Avatar,Badge,Skeleton,Tooltip  } from 'antd'
 import { CarFilled,WifiOutlined } from '@ant-design/icons';
 import { BLUE_BASE, GOLD_BASE, GRAY_DARK, GREEN_BASE,RED_BASE,ORANGE_BASE } from 'constants/ThemeConstant';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -17,6 +17,33 @@ const tableProps = {
     showHeader,
   };
 
+  const vehicle_color = (value) => {
+    console.log(value);
+    switch (value) {
+      case 1:
+        return  BLUE_BASE;
+        break;
+      case 2:
+        return GOLD_BASE;
+        break;
+      case 3:
+        return GREEN_BASE;
+        break;
+        case 4:
+          return RED_BASE;
+        break;
+        case 5:
+          return GRAY_DARK;
+        break;
+        case 6:
+          return ORANGE_BASE;
+        break;
+      default:
+        return GRAY_DARK;
+        break;
+    }
+
+  }
   const handleSwitch = (condition) => {
     let output;
     switch (condition) {
@@ -111,10 +138,11 @@ const tableProps = {
           device_imei:item?.device_imei,
           title: item?.vehicle_name||"TEST",
           description:item?.device_updatedtime|| "0000-00-00 00:00:00",
-          color:handleSwitch(item?.vehicle_current_status),
+          color:vehicle_color(item?.vehicle_current_status),
           speed:item?.speed||0,
-          gps_count:20,
-          gsm_count:15,
+          gps_count:item?.gpssignal =='1'? GREEN_BASE : RED_BASE,
+          gsm_count:item?.gsm_status =='1'? GREEN_BASE : RED_BASE,
+          power_status : item?.power_status ? GREEN_BASE : RED_BASE,
         }));
       setMultiVehicles(processedData);
     }
@@ -123,13 +151,14 @@ const tableProps = {
         const processedData = filteredItems?.map((item) => ({
           id:item?.id,
           device_imei:item?.device_imei,
-          live_status:vehicle_live_status(item?.vehicle_current_status),
+          live_status:vehicle_color(item?.vehicle_current_status),
           title: item?.vehicle_name||"TEST",
           description:item?.device_updatedtime|| "0000-00-00 00:00:00",
-          color:handleSwitch(item?.vehicle_current_status),
+          color:vehicle_color(item?.vehicle_current_status),
           speed:item?.speed||0,
-          gps_count:20,
-          gsm_count:15,
+          gps_count:item?.gpssignal =='1'? GREEN_BASE : RED_BASE,
+          gsm_count:item?.gsm_status =='1'? GREEN_BASE : RED_BASE,
+          power_status : item?.power_status ? GREEN_BASE :RED_BASE,
         }));
       setMultiVehicles(processedData);
     }
@@ -139,7 +168,7 @@ const tableProps = {
     vehicle_list(status);
     const interval = setInterval(() => {
       vehicle_list(status);
-    }, 2000);
+    }, 5000);
     return () => {
       clearInterval(interval);
      };
@@ -163,13 +192,19 @@ const tableProps = {
             <h6>{item.speed} KMPH</h6>
           </Col >
           <Col className='ml-2'>
-            <WifiOutlined style={{fontSize: '15px',color:RED_BASE}} />
+            <Tooltip title="GPS Status">
+            <WifiOutlined style={{fontSize: '15px',color:item.gps_count}} />
+            </Tooltip>
           </Col>
           <Col className='ml-2'>
-            <FontAwesomeIcon icon={faLocationCrosshairs} style={{fontSize: '15px',color:GREEN_BASE}}/>
-          </Col>
+          <Tooltip title="GSM Status">
+            <FontAwesomeIcon icon={faLocationCrosshairs} style={{fontSize: '15px',color:item.gsm_count}}/>
+          </Tooltip>
+            </Col>
           <Col className='ml-2'>
-          <FontAwesomeIcon icon={faPlug} style={{fontSize: '15px',color: RED_BASE}} />
+          <Tooltip title="Power Status">
+          <FontAwesomeIcon icon={faPlug} style={{fontSize: '15px',color: item.power_status}} />
+          </Tooltip>
           </Col>
         </Row>
       </List.Item>
