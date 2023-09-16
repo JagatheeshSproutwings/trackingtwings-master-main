@@ -1,1 +1,0 @@
-{"version":3,"file":"static/css/819.98d20a74.chunk.css","mappings":"AAAA,UACI,yBAA2B,CAE3B,kBAAmB,CADnB,iEAEJ","sources":["assets/styles/login.css"],"sourcesContent":[".ant-card{\r\n    background: none !important;\r\n    box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);\r\n    border-radius: 15px;\r\n}\r\n"],"names":[],"sourceRoot":""}
