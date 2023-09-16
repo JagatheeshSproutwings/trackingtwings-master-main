@@ -24,6 +24,7 @@ import {
 } from "@ant-design/icons";
 import Config from "./config";
 import Configs from "./configs";
+import Update from "./vehicle_update";
 
 import utils from "utils";
 
@@ -34,6 +35,7 @@ const Vehicle = () => {
   const [loading, setLoading] = useState(false);
   const [isComponentVisible, setIsComponentVisible] = useState(false);
   const [isConfigVisible, setIsConfigVisible] = useState(false);
+  const [isUpdateVisible, setIsUpdateVisible] = useState(false);
 
   const [mulitiVehicles, setMulitiVehicles] = useState([]);
 
@@ -494,11 +496,6 @@ const Vehicle = () => {
       </Menu.Item>
     </Menu>
   );
-
-  const handleEdit = (record) => {
-    message.success(`Editing ${record.vehicle_name}`);
-  };
-
   const handleSetting = async (record) => {
     try {
       const data = {
@@ -524,7 +521,6 @@ const Vehicle = () => {
       console.error("Error fetching users:", error);
     }
   };
-
   const clickConfig = async () => {
     if (mulitiVehicles.length !== 0) {
       setIsConfigVisible(true);
@@ -532,7 +528,6 @@ const Vehicle = () => {
       openNotification("success", "Vehicle", "Please Select One Vehicles");
     }
   };
-
   const loadVehicles = async () => {
     try {
       const user_data = { user_id: currentUser };
@@ -606,7 +601,6 @@ const Vehicle = () => {
       });
     SetPlanList(plan_list?.data?.data);
   };
-
   const onSearch = (e) => {
     const searchValue = e.currentTarget.value;
     const searchArray = searchValue ? vehicleList : mainvehicleList; // Use a different source if needed
@@ -636,6 +630,7 @@ const Vehicle = () => {
           />
         )}
       </div>
+      {isUpdateVisible && <Update />}
 
       <Card title="Vehicle List">
         <Flex
@@ -690,7 +685,16 @@ const Vehicle = () => {
             </Button>
           </Col>
 
-          <Col sm={2} md={4} lg={4}></Col>
+          <Col sm={2} md={4} lg={4}>
+            <Input
+              style={{
+                width: "70%",
+              }}
+              placeholder="Search"
+              prefix={<SearchOutlined />}
+              onChange={(e) => onSearch(e)}
+            />
+          </Col>
           <Col sm={2} md={4} lg={4}>
             <Button
               type="primary"

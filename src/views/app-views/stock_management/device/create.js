@@ -25,15 +25,29 @@ const Create = (props) => {
   const [selectedModelId, setselectedModelId] = useState();
   const [modelOptions, setModelOptions] = useState([]);
 
-  const handleSupplierIdChange = (roleID) => {
-    setselectedSupplierId(roleID);
+  const handleSupplierIdChange = (sid) => {
+    setselectedSupplierId(sid);
   };
-  const handleMakeIdChange = (roleID) => {
-    setselectedMakeId(roleID);
+  const handleMakeIdChange = (makeid) => {
+    setselectedMakeId(makeid);
+    fetchModelOptions(setModelOptions);
+    async function fetchModelOptions(setModelOptions) {
+      try {
+        const data = { make_id: makeid };
+        const response = await api.post("model_list", data);
+        if (response.data.success) {
+          setModelOptions(response.data.data);
+        } else {
+          console.error("API request was not successful");
+        }
+      } catch (error) {
+        console.error("Error fetching roles:", error);
+      }
+    }
   };
 
-  const handleModelIdChange = (roleID) => {
-    setselectedModelId(roleID);
+  const handleModelIdChange = (modelid) => {
+    setselectedModelId(modelid);
   };
 
   const openNotification = (type, message, description) => {
@@ -46,7 +60,6 @@ const Create = (props) => {
   useEffect(() => {
     fetchSupplierOptions(setSupplierOptions);
     fetchMakeOptions(setMakeOptions);
-    fetchModelOptions(setModelOptions);
   }, []);
 
   const onFinish = async (values) => {
@@ -101,19 +114,6 @@ const Create = (props) => {
       const response = await api.get("device_make");
       if (response.data.success) {
         setMakeOptions(response.data.data);
-      } else {
-        console.error("API request was not successful");
-      }
-    } catch (error) {
-      console.error("Error fetching roles:", error);
-    }
-  }
-
-  async function fetchModelOptions(setModelOptions) {
-    try {
-      const response = await api.get("device_model");
-      if (response.data.success) {
-        setModelOptions(response.data.data);
       } else {
         console.error("API request was not successful");
       }

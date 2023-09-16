@@ -32,9 +32,26 @@ const Edit = ({ parentToChild, ...props }) => {
   const handleSupplierIdChange = (roleID) => {
     setselectedSupplierId(roleID);
   };
-  const handleMakeIdChange = (roleID) => {
-    setselectedMakeId(roleID);
+
+  const handleMakeIdChange = (makeid) => {
+    setselectedMakeId(makeid);
   };
+
+  async function fetchModelOptions() {
+    try {
+      alert(parentToChild[3]);
+      const data = { make_id: parentToChild[3] };
+      const response = await api.post("model_list", data);
+      if (response.data.success) {
+        setModelOptions(response.data.data);
+      } else {
+        console.error("API request was not successful");
+      }
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
+  }
+
   const handleModelIdChange = (roleID) => {
     setselectedModelId(roleID);
   };
@@ -49,7 +66,7 @@ const Edit = ({ parentToChild, ...props }) => {
   useEffect(() => {
     fetchSupplierOptions(setSupplierOptions);
     fetchMakeOptions(setMakeOptions);
-    fetchModelOptions(setModelOptions);
+    fetchModelOptions();
   }, []);
 
   const onFinish = async (values) => {
@@ -114,19 +131,6 @@ const Edit = ({ parentToChild, ...props }) => {
     }
   }
 
-  async function fetchModelOptions(setModelOptions) {
-    try {
-      const response = await api.get("device_model");
-      if (response.data.success) {
-        setModelOptions(response.data.data);
-      } else {
-        console.error("API request was not successful");
-      }
-    } catch (error) {
-      console.error("Error fetching roles:", error);
-    }
-  }
-
   return (
     <Row gutter={6}>
       {isComponentVisible && (
@@ -134,7 +138,6 @@ const Edit = ({ parentToChild, ...props }) => {
           <Card title="Edit Device">
             <Flex>
               <div className="container">
-                {parentToChild}
                 <Form
                   size="small"
                   name="registrationForm"
