@@ -4,6 +4,7 @@ import { BLUE_BASE, GOLD_BASE, GRAY_DARK, GREEN_BASE,RED_BASE,ORANGE_BASE } from
 import {Card,Tabs} from 'antd'
 import api from 'configs/apiConfig'
 import L from 'leaflet';
+import { Tabs } from 'antd';
 function MultiDashboardVehicles({data}) {
     const center = [20.5937, 78.9629];
     const { BaseLayer } = LayersControl;
@@ -64,21 +65,21 @@ function MultiDashboardVehicles({data}) {
     }
   return (
     <>
-    
     <MapContainer center={center} bounds={bounds} zoom={5} style={{ width: '100%'}}>
         <LayersControl>
-            <BaseLayer  checked name="OpenStreetMap">
-                <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                />
-            </BaseLayer>
-            <BaseLayer checked name="Google-Street View">
+        <BaseLayer checked name="Google-Street View">
                 <TileLayer
                     attribution="Google Maps"
                     url="https://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}"
                     />
             </BaseLayer>
+            <BaseLayer   name="OpenStreetMap">
+                <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                />
+            </BaseLayer>
+            
             <BaseLayer  name="Google-Satelite">
             <TileLayer
                     url='https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
