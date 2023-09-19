@@ -14,9 +14,9 @@ import NoNetworkVehicles from 'components/map-components/noNetworkVehicles';
 import ExpiryVehicles from 'components/map-components/expiryVehicles';
 import TrackingMarker from 'components/map-components/trackingMarker';
 import Dashboard_vehicles from 'components/map-components/dashboard_vehicles'
-import Multivehicles from 'components/map-components/multi_dashboard_vehicles'
 import api from 'configs/apiConfig';
 import TestMovement from 'components/map-components/TestLiveTrack';
+import LiveTracking from 'components/map-components/live_tracking_map'
 const { Option } = Select
 
 
@@ -136,8 +136,35 @@ export const Admin = () => {
           return GRAY_DARK;
           break;
       }
-  
     }
+
+    const vehicle_icon_url = (status) => 
+    {
+      switch (status) {
+        case 1:
+          return  '/img/ICONS/BLUE/';
+          break;
+        case 2:
+          return '/img/ICONS/YELLOW/';
+          break;
+        case 3:
+          return '/img/ICONS/GREEN/';
+          break;
+          case 4:
+            return '/img/ICONS/RED/';
+          break;
+          case 5:
+            return '/img/ICONS/GRAY/';
+          break;
+          case 6:
+            return  '/img/ICONS/PURPLE/';
+          break;
+        default:
+          return '/img/ICONS/GRAY/';
+          break;
+      }
+    }
+
     const vehicle_live_status = (value) => {
       switch (value) {
           case 1:
@@ -163,6 +190,7 @@ export const Admin = () => {
             break;
         }
   }
+
     const  vehicle_list = async (status) =>{
 
       const multiple_vehicles_data = await api.get("multi_dashboard").then((res) => { return res;}).catch((err) => {console.log(err)});
@@ -173,12 +201,14 @@ export const Admin = () => {
           const processedData = filteredItems?.map((item) => ({
             id:item?.id,
             live_status:vehicle_live_status(item?.vehicle_current_status),
+            icon_url:vehicle_icon_url(item?.vehicle_current_status)+item?.short_name+'.png',
             latitude:item.lattitute,
             longtitude:item.longitute,
             last_duration:item?.last_duration,
             title: item?.vehicle_name||"TEST",
             description:item?.device_updatedtime|| "0000-00-00 00:00:00",
             color:vehicle_color(item?.vehicle_current_status),
+            angle:item?.angle ||0,
             speed:item?.speed||0,
             gps_count:20,
             gsm_count:15,
@@ -191,6 +221,7 @@ export const Admin = () => {
           const processedData = filteredItems?.map((item) => ({
             id:item?.id,
             live_status:vehicle_live_status(item?.vehicle_current_status),
+            icon_url:vehicle_icon_url(item?.vehicle_current_status)+item?.short_name+'.png',
             last_duration:item?.last_duration,
             latitude:item?.lattitute || 0.00000,
             longtitude:item?.longitute || 0.00000,
@@ -199,6 +230,7 @@ export const Admin = () => {
             device_time:item?.device_updatedtime|| "0000-00-00 00:00:00",
             color:vehicle_color(item?.vehicle_current_status),
             vehicle_current_status:item?.vehicle_current_status,
+            angle:item?.angle ||0,
             speed:item?.speed||0,
             gps_count:20,
             gsm_count:15,
@@ -407,8 +439,8 @@ return(
                           </StickyContainer>
                         </Card>
                     </Col>
-                    <Col sm={12} md={18} lg={18} style={{padding:0}}>
-                    <Multivehicles data={multiplevehiclesData}/>
+                    <Col sm={12} md={18} lg={18}>
+                    <LiveTracking data={multiplevehiclesData}/>
                     </Col>
                 </Row>
             </Col>

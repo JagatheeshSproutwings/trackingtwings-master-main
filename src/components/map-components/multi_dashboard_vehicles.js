@@ -1,17 +1,30 @@
 import React, { useState,useEffect } from 'react'
-import {MapContainer,TileLayer,Marker,Popup,LayersControl,Polyline} from 'react-leaflet'
+import {MapContainer,TileLayer,Marker,Popup,LayersControl,Polyline,Tooltip} from 'react-leaflet'
 import { BLUE_BASE, GOLD_BASE, GRAY_DARK, GREEN_BASE,RED_BASE,ORANGE_BASE } from 'constants/ThemeConstant';
 import {Card,Tabs} from 'antd'
 import api from 'configs/apiConfig'
+import L from 'leaflet';
 function MultiDashboardVehicles({data}) {
-    const center = [51.505, -0.09];
+    const center = [20.5937, 78.9629];
     const { BaseLayer } = LayersControl;
+    const [bounds,setBounds] = useState("");
     const [multiplevehiclesData,setMultiplevehiclesData] = useState(data);
     
+    
     useEffect(()=>{
-        const interval = setInterval(() => {
+        
+        if (data.length > 0) {
+            const bounds = data.map((vehicle_data) =>
+              L.latLng(vehicle_data.latitude, vehicle_data.longitude)
+            );
+            
+        }
+        const boundsObject = L.latLngBounds(bounds);
+        console.log(bounds);
+        setBounds(boundsObject);
+          const interval = setInterval(() => {
             setMultiplevehiclesData(data);
-        }, 2000);
+        }, 5000);
         return () => {
           clearInterval(interval);
          };
@@ -52,7 +65,7 @@ function MultiDashboardVehicles({data}) {
   return (
     <>
     
-    <MapContainer center={center} zoom={13} style={{ width: '100%'}}>
+    <MapContainer center={center} bounds={bounds} zoom={5} style={{ width: '100%'}}>
         <LayersControl>
             <BaseLayer  checked name="OpenStreetMap">
                 <TileLayer
@@ -74,14 +87,16 @@ function MultiDashboardVehicles({data}) {
                 />
             </BaseLayer>
         </LayersControl>
+
         {data?.map((marker) => (
               <Marker key={marker.id} position={[marker?.latitude, marker?.longtitude]} keepCenter={true}>
                 <Popup>
-                <p style={{margin:0}}>Vehicle Name:{marker?.title}</p>
-                <p style={{margin:0}}>Status:{marker?.live_status} ({marker?.last_duration}) </p>
-                <p style={{margin:0}}>Speed:{marker?.speed} KMPH</p>
-                <p style={{margin:0}}>Last Update:{marker?.device_time}</p>
+                <p style={{margin:0}}><b>Vehicle Name: </b>  {marker?.title}</p>
+                <p style={{margin:0}}><b>Status: </b>{marker?.live_status} ({marker?.last_duration||"00:00:00"}) </p>
+                <p style={{margin:0}}><b>Speed: </b> {marker?.speed} KMPH</p>
+                <p style={{margin:0}}><b>Last Update: </b> {marker?.device_time}</p>
                 </Popup>
+                <Tooltip  permanent><b>{marker?.title}</b>  </Tooltip>
               </Marker>
             ))
           }
