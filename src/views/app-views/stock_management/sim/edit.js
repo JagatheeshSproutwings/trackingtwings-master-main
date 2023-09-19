@@ -70,8 +70,8 @@ const Edit = ({ parentToChild, ...props }) => {
           if (validationErrors.hasOwnProperty("sim_imei_no")) {
             openNotification(
               "info",
-              "Sim IMEI",
-              "Given Sim IMEI No is Already Exists"
+              "Sim CCID",
+              "Given Sim CCID is Already Exists"
             );
           }
           if (validationErrors.hasOwnProperty("sim_mob_no1")) {
@@ -157,13 +157,13 @@ const Edit = ({ parentToChild, ...props }) => {
                     <Col sm={12} md={12} lg={12}>
                       <Form.Item
                         size="small"
-                        label="Sim IMEI No"
+                        label="Sim CCID"
                         name="sim_imei_no"
                         initialValue={parentToChild[3]}
                         rules={[
                           {
                             required: true,
-                            message: "Please enter a Sim IMEI No",
+                            message: "Please enter a Sim CCID",
                           },
                         ]}
                       >

@@ -15,7 +15,7 @@ import {
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import api from "configs/apiConfig";
-import { Space, Menu, Dropdown, message } from "antd";
+import { Space, Menu, Dropdown } from "antd";
 import Flex from "components/shared-components/Flex";
 import {
   DownOutlined,
@@ -685,16 +685,7 @@ const Vehicle = () => {
             </Button>
           </Col>
 
-          <Col sm={2} md={4} lg={4}>
-            <Input
-              style={{
-                width: "70%",
-              }}
-              placeholder="Search"
-              prefix={<SearchOutlined />}
-              onChange={(e) => onSearch(e)}
-            />
-          </Col>
+          <Col sm={2} md={4} lg={4}></Col>
           <Col sm={2} md={4} lg={4}>
             <Button
               type="primary"
@@ -721,17 +712,22 @@ const Vehicle = () => {
         placement="right"
         closable={false}
         onClose={onClose}
-        width={850}
+        width={1000}
         open={open}
         title="Add Vehicle"
       >
         <Spin spinning={loading} delay={500}>
-          <Form form={form} name="device_form" onFinish={onFinish}>
-            <h5>Users Details:</h5>
+          <Form
+            form={form}
+            name="device_form"
+            onFinish={onFinish}
+            layout="vertical"
+          >
+            <h4>Users Details :</h4>
             <Row gutter={[10, 10]}>
               {currentRole == 1 && (
-                <Col sm={2} md={4} lg={4} xxl={4}>
-                  <Form.Item name="admin_id">
+                <Col sm={3} md={6} lg={6} xxl={6}>
+                  <Form.Item name="admin_id" label="Admin Name">
                     <Select
                       showSearch
                       allowClear
@@ -757,8 +753,8 @@ const Vehicle = () => {
                 </Col>
               )}
               {(currentRole == 1 || currentRole == 2) && (
-                <Col sm={2} md={4} lg={4} xxl={4}>
-                  <Form.Item name="distributor_id">
+                <Col sm={3} md={6} lg={6} xxl={6}>
+                  <Form.Item name="distributor_id" label="Distributor Name">
                     <Select
                       showSearch
                       allowClear
@@ -784,8 +780,8 @@ const Vehicle = () => {
                 </Col>
               )}
               {(currentRole == 1 || currentRole == 2 || currentRole == 3) && (
-                <Col sm={2} md={4} lg={4} xxl={4}>
-                  <Form.Item name="dealer_id">
+                <Col sm={3} md={6} lg={6} xxl={6}>
+                  <Form.Item name="dealer_id" label="Dealer Name">
                     <Select
                       showSearch
                       allowClear
@@ -814,8 +810,8 @@ const Vehicle = () => {
                 currentRole == 2 ||
                 currentRole == 3 ||
                 currentRole == 4) && (
-                <Col sm={2} md={4} lg={4} xxl={4}>
-                  <Form.Item name="subdealer_id">
+                <Col sm={3} md={6} lg={6} xxl={6}>
+                  <Form.Item name="subdealer_id" label="SubDealer Name">
                     <Select
                       showSearch
                       allowClear
@@ -846,8 +842,9 @@ const Vehicle = () => {
                 currentRole == 3 ||
                 currentRole == 4 ||
                 currentRole == 5) && (
-                <Col sm={2} md={4} lg={4} xxl={4}>
+                <Col sm={3} md={6} lg={6} xxl={6}>
                   <Form.Item
+                    label="Client Name"
                     name="client_id"
                     rules={[
                       {
@@ -881,10 +878,18 @@ const Vehicle = () => {
                 </Col>
               )}
             </Row>
-            <h5>Licence Details:</h5>
             <Row gutter={6}>
-              <Col sm={5} md={10} lg={10} xxl={10}>
+              <Col sm={12} md={12} lg={12} xxl={12}>
+                <h4>Licence Details :</h4>
+              </Col>
+              <Col sm={12} md={12} lg={12} xxl={12}>
+                <h4>SIM Details :</h4>
+              </Col>
+            </Row>
+            <Row gutter={6}>
+              <Col sm={3} md={6} lg={6} xxl={6}>
                 <Form.Item
+                  label="Plan Type"
                   name="plan_id"
                   rules={[
                     {
@@ -911,8 +916,9 @@ const Vehicle = () => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col sm={5} md={10} lg={10} xxl={10}>
+              <Col sm={3} md={6} lg={6} xxl={6}>
                 <Form.Item
+                  label="License Number"
                   name="license_id"
                   rules={[
                     {
@@ -944,11 +950,52 @@ const Vehicle = () => {
                   </Select>
                 </Form.Item>
               </Col>
+              <Col sm={3} md={6} lg={6} xxl={6}>
+                <Form.Item
+                  label="Sim Mobile No"
+                  name="sim_id"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please Select Sim Mobile No",
+                    },
+                  ]}
+                >
+                  <Select
+                    showSearch
+                    allowClear
+                    placeholder="Select Sim"
+                    optionFilterProp="children"
+                    onChange={SimChange}
+                    filterOption={(input, option) =>
+                      option.children
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0
+                    }
+                  >
+                    {Array.isArray(simList) ? (
+                      simList.map((sim) => (
+                        <Select.Option key={sim?.id} value={sim?.id}>
+                          {sim?.sim_mob_no1}
+                        </Select.Option>
+                      ))
+                    ) : (
+                      <Select.Option role_id="2" value=""></Select.Option>
+                    )}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col sm={3} md={6} lg={6} xxl={6}>
+                <Form.Item label="Sim CCID">
+                  <Input type="text" value={simData}></Input>
+                </Form.Item>
+              </Col>
             </Row>
-            <h5>Device Details :</h5>
+            <h4>Device Details :</h4>
             <Row gutter={6}>
               <Col sm={3} md={6} lg={6} xxl={6}>
                 <Form.Item
+                  label="Device IMEI No"
                   name="device_id"
                   rules={[
                     {
@@ -982,11 +1029,11 @@ const Vehicle = () => {
                 </Form.Item>
               </Col>
               <Col sm={3} md={6} lg={6} xxl={6}>
-                <Form.Item>
+                <Form.Item label="Device UID">
                   <Input type="text" value={deviceData}></Input>
                 </Form.Item>
               </Col>
-              <Col sm={4} md={8} lg={8} xxl={8}>
+              <Col sm={3} md={6} lg={6} xxl={6}>
                 <input
                   type="text"
                   name="device_make_id"
@@ -999,7 +1046,7 @@ const Vehicle = () => {
                   hidden
                   value={modelIdData}
                 ></input>
-                <Form.Item>
+                <Form.Item label="Device Make-Model">
                   <Input
                     type="textarea"
                     value={makeData + "-" + modelData}
@@ -1007,52 +1054,11 @@ const Vehicle = () => {
                 </Form.Item>
               </Col>
             </Row>
-            <h5>SIM Details :</h5>
+            <h4>Vehicle Details :</h4>
             <Row gutter={6}>
-              <Col sm={6} md={10} lg={10} xxl={10}>
+              <Col sm={3} md={6} lg={6} xxl={6}>
                 <Form.Item
-                  name="sim_id"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please Select Sim Mobile No",
-                    },
-                  ]}
-                >
-                  <Select
-                    showSearch
-                    allowClear
-                    placeholder="Select Sim"
-                    optionFilterProp="children"
-                    onChange={SimChange}
-                    filterOption={(input, option) =>
-                      option.children
-                        .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                  >
-                    {Array.isArray(simList) ? (
-                      simList.map((sim) => (
-                        <Select.Option key={sim?.id} value={sim?.id}>
-                          {sim?.sim_mob_no1}
-                        </Select.Option>
-                      ))
-                    ) : (
-                      <Select.Option role_id="2" value=""></Select.Option>
-                    )}
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col sm={6} md={10} lg={10} xxl={10}>
-                <Form.Item>
-                  <Input type="text" value={simData}></Input>
-                </Form.Item>
-              </Col>
-            </Row>
-            <h5>Vehicle Details :</h5>
-            <Row gutter={6}>
-              <Col sm={4} md={8} lg={8} xxl={8}>
-                <Form.Item
+                  label="Vehicle Type"
                   name="vehicle_type_id"
                   rules={[
                     {
@@ -1087,8 +1093,9 @@ const Vehicle = () => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col sm={4} md={8} lg={8} xxl={8}>
+              <Col sm={3} md={6} lg={6} xxl={6}>
                 <Form.Item
+                  label="Vehicle Name"
                   name="vehicle_name"
                   rules={[
                     {
@@ -1104,9 +1111,10 @@ const Vehicle = () => {
                   ></Input>
                 </Form.Item>
               </Col>
-              <Col sm={4} md={8} lg={8} xxl={8}>
-                <Form.Item name="installation_date">
+              <Col sm={3} md={6} lg={6} xxl={6}>
+                <Form.Item name="installation_date" label="Installation Date">
                   <DatePicker
+                    width="100%"
                     required
                     allowClear={false}
                     format={dateFormat}
@@ -1114,8 +1122,13 @@ const Vehicle = () => {
                   ></DatePicker>
                 </Form.Item>
               </Col>
+            </Row>
+            <Row gutter={6}>
               <Col sm={3} md={6} lg={6} xxl={6}>
-                <Form.Item name="service_person_name">
+                <Form.Item
+                  name="service_person_name"
+                  label="Service Person Name"
+                >
                   <Input
                     type="text"
                     name="service_person_name"
@@ -1124,7 +1137,10 @@ const Vehicle = () => {
                 </Form.Item>
               </Col>
               <Col sm={3} md={6} lg={6} xxl={6}>
-                <Form.Item name="install_person_name">
+                <Form.Item
+                  name="install_person_name"
+                  label="Install Person Name"
+                >
                   <Input
                     type="text"
                     name="install_person_name"
@@ -1132,8 +1148,8 @@ const Vehicle = () => {
                   ></Input>
                 </Form.Item>
               </Col>
-              <Col sm={4} md={8} lg={8} xxl={8}>
-                <Form.Item name="description">
+              <Col sm={3} md={6} lg={6} xxl={6}>
+                <Form.Item name="description" label="Vehicle Description">
                   <Input
                     type="text"
                     name="description"

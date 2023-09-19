@@ -31,6 +31,7 @@ const Create = (props) => {
   const [roleOptions, setRoleOptions] = useState([]);
   const [selectedCountryId, setSelectedCountryId] = useState();
   const [countryOptions, setCountryOptions] = useState([]);
+  const [userLabel, SetUserLabel] = useState("Name");
 
   //File Upload Ends
 
@@ -116,6 +117,21 @@ const Create = (props) => {
   };
 
   const handleRoleIdChange = (roleID) => {
+    alert(roleID);
+
+    if (roleID == 2) {
+      SetUserLabel("Admin Name");
+    } else if (roleID == 3) {
+      SetUserLabel("Distributor Name");
+    } else if (roleID == 4) {
+      SetUserLabel("Dealer Name");
+    } else if (roleID == 5) {
+      SetUserLabel("SubDealer Name");
+    } else if (roleID == 6) {
+      SetUserLabel("Customer Name");
+    } else {
+      SetUserLabel("Name");
+    }
     setSelectedRoleId(roleID);
     SetroleType(roleID);
     getUserList();
@@ -519,7 +535,7 @@ const Create = (props) => {
                     <Row gutter={[8, 8]}>
                       <Col sm={12} md={12} lg={12}>
                         <Form.Item
-                          label="User Name"
+                          label={userLabel}
                           name="name"
                           rules={[
                             {
@@ -564,6 +580,16 @@ const Create = (props) => {
                           ]}
                         >
                           <Input.Password />
+                          <div
+                            style={{
+                              fontSize: "10.5px",
+                              fontWeight: "bold",
+                              color: "green",
+                              fontStyle: "italic",
+                            }}
+                          >
+                            [Alpha-Numeric and Minimum 8 Characters]
+                          </div>
                         </Form.Item>
                       </Col>
                       <Col sm={12} md={12} lg={12}>
