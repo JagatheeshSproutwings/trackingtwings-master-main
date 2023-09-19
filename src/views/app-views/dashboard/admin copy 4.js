@@ -1,11 +1,8 @@
 import React, { useState,useEffect } from 'react'
 import { useSelector, useDispatch } from "react-redux";
-import {Form,Row,Col,Button,Card,Table,Select,Input,Badge,Avatar,Divider,Tabs, List,Spin,Tooltip, Space  } from 'antd'
+import {Form,Row,Col,Card,Table,Select,Input,Badge,Avatar,Divider,Tabs, List,Spin  } from 'antd'
 import {MapContainer,TileLayer,Marker,Popup,LayersControl,Polyline} from 'react-leaflet'
-import { CarFilled,WifiOutlined } from '@ant-design/icons';
 import { BLUE_BASE, GOLD_BASE, GRAY_DARK, GREEN_BASE,RED_BASE,ORANGE_BASE } from 'constants/ThemeConstant';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEllipsisVertical,faLocationCrosshairs,faPlug } from '@fortawesome/free-solid-svg-icons'
 
 import { WHITE } from 'constants/ThemeConstant'
 import { Sticky, StickyContainer } from 'react-sticky';
@@ -22,7 +19,7 @@ import TestMovement from 'components/map-components/TestLiveTrack';
 import LiveTracking from 'components/map-components/live_tracking_map'
 import 'assets/styles/form_item.css'
 const { Option } = Select
-const { Search } = Input;
+
 
 export const Admin = () => {
   const [currentRole,setCurrentRole] = useState(); 
@@ -59,22 +56,6 @@ export const Admin = () => {
 
   const handleTabChange = (key) => {
     setActiveKey(key);
-  };
-  const SingleVehicle = async (value) => {
-    if(value)
-    {
-    const singlevehicles_data = await api.get("single_dashboard/"+value).then((res) => { return res;}).catch((err) => {console.log(err)});
-    console.log(singlevehicles_data);
-    }
-    
-    
-  }
-  const onSearch = (e) => {
-    const search_value = e.target.value;
-    const selected_vehicles = multiplevehiclesData?.filter(item => item.vehicle_name === search_value);
-     console.log(search_value);
-     console.log(selected_vehicles);
-    //setMultiVehicles(selected_vehicles);
   };
   const user = () => {
     return localStorage.getItem("id");
@@ -478,9 +459,8 @@ export const Admin = () => {
               vehicle_current_status:item?.vehicle_current_status,
               angle:item?.angle ||0,
               speed:item?.speed||0,
-              gps_count:item?.gpssignal =='1'? GREEN_BASE : RED_BASE,
-            gsm_count:item?.gsm_status =='1'? GREEN_BASE : RED_BASE,
-            power_status : item?.power_status ? GREEN_BASE : RED_BASE,
+              gps_count:20,
+              gsm_count:15,
             }));
           setMultiplevehiclesData(processedData);
         }else{
@@ -500,9 +480,8 @@ export const Admin = () => {
             vehicle_current_status:item?.vehicle_current_status,
             angle:item?.angle ||0,
             speed:item?.speed||0,
-            gps_count:item?.gpssignal =='1'? GREEN_BASE : RED_BASE,
-            gsm_count:item?.gsm_status =='1'? GREEN_BASE : RED_BASE,
-            power_status : item?.power_status ? GREEN_BASE : RED_BASE,
+            gps_count:20,
+            gsm_count:15,
         }));
             setMultiplevehiclesData(processedData);
         }
@@ -572,8 +551,7 @@ return(
                                 
                                 <Col md={12}>
                                 <Form.Item name="distributor_id" label="Distributor" size="small" initialValue="" rules={[{required:true,message:'Admin Value is Required!'}]}>
-                                <Select showSearch onChange={currentDealerList} size="small" placeholder="Distributor">
-                                
+                                <Select showSearch onChange={currentDealerList} placeholder="Distributor">
                                 {Array.isArray(distributorList) ? (
                         distributorList.map((distributor) => (
                           <Select.Option 
@@ -602,8 +580,9 @@ return(
       {Array.isArray(dealerList) ? (
 dealerList.map((dealer) => (
 <Select.Option 
-  
+  key={dealer?.id}
   role_id="4"
+  
   value={dealer?.id}
 >
   {dealer?.name}
@@ -665,64 +644,13 @@ dealerList.map((dealer) => (
                         </Form>
                         <Card style={{padding:0,margin:0}}>
                             <StickyContainer style={{padding:0,margin:0}}>
-                              <Col sm={24} md={24} lg={24}>
-                               <Row>
-                               <Col md={4} style={{border:'1px solid',textAlign:'center',margin:'0px'}}><p style={{fontSize:'10px',margin:'0px'}}><strong>All</strong></p><p style={{backgroundColor:'#0dcaf0',margin:'0px',color:'white'}}>{vehilcecount?.total_vehicles||0}</p></Col>
-                              <Col md={4} style={{border:'1px solid',textAlign:'center',margin:'0px'}}><p style={{fontSize:'10px',margin:'0px'}}>Parking</p><p style={{backgroundColor:'#0d6efd',margin:'0px',color:'white'}}>{vehilcecount?.stop||0}</p></Col>
-                              <Col md={4} style={{border:'1px solid',textAlign:'center',margin:'0px'}}><p style={{fontSize:'10px',margin:'0px'}}>Idle</p><p style={{backgroundColor:'#ffc107',margin:'0px',color:'white'}}>{vehilcecount?.idle||0}</p></Col>
-                              <Col md={4} style={{border:'1px solid',textAlign:'center',margin:'0px'}}><p style={{fontSize:'10px',margin:'0px'}}>Moving</p><p style={{backgroundColor:'#20c997',margin:'0px',color:'white'}}>{vehilcecount?.running||0}</p></Col>
-                              <Col md={4} style={{border:'1px solid',textAlign:'center',margin:'0px'}}><p style={{fontSize:'10px',margin:'0px'}}>No Data</p><p style={{backgroundColor:'#dc3545',margin:'0px',color:'white'}}>{vehilcecount?.no_data||0}</p></Col>
-                              <Col md={4} style={{border:'1px solid',textAlign:'center',margin:'0px'}}><p style={{fontSize:'10px',margin:'0px'}}>Inactive</p><p style={{backgroundColor:'#888d9599',margin:'0px',color:'white'}}>{vehilcecount?.inactive||0}</p></Col>
-                              </Row> 
-                              
-                              </Col>
-                              
-                            {/* <Tabs activeKey={activeKey}  size='small'  onChange={handleTabChange}>
+                            <Tabs activeKey={activeKey}  size='small'  onChange={handleTabChange}>
                               {tabs.map((tab) => (
                                 <Tabs key={tab.key} tab={tab.tab}>
                                   {activeKey === tab.key && <div>{tab.content}</div>}
                                 </Tabs>
                               ))}
-                            </Tabs> */}
-                             <Search
-      placeholder="Search Vehicle.."
-      onChange={onSearch}
-      allowClear
-    />
-    <List style={{padding:0,margin:1,fontSize:'10px',height:'300px',border:'1px',overflow: 'auto'}}
-    itemLayout="horizontal"
-    size='small'
-    dataSource={multiplevehiclesData}
-    renderItem={item => (
-      <List.Item onClick={() => SingleVehicle(item?.device_imei)} value={item?.id} actions={[ <a key="list-loadmore-more"><FontAwesomeIcon icon={faEllipsisVertical} style={{fontSize: '15px',padding:'0',color:GREEN_BASE}}/></a>]}>
-        <List.Item.Meta
-          avatar={ <Avatar size="small"  style={{backgroundColor:'transparent'}} icon={<CarFilled style={{ fontSize: '20px',padding:'0',color: item.color } }/>}/>}
-          title={<span style={{fontSize:'12px'}}>{item.title}</span>}
-          description={<span style={{fontSize:'10px'}}>{item.description}</span>}
-        />
-        <Row style={{padding:0}}>
-          <Col className='ml-13'>
-            <h6>{item.speed} KMPH</h6>
-          </Col >
-          <Col className='ml-2'>
-            <Tooltip title="GSM Status">
-            <WifiOutlined style={{fontSize: '15px',color:item.gps_count}} />
-            </Tooltip>
-          </Col>
-          <Col className='ml-2'>
-          <Tooltip title="GPS Status">
-            <FontAwesomeIcon icon={faLocationCrosshairs} style={{fontSize: '15px',color:item.gsm_count}}/>
-          </Tooltip>
-            </Col>
-          <Col className='ml-2'>
-          <Tooltip title="Power Status">
-          <FontAwesomeIcon icon={faPlug} style={{fontSize: '15px',color: item.power_status}} />
-          </Tooltip>
-          </Col>
-        </Row>
-      </List.Item>
-    )}
-  />
+                            </Tabs>
                           </StickyContainer>
                         </Card>
                     </Col>

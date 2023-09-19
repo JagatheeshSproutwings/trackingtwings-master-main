@@ -42,18 +42,19 @@ const center = data?.length>0 ? [data[0].latitude, data[0].longtitude]:[0.0000,0
   return (
     <MapContainer center={center} bounds={bounds} zoom={4} style={{ height: '500px', width: '100%' }}>
       <LayersControl>
-        <LayersControl.BaseLayer checked name="OpenStreetMap">
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          />
-        </LayersControl.BaseLayer>
-        <LayersControl.BaseLayer  name="Google-Street View">
+      <LayersControl.BaseLayer checked name="Google-Street View">
         <TileLayer
                     attribution="Google Maps"
                     url="https://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}"
                     />
         </LayersControl.BaseLayer>
+        <LayersControl.BaseLayer  name="OpenStreetMap">
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          />
+        </LayersControl.BaseLayer>
+        
         <LayersControl.BaseLayer  name="Google-Satelite">
         <TileLayer
                     url='https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
@@ -67,7 +68,7 @@ const center = data?.length>0 ? [data[0].latitude, data[0].longtitude]:[0.0000,0
         <LeafletTrackingMarker
           key={vehicle?.id}
           position={[vehicle?.latitude, vehicle?.longtitude]}
-          duration={10000}
+          duration={1000}
           rotationAngle={vehicle?.angle}
           icon={createIcon(vehicle?.icon_url)} 
           keepAtCenter={vehicle?.vehicle_current_status==3?true:false}

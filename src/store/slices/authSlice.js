@@ -20,7 +20,7 @@ export const signIn = createAsyncThunk(
     try {
       const response = await AuthService.login({ email, password });
 
-      if (response.data.status_code === 200) {
+      if (response?.data?.status_code === 200) {
         const refresh_token = response.data.data.token;
         const role_id = response.data.data.user.role_id;
         const id = response.data.data.user.id;
@@ -45,12 +45,15 @@ export const signIn = createAsyncThunk(
         setTokenInHeaders();
 
         return { token, refresh_token };
-      } else {
-        return rejectWithValue(response.message?.response.message || "Error");
+      } else { 
+        
+        console.log(response);
+        return rejectWithValue(response?.message|| "Invalid Login Credentials");
       }
     } catch (err) {
       localStorage.removeItem("token");
-      return rejectWithValue(err.response?.data?.message || "Error");
+      console.log(err.response);
+      return rejectWithValue(err.response?.data?.message || "Invalid Login Credentials");
     }
   }
 );
@@ -67,10 +70,10 @@ export const signUp = createAsyncThunk(
         localStorage.setItem(AUTH_TOKEN, refresh_token);
         return token;
       } else {
-        return rejectWithValue(response.message?.message || "Error");
+        return rejectWithValue(response.message?.message || "Invalid Login Credentials");
       }
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "Error");
+      return rejectWithValue(err.response?.data?.message || "Invalid Login Credentials");
     }
   }
 );
