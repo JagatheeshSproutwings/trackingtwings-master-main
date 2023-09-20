@@ -82,7 +82,6 @@ const Create = (props) => {
         setLoading(false);
         openNotification("success", "User", "User Created Successfully!");
       } catch (error) {
-        setLoading(false);
         if (error.response && error.response.status === 403) {
           const errorData = error.response.data;
           if (errorData.message && typeof errorData.message === "object") {
@@ -108,6 +107,7 @@ const Create = (props) => {
         }
       }
     } else {
+      setLoading(false);
       openNotification(
         "error",
         "Password",
@@ -117,8 +117,6 @@ const Create = (props) => {
   };
 
   const handleRoleIdChange = (roleID) => {
-    alert(roleID);
-
     if (roleID == 2) {
       SetUserLabel("Admin Name");
     } else if (roleID == 3) {
@@ -580,16 +578,6 @@ const Create = (props) => {
                           ]}
                         >
                           <Input.Password />
-                          <div
-                            style={{
-                              fontSize: "10.5px",
-                              fontWeight: "bold",
-                              color: "green",
-                              fontStyle: "italic",
-                            }}
-                          >
-                            [Alpha-Numeric and Minimum 8 Characters]
-                          </div>
                         </Form.Item>
                       </Col>
                       <Col sm={12} md={12} lg={12}>

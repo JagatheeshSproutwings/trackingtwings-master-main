@@ -59,6 +59,7 @@ const Config = ({ parentToChild, ...props }) => {
                 form={form}
                 size="small"
                 name="settings_form"
+                layout="vertical"
                 onFinish={onSubmit}
               >
                 <Row gutter={[12, 12]}>

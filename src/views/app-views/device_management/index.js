@@ -19,14 +19,14 @@ import { Space, Menu, Dropdown } from "antd";
 import Flex from "components/shared-components/Flex";
 import {
   DownOutlined,
-  SettingOutlined,
+  SettingTwoTone,
   SearchOutlined,
+  EditTwoTone,
 } from "@ant-design/icons";
 import Config from "./config";
 import Configs from "./configs";
-import Update from "./vehicle_update";
-
 import utils from "utils";
+import moment from "moment"; // Import moment
 
 const { Option } = Select;
 
@@ -35,7 +35,6 @@ const Vehicle = () => {
   const [loading, setLoading] = useState(false);
   const [isComponentVisible, setIsComponentVisible] = useState(false);
   const [isConfigVisible, setIsConfigVisible] = useState(false);
-  const [isUpdateVisible, setIsUpdateVisible] = useState(false);
 
   const [mulitiVehicles, setMulitiVehicles] = useState([]);
 
@@ -66,6 +65,11 @@ const Vehicle = () => {
   const [modelIdData, SetModelIdData] = useState("");
   const [makeData, SetMakeData] = useState("");
   const [modelData, SetModelData] = useState("");
+
+  const [installationDate, SetInstallationDate] = useState("");
+  const [expireDate, SetExpireDate] = useState("");
+  const [extendDate, SetExtendDate] = useState("");
+  // Function to format the date as a string in the desired format
 
   const [currentUser, SetCurrentUser] = useState(
     localStorage.getItem("id") || ""
@@ -344,6 +348,9 @@ const Vehicle = () => {
 
   const PlanChange = async (value) => {
     SetLicenseList([]);
+    SetInstallationDate("");
+    SetExpireDate("");
+    SetExtendDate("");
 
     if (value != null) {
       const data = { user_id: userValue, plan_id: value };
@@ -356,6 +363,25 @@ const Vehicle = () => {
           return err;
         });
       SetLicenseList(license_list?.data.data);
+
+      SetInstallationDate("");
+      SetExpireDate("");
+      SetExtendDate("");
+
+      const plan_days = await api
+        .post("plan_days", data)
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err;
+        });
+      console.log(plan_days);
+      console.log(plan_days?.data);
+      console.log(plan_days?.data?.data);
+      SetInstallationDate(plan_days?.data?.data?.installation_date);
+      SetExpireDate(plan_days?.data?.data?.expire_date);
+      SetExtendDate(plan_days?.data?.data?.extend_date);
     }
   };
 
@@ -402,10 +428,15 @@ const Vehicle = () => {
     try {
       setLoading(true);
       values["user_id"] = currentUser;
-      const installation_date = new Date(values["installation_date"]);
-      values["installation_date"] = installation_date
+      values["installation_date"] = installationDate;
+      values["expire_date"] = expireDate;
+      values["extend_date"] = extendDate;
+
+      const vehicle_expire_date = new Date(values["vehicle_expire_date"]);
+      values["vehicle_expire_date"] = vehicle_expire_date
         .toISOString()
         .split("T")[0];
+
       await api.post("vehicle", values);
       form.resetFields();
       setLoading(false);
@@ -416,6 +447,10 @@ const Vehicle = () => {
       SetDeviceData("");
       SetMakeData("");
       SetModelData("");
+
+      SetInstallationDate("");
+      SetExpireDate("");
+      SetExtendDate("");
 
       loadsims();
       loaddevices();
@@ -480,16 +515,16 @@ const Vehicle = () => {
 
   const getMenu = (record) => (
     <Menu>
-      {/* <Menu.Item
+      <Menu.Item
         key="edit"
-        icon={<EditOutlined />}
+        icon={<EditTwoTone />}
         onClick={() => handleEdit(record)}
       >
         Edit
-      </Menu.Item> */}
+      </Menu.Item>
       <Menu.Item
         key="config"
-        icon={<SettingOutlined />}
+        icon={<SettingTwoTone />}
         onClick={() => handleSetting(record)}
       >
         Settings
@@ -521,11 +556,13 @@ const Vehicle = () => {
       console.error("Error fetching users:", error);
     }
   };
+
+  const handleEdit = async (record) => {};
   const clickConfig = async () => {
     if (mulitiVehicles.length !== 0) {
       setIsConfigVisible(true);
     } else {
-      openNotification("success", "Vehicle", "Please Select One Vehicles");
+      openNotification("info", "Vehicle", "Please Select Atleast One Vehicles");
     }
   };
   const loadVehicles = async () => {
@@ -630,7 +667,6 @@ const Vehicle = () => {
           />
         )}
       </div>
-      {isUpdateVisible && <Update />}
 
       <Card title="Vehicle List">
         <Flex
@@ -652,49 +688,56 @@ const Vehicle = () => {
           </Col>
 
           <Col sm={3} md={6} lg={6}>
-            <Select
-              mode="tags"
-              style={{
-                width: "95%",
-              }}
-              placeholder="Select Vehicle"
-              onChange={changeMutliVehicles}
-              allowClear
-              showSearch
-              filterOption={(input, option) =>
-                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-              }
-            >
-              {Array.isArray(vehicleList) ? (
-                vehicleList.map((vehicle) => (
-                  <Option key={vehicle.id} value={vehicle.id}>
-                    {vehicle.vehicle_name}
+            {currentRole == 6 && (
+              <Select
+                mode="tags"
+                style={{
+                  width: "95%",
+                }}
+                placeholder="Select Vehicle"
+                onChange={changeMutliVehicles}
+                allowClear
+                showSearch
+                filterOption={(input, option) =>
+                  option.children.toLowerCase().indexOf(input.toLowerCase()) >=
+                  0
+                }
+              >
+                {Array.isArray(vehicleList) ? (
+                  vehicleList.map((vehicle) => (
+                    <Option key={vehicle.id} value={vehicle.id}>
+                      {vehicle.vehicle_name}
+                    </Option>
+                  ))
+                ) : (
+                  <Option value="Loading" disabled>
+                    Loading...
                   </Option>
-                ))
-              ) : (
-                <Option value="Loading" disabled>
-                  Loading...
-                </Option>
-              )}
-            </Select>
+                )}
+              </Select>
+            )}
           </Col>
 
           <Col sm={2} md={4} lg={4}>
-            <Button type="primary" ghost onClick={clickConfig}>
-              Config
-            </Button>
+            {currentRole == 6 && (
+              <Button type="primary" ghost onClick={clickConfig}>
+                Config
+              </Button>
+            )}
           </Col>
 
           <Col sm={2} md={4} lg={4}></Col>
           <Col sm={2} md={4} lg={4}>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={showDrawer}
-              ghost
-            >
-              Add Vehicle
-            </Button>
+            {currentRole <= 5 && (
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={showDrawer}
+                ghost
+              >
+                Add Vehicle
+              </Button>
+            )}
           </Col>
         </Row>
 
@@ -1111,14 +1154,24 @@ const Vehicle = () => {
                   ></Input>
                 </Form.Item>
               </Col>
-              <Col sm={3} md={6} lg={6} xxl={6}>
-                <Form.Item name="installation_date" label="Installation Date">
+              <Col sm={2} md={4} lg={4} xxl={4}>
+                <Form.Item label="Expire Date">
+                  <Input
+                    value={expireDate}
+                    disabled
+                    style={{ color: "red", fontWeight: "bold" }}
+                  />
+                </Form.Item>
+              </Col>
+
+              <Col sm={2} md={4} lg={4} xxl={4}>
+                <Form.Item
+                  name="vehicle_expire_date"
+                  label="Vehicle Expire Date"
+                >
                   <DatePicker
-                    width="100%"
-                    required
                     allowClear={false}
                     format={dateFormat}
-                    placeholder="Installation Date"
                   ></DatePicker>
                 </Form.Item>
               </Col>
