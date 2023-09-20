@@ -244,8 +244,8 @@ export const User = () => {
         <Col sm={24} md={14} lg={14}>
           <Popconfirm
             size="big"
-            title="Sim"
-            description="Click OK to Delete this Sim"
+            title="User"
+            description="Are you sure to delete this user"
             open={open}
             placement="rightTop"
             onConfirm={handleOk}
