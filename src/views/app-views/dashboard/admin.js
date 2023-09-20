@@ -201,7 +201,7 @@ export const Admin = () => {
     const getCustomerList = async () => {
       const customer_data = { user_id: user_id};
       const customer_list = await api.post("role_based_user_list",customer_data).then((res) => { return res;}).catch((err) => { return [];});
-      SetCustomerList(customer_list?.data?.data?.user_list);
+      setCurrentCustomerList(customer_list?.data?.data?.user_list);
       console.log(customer_list?.data?.data?.user_list);
     }
     const getUserList = async (current_user_id) => {
