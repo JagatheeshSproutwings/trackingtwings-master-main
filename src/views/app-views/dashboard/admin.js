@@ -48,7 +48,7 @@ export const Admin = () => {
   const [dealerLoading,setDealerLoading] = useState(false);
   const [subdealerLoading,setSubdealerLoading] = useState(false);
   const [customerLoading,setCustomerLoading] = useState(false);
-  const [currentCustomerUser,setCurrentCustomerUser] = useState();
+  const [currentCustomerUser,setCurrentCustomerUser] = useState("");
   const token = useSelector((state) => state.auth);
   const role_id = token?.user_info?.role_id;
   const user_id = token?.user_info?.id;
@@ -56,16 +56,71 @@ export const Admin = () => {
   const [vehilcecount,setvehiclecount] = useState([]);
   const [vehicleDisplayType,setvehicleDisplayType] = useState(1);
   const [multiplevehiclesData,setMultiplevehiclesData] = useState([]);
+  const [mapvehicleDate,setmapvehicleDate] = useState([]);
+  const [singleVehicle,setSingleVehicle] = useState("");
 
   const handleTabChange = (key) => {
     setActiveKey(key);
   };
   const SingleVehicle = async (value) => {
-    if(value)
+    setSingleVehicle(value);
+    if(value && role_id===6)
     {
     const singlevehicles_data = await api.get("single_dashboard/"+value).then((res) => { return res;}).catch((err) => {console.log(err)});
-    console.log(singlevehicles_data);
+    const processedData = singlevehicles_data?.data?.data;
+    // const single_map_data = Object.keys(processedData).map((key) => processedData[key]);
+    // console.log(single_map_data[1]); 
+    
+    
+    const mapData = [{
+      id:processedData?.id,
+      device_imei:processedData?.device_imei,
+      live_status:vehicle_live_status(processedData?.vehicle_current_status),
+      icon_url:vehicle_icon_url(processedData?.vehicle_current_status)+processedData?.short_name+'.png',
+      latitude:processedData?.lattitute||0.0000,
+      longtitude:processedData?.longitute||0.0000,
+      last_duration:processedData?.last_duration,
+      title: processedData?.vehicle_name||"TEST",
+      description:processedData?.device_updatedtime|| "0000-00-00 00:00:00",
+      color:vehicle_color(processedData?.vehicle_current_status),
+      angle:processedData?.angle ||0,
+      speed:processedData?.speed||0,
+      gps_count:20,
+      gsm_count:15,
+    }];
+    console.log(Array.isArray(mapData)?'True':'False');
+    setmapvehicleDate(mapData);
     }
+
+
+    if(value && role_id!=6 && currentCustomerUser!='')
+    {
+      console.log(value);
+      console.log(currentCustomerUser);
+      const customer_data = {user_id:currentCustomerUser};
+      const singlevehicles_data = await api.post("client_single_dashboard",customer_data).then((res) => { return res;}).catch((err) => { return [];});
+      const processedData = singlevehicles_data?.data?.data?.map((item) => ({
+        id:item?.id,
+        device_imei:item?.device_imei,
+        live_status:vehicle_live_status(item?.vehicle_current_status),
+        icon_url:vehicle_icon_url(item?.vehicle_current_status)+item?.short_name+'.png',
+        latitude:item.lattitute,
+        longtitude:item.longitute,
+        last_duration:item?.last_duration,
+        title: item?.vehicle_name||"TEST",
+        description:item?.device_updatedtime|| "0000-00-00 00:00:00",
+        color:vehicle_color(item?.vehicle_current_status),
+        angle:item?.angle ||0,
+        speed:item?.speed||0,
+        gps_count:20,
+        gsm_count:15,
+      }));
+
+      setmapvehicleDate(processedData);
+  
+    }
+    
+    
     
     
   }
@@ -108,7 +163,7 @@ export const Admin = () => {
         setadminuser(true);
         const admin_list = getUserList(currentUser);
         SetAdminList(admin_list);
-        console.log(admin_list);
+        
       }
       if(role_id===2)
       {
@@ -138,16 +193,17 @@ export const Admin = () => {
       SetDealerList(dealer_list?.data?.data?.user_list);
     }
 
-    // const getSubDealerList = async () => {
-    //   const subdealer_data = { user_id: user_id};
-    //   const subdealer_list = await api.post("role_based_user_list",subdealer_data).then((res) => { return res;}).catch((err) => { return [];});
-    //   SetSubdealerList(subdealer_list?.data?.data?.user_list);
-    // }
-    // const getCustomerList = async () => {
-    //   const customer_data = { user_id: user_id};
-    //   const customer_list = await api.post("role_based_user_list",customer_data).then((res) => { return res;}).catch((err) => { return [];});
-    //   SetCustomerList(customer_list?.data?.data?.user_list);
-    // }
+    const getSubDealerList = async () => {
+      const subdealer_data = { user_id: user_id};
+      const subdealer_list = await api.post("role_based_user_list",subdealer_data).then((res) => { return res;}).catch((err) => { return [];});
+      SetSubdealerList(subdealer_list?.data?.data?.user_list);
+    }
+    const getCustomerList = async () => {
+      const customer_data = { user_id: user_id};
+      const customer_list = await api.post("role_based_user_list",customer_data).then((res) => { return res;}).catch((err) => { return [];});
+      SetCustomerList(customer_list?.data?.data?.user_list);
+      console.log(customer_list?.data?.data?.user_list);
+    }
     const getUserList = async (current_user_id) => {
       const user_data = { user_id: current_user_id };
       const user_list = await api
@@ -250,6 +306,7 @@ export const Admin = () => {
           
             const processedData = filteredItems?.map((item) => ({
               id:item?.id,
+              device_imei:item?.device_imei,
               live_status:vehicle_live_status(item?.vehicle_current_status),
               icon_url:vehicle_icon_url(item?.vehicle_current_status)+item?.short_name+'.png',
               latitude:item.lattitute,
@@ -264,12 +321,14 @@ export const Admin = () => {
               gsm_count:15,
             }));
             setMultiplevehiclesData(processedData);
+            setmapvehicleDate(processedData);
         }
         else{
           const filteredItems = multiple_vehicles_data?.data?.data;
           
             const processedData = filteredItems?.map((item) => ({
               id:item?.id,
+              device_imei:item?.device_imei,
               live_status:vehicle_live_status(item?.vehicle_current_status),
               icon_url:vehicle_icon_url(item?.vehicle_current_status)+item?.short_name+'.png',
               last_duration:item?.last_duration,
@@ -286,6 +345,7 @@ export const Admin = () => {
               gsm_count:15,
             }));
             setMultiplevehiclesData(processedData);
+            setmapvehicleDate(processedData);
         }
           
       }
@@ -466,6 +526,7 @@ export const Admin = () => {
           const filteredItems = customer_vehicles?.data?.data.filter(item => item.vehicle_current_status === vehicle_status);
           const processedData = filteredItems?.map((item) => ({
               id:item?.id,
+              device_imei:item?.device_imei,
               live_status:vehicle_live_status(item?.vehicle_current_status),
               icon_url:vehicle_icon_url(item?.vehicle_current_status)+item?.short_name+'.png',
               last_duration:item?.last_duration,
@@ -483,11 +544,13 @@ export const Admin = () => {
             power_status : item?.power_status ? GREEN_BASE : RED_BASE,
             }));
           setMultiplevehiclesData(processedData);
+          setmapvehicleDate(processedData);
         }else{
           const filteredItems = customer_vehicles?.data?.data;
           
           const processedData = filteredItems?.map((item) => ({
             id:item?.id,
+            device_imei:item?.device_imei,
             live_status:vehicle_live_status(item?.vehicle_current_status),
             icon_url:vehicle_icon_url(item?.vehicle_current_status)+item?.short_name+'.png',
             last_duration:item?.last_duration,
@@ -505,13 +568,14 @@ export const Admin = () => {
             power_status : item?.power_status ? GREEN_BASE : RED_BASE,
         }));
             setMultiplevehiclesData(processedData);
+            setmapvehicleDate(processedData);
         }
       // Set vehicle count 
       const customer_data = {user_id:value};
         const count_vehicles =  await api.post("client_vehicle_count",customer_data).then((res)=> { return res;}).catch((err)=>{return [];});
         console.log(count_vehicles?.data?.data);
         setvehiclecount(count_vehicles?.data?.data);
-
+        
     }
     const handleChange = (value,option) =>{
         const selected_user_id = value;
@@ -552,7 +616,7 @@ return(
                                 <Form.Item name="admin_id" label="Admin" size="small" initialValue="" rules={[{required:true,message:'Admin Value is Required!'}]}>
                                 <Select showSearch onChange={handleChange} placeholder="Admin">
                                 {Array.isArray(adminList) ? (
-                        adminList.map((admin) => (
+                        adminList?.map((admin) => (
                           <Select.Option 
                             key={admin?.id}
                             role_id="2"
@@ -562,7 +626,7 @@ return(
                           </Select.Option>
                         ))
                       ) : (
-                        <Select.Option value="" role_id="3"></Select.Option>
+                        <Select.Option value={null} role_id="3"></Select.Option>
                       )}
                                 </Select>
                                 </Form.Item>
@@ -575,7 +639,7 @@ return(
                                 <Select showSearch onChange={currentDealerList} size="small" placeholder="Distributor">
                                 
                                 {Array.isArray(distributorList) ? (
-                        distributorList.map((distributor) => (
+                        distributorList?.map((distributor) => (
                           <Select.Option 
                             key={distributor?.id}
                             role_id="3"
@@ -585,7 +649,7 @@ return(
                           </Select.Option>
                         ))
                       ) : (
-                        <Select.Option value="" role_id="3"></Select.Option>
+                        <Select.Option value={null} role_id="3"></Select.Option>
                       )}
                                 </Select>
                                 </Form.Item>
@@ -600,7 +664,7 @@ return(
         <Spin size="large" />
       ) : (<Select showSearch onChange={changeDealer} placeholder="Dealer">
       {Array.isArray(dealerList) ? (
-dealerList.map((dealer) => (
+dealerList?.map((dealer) => (
 <Select.Option 
   
   role_id="4"
@@ -610,7 +674,7 @@ dealerList.map((dealer) => (
 </Select.Option>
 ))
 ) : (
-<Select.Option value="" role_id="4"></Select.Option>
+<Select.Option value={null} role_id="4"></Select.Option>
 )}
       </Select>)}
                                 
@@ -622,7 +686,7 @@ dealerList.map((dealer) => (
                                 <Form.Item name="subdealer_id" label="Sub Dealer" size="small" initialValue="" rules={[{required:true,message:'Admin Value is Required!'}]}>
                                 <Select showSearch onChange={changeSubDealer} placeholder="Sub Dealer">
                                 {Array.isArray(subdealerList) ? (
-                        subdealerList.map((subdealer) => (
+                        subdealerList?.map((subdealer) => (
                           <Select.Option 
                             key={subdealer?.id}
                             role_id="5"
@@ -632,7 +696,7 @@ dealerList.map((dealer) => (
                           </Select.Option>
                         ))
                       ) : (
-                        <Select.Option value="" role_id="5"></Select.Option>
+                        <Select.Option value={null} role_id="5"></Select.Option>
                       )}
                                 </Select>
                                 </Form.Item>
@@ -643,7 +707,7 @@ dealerList.map((dealer) => (
                                 <Form.Item name="customer_id" label="Customer" size="small" initialValue="" rules={[{required:true,message:'Admin Value is Required!'}]}>
                                 <Select showSearch onChange={changeCustomer} placeholder="Customer">
                                 {Array.isArray(listCustomer) ? (
-                        listCustomer.map((customer) => (
+                        listCustomer?.map((customer) => (
                           <Select.Option 
                             key={customer?.id}
                             role_id="6"
@@ -653,7 +717,7 @@ dealerList.map((dealer) => (
                           </Select.Option>
                         ))
                       ) : (
-                        <Select.Option value="" role_id="6"></Select.Option>
+                        <Select.Option value={null} role_id="6"></Select.Option>
                       )}
                                 </Select>
                                 </Form.Item>
@@ -686,10 +750,12 @@ dealerList.map((dealer) => (
                             </Tabs> */}
                              <Search
       placeholder="Search Vehicle.."
+      options = {multiplevehiclesData}
       onChange={onSearch}
       allowClear
+      
     />
-    <List style={{padding:0,margin:1,fontSize:'10px',height:'300px',border:'1px',overflow: 'auto'}}
+    <List style={{padding:'1px',margin:'1px',fontSize:'10px',height:'300px',border:'1px',overflow: 'auto'}}
     itemLayout="horizontal"
     size='small'
     dataSource={multiplevehiclesData}
@@ -728,7 +794,7 @@ dealerList.map((dealer) => (
                     </Col>
                     <Col sm={12} md={18} lg={18}>
 
-                    <LiveTracking data={multiplevehiclesData}/>
+                    <LiveTracking data={mapvehicleDate}/>
                     </Col>
                 </Row>
             </Col>
