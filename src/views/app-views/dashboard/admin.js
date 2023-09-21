@@ -589,6 +589,11 @@ const single_vehicle_live_data = () => {
           },
     ];
 
+    const tabs = [
+      {key:"1",tab:"Map",content:'<Table></Table>'},
+      {key:"2",tab:"Chart",content:'<Table></Table>'},
+      {key:"3",tab:"Table",content:'<Table></Table>'},
+    ];
     // const tabs = [
     //   { key: "1", tab: <p>All-{vehilcecount?.total_vehicles||0}</p>, content: <Dashboard_vehicles status={""} Customervalue={currentCustomerUser} map_vehicles_data={multiplevehiclesData} /> },
     //   { key: "2", tab: <p>Parking -{vehilcecount?.stop||0}</p>, content: <Dashboard_vehicles status={1} Customervalue={currentCustomerUser} map_vehicles_data={multiplevehiclesData}/> },
@@ -1002,9 +1007,11 @@ dealerList?.map((dealer) => (
     )}
   />
 </StickyContainer>
-</Card>
-</Col>
+                        </Card>
+                    </Col>
+
                     <Col sm={12} md={18} lg={18}>
+                      
                     <Button className='active' danger>Map</Button>
                     <Button>Charts</Button>
                     <Button>Table</Button>
