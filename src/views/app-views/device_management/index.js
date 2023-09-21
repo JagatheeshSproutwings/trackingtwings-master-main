@@ -26,7 +26,9 @@ import {
 import Config from "./config";
 import Configs from "./configs";
 import utils from "utils";
-import moment from "moment"; // Import moment
+
+import AdminUpdate from "./admin_update";
+import CustomerUpdate from "./customer_update";
 
 const { Option } = Select;
 
@@ -34,6 +36,10 @@ const Vehicle = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [isComponentVisible, setIsComponentVisible] = useState(false);
+
+  // const [isComponentVisible, setIsComponentVisible] = useState(false);
+  // const [isComponentVisible, setIsComponentVisible] = useState(false);
+
   const [isConfigVisible, setIsConfigVisible] = useState(false);
 
   const [mulitiVehicles, setMulitiVehicles] = useState([]);
@@ -557,7 +563,11 @@ const Vehicle = () => {
     }
   };
 
-  const handleEdit = async (record) => {};
+  const handleEdit = async (record) => {
+    if (role == 6) {
+    } else {
+    }
+  };
   const clickConfig = async () => {
     if (mulitiVehicles.length !== 0) {
       setIsConfigVisible(true);
