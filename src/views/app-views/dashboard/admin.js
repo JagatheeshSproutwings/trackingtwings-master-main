@@ -952,7 +952,7 @@ dealerList?.map((dealer) => (
                               <Col md={4} style={{border:'1px solid',textAlign:'center',margin:'0px'}} value="1" onClick={handleTabChange}><p style={{fontSize:'10px',margin:'0px'}} value="1" >Parking</p><p style={{backgroundColor:'#0d6efd',margin:'0px',color:'white'}}>{vehilcecount?.stop||0}</p></Col>
                               <Col md={4} style={{border:'1px solid',textAlign:'center',margin:'0px'}} value="2" onClick={handleTabChange}><p style={{fontSize:'10px',margin:'0px'}} value="2" >Idle</p><p style={{backgroundColor:'#ffc107',margin:'0px',color:'white'}}>{vehilcecount?.idle||0}</p></Col>
                               <Col md={4} style={{border:'1px solid',textAlign:'center',margin:'0px'}} value="3" onClick={handleTabChange}><p style={{fontSize:'10px',margin:'0px'}} value="3" >Moving</p><p style={{backgroundColor:'#20c997',margin:'0px',color:'white'}}>{vehilcecount?.running||0}</p></Col>
-                              <Col md={4} style={{border:'1px solid',textAlign:'center',margin:'0px'}} value="4" onClick={handleTabChange}><p style={{fontSize:'10px',margin:'0px'}} value="4" >No Data</p><p style={{backgroundColor:'#dc3545',margin:'0px',color:'white'}}>{vehilcecount?.no_data||0}</p></Col>
+                              <Col md={4} style={{border:'1px solid',textAlign:'center',margin:'0px'}} value="4" onClick={handleTabChange}><p style={{fontSize:'10px',margin:'0px'}} value="4" >NoData</p><p style={{backgroundColor:'#dc3545',margin:'0px',color:'white'}}>{vehilcecount?.no_data||0}</p></Col>
                               <Col md={4} style={{border:'1px solid',textAlign:'center',margin:'0px'}} value="5" onClick={handleTabChange}><p style={{fontSize:'10px',margin:'0px'}} value="5" >Inactive</p><p style={{backgroundColor:'#888d9599',margin:'0px',color:'white'}}>{vehilcecount?.inactive||0}</p></Col>
                               </Row> 
                               
@@ -1011,7 +1011,7 @@ dealerList?.map((dealer) => (
                     </Col>
 
                     <Col sm={12} md={18} lg={18}>
-                      
+
                     <Button className='active' danger>Map</Button>
                     <Button>Charts</Button>
                     <Button>Table</Button>
