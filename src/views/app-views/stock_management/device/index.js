@@ -1,6 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Card, Row, Col, Input } from "antd";
-import { PlusOutlined, SearchOutlined, EditOutlined } from "@ant-design/icons";
+import {
+  Table,
+  Button,
+  Card,
+  Row,
+  Col,
+  Input,
+  Popconfirm,
+  notification,
+} from "antd";
+import {
+  PlusOutlined,
+  SearchOutlined,
+  EditTwoTone,
+  DeleteTwoTone,
+} from "@ant-design/icons";
 import Flex from "components/shared-components/Flex";
 import api from "configs/apiConfig";
 import Create from "./create";
@@ -20,6 +34,41 @@ export const Device = () => {
 
   const [editdata, setEditData] = useState("");
   const [assigndata, setAssignData] = useState("");
+
+  const currentUser = localStorage.getItem("id") || "";
+
+  const [open, setOpen] = useState(false);
+  const [deleteID, setDeleteID] = useState("");
+
+  const showPopconfirm = (record) => {
+    setDeleteID(record.id);
+    setOpen(true);
+  };
+
+  const handleCancel = () => {
+    setOpen(false);
+  };
+
+  const handleOk = async () => {
+    alert(deleteID);
+    const data = { id: deleteID, user_id: currentUser };
+
+    try {
+      const response = await api.post("device/delete", data);
+      openNotification("success", "Device", "Device Deleted Successfully!");
+      setOpen(false);
+      loadDevices();
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
+
+  const openNotification = (type, message, description) => {
+    notification[type]({
+      message,
+      description,
+    });
+  };
 
   const handleCreateCard = () => {
     setIsCreateVisible(true);
@@ -128,29 +177,30 @@ export const Device = () => {
       dataIndex: "device_model",
     },
     {
-      title: "Edit",
-      dataIndex: "edit",
+      title: "Actions",
+      dataIndex: "actions",
       fixed: "right",
       render: (_, record) => (
-        <span
-          style={{ cursor: "pointer" }}
-          onClick={() => handleEditClick(record)}
-        >
-          <EditOutlined />
-        </span>
-      ),
-    },
-    {
-      title: "Assign",
-      dataIndex: "edit",
-      fixed: "right",
-      render: (_, record) => (
-        <span
-          style={{ cursor: "pointer" }}
-          onClick={() => handleAssignClick(record)} // Replace handleEditClick with your custom action function
-        >
-          <EditOutlined /> {/* Replace EditOutlined with your custom icon */}
-        </span>
+        <div>
+          <span
+            style={{ cursor: "pointer", marginRight: "8px" }}
+            onClick={() => handleEditClick(record)}
+          >
+            <EditTwoTone />
+          </span>
+          <span
+            style={{ cursor: "pointer", marginRight: "8px" }}
+            onClick={() => handleAssignClick(record)}
+          >
+            <EditTwoTone />
+          </span>
+          <span
+            style={{ cursor: "pointer" }}
+            onClick={() => showPopconfirm(record)}
+          >
+            <DeleteTwoTone />
+          </span>
+        </div>
       ),
     },
   ];
@@ -167,43 +217,53 @@ export const Device = () => {
     <>
       <Row gutter={6}>
         <Col sm={24} md={14} lg={14}>
-          <Card title="Device">
-            <Flex
-              alignItems="center"
-              justifyContent="space-between"
-              mobileFlex={false}
-            >
-              <Flex className="mb-1" mobileFlex={false}>
-                <div className="mr-md-3 mb-3">
-                  <Input
-                    placeholder="Search"
-                    prefix={<SearchOutlined />}
-                    onChange={(e) => onSearch(e)}
-                  />
-                </div>
+          <Popconfirm
+            size="big"
+            title="Sim"
+            description="Click OK to Delete this Device"
+            open={open}
+            placement="rightTop"
+            onConfirm={handleOk}
+            onCancel={handleCancel}
+          >
+            <Card title="Device">
+              <Flex
+                alignItems="center"
+                justifyContent="space-between"
+                mobileFlex={false}
+              >
+                <Flex className="mb-1" mobileFlex={false}>
+                  <div className="mr-md-3 mb-3">
+                    <Input
+                      placeholder="Search"
+                      prefix={<SearchOutlined />}
+                      onChange={(e) => onSearch(e)}
+                    />
+                  </div>
 
-                <div className="mb-3"></div>
+                  <div className="mb-3"></div>
+                </Flex>
+                <div className="mb-3">
+                  <Button
+                    type="primary"
+                    icon={<PlusOutlined />}
+                    ghost
+                    onClick={handleCreateCard}
+                  >
+                    Add Device
+                  </Button>
+                </div>
               </Flex>
-              <div className="mb-3">
-                <Button
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  ghost
-                  onClick={handleCreateCard}
-                >
-                  Add Device
-                </Button>
+              <div className="table-responsive">
+                <Table
+                  bordered
+                  columns={tableColumns}
+                  dataSource={deviceList}
+                  rowKey="id"
+                />
               </div>
-            </Flex>
-            <div className="table-responsive">
-              <Table
-                bordered
-                columns={tableColumns}
-                dataSource={deviceList}
-                rowKey="id"
-              />
-            </div>
-          </Card>
+            </Card>
+          </Popconfirm>
         </Col>
         <Col sm={24} md={10} lg={10}>
           {isCreateVisible && <Create parentFunction={parentFunction} />}

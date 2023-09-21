@@ -1,6 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Card, Row, Col, Input, Form, notification } from "antd";
-import { PlusOutlined, SearchOutlined, EditOutlined } from "@ant-design/icons";
+import {
+  Table,
+  Button,
+  Card,
+  Row,
+  Col,
+  Input,
+  Form,
+  Popconfirm,
+  notification,
+} from "antd";
+import {
+  PlusOutlined,
+  SearchOutlined,
+  EditTwoTone,
+  DeleteTwoTone,
+} from "@ant-design/icons";
 import Flex from "components/shared-components/Flex";
 import api from "configs/apiConfig";
 import utils from "utils";
@@ -22,6 +37,33 @@ export const User = () => {
   const [loginimage, setLoginImage] = useState("");
 
   const [isuploadvisible, setUploadVisible] = useState(false);
+
+  const [open, setOpen] = useState(false);
+  const [deleteID, setDeleteID] = useState("");
+
+  const showPopconfirm = (record) => {
+    alert(record.id);
+    setDeleteID(record.id);
+    setOpen(true);
+  };
+
+  const handleCancel = () => {
+    setOpen(false);
+  };
+
+  const handleOk = async () => {
+    alert(deleteID);
+    const data = { id: deleteID, user_id: user };
+
+    try {
+      const response = await api.post("user/delete", data);
+      openNotification("success", "User", "User Deleted Successfully!");
+      setOpen(false);
+      loadUsers();
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
 
   const openNotification = (type, message, description) => {
     notification[type]({
@@ -137,16 +179,24 @@ export const User = () => {
       dataIndex: "country",
     },
     {
-      title: "Edit",
-      dataIndex: "edit",
+      title: "Actions",
+      dataIndex: "actions",
       fixed: "right",
       render: (_, record) => (
-        <span
-          style={{ cursor: "pointer" }}
-          onClick={() => handleEditClick(record)}
-        >
-          <EditOutlined />
-        </span>
+        <div>
+          <span
+            style={{ cursor: "pointer", marginRight: "8px" }}
+            onClick={() => handleEditClick(record)}
+          >
+            <EditTwoTone />
+          </span>
+          <span
+            style={{ cursor: "pointer" }}
+            onClick={() => showPopconfirm(record)} // Replace handleEditClick with your custom action function
+          >
+            <DeleteTwoTone />
+          </span>
+        </div>
       ),
     },
   ];
@@ -192,52 +242,62 @@ export const User = () => {
     <>
       <Row gutter={6}>
         <Col sm={24} md={14} lg={14}>
-          <Card title="User">
-            <Flex
-              alignItems="center"
-              justifyContent="space-between"
-              mobileFlex={false}
-            >
-              <Flex className="mb-1" mobileFlex={false}>
-                <div className="mr-md-3 mb-3">
-                  <Input
-                    placeholder="Search"
-                    prefix={<SearchOutlined />}
-                    onChange={(e) => onSearch(e)}
-                  />
+          <Popconfirm
+            size="big"
+            title="User"
+            description="Are you sure to delete this user"
+            open={open}
+            placement="rightTop"
+            onConfirm={handleOk}
+            onCancel={handleCancel}
+          >
+            <Card title="User">
+              <Flex
+                alignItems="center"
+                justifyContent="space-between"
+                mobileFlex={false}
+              >
+                <Flex className="mb-1" mobileFlex={false}>
+                  <div className="mr-md-3 mb-3">
+                    <Input
+                      placeholder="Search"
+                      prefix={<SearchOutlined />}
+                      onChange={(e) => onSearch(e)}
+                    />
+                  </div>
+                  <div className="mb-3"></div>
+                </Flex>
+                <div className="mb-3">
+                  <Button
+                    type="primary"
+                    icon={<PlusOutlined />}
+                    ghost
+                    onClick={handleUploadCard}
+                  >
+                    Upload Logo
+                  </Button>
                 </div>
-                <div className="mb-3"></div>
+                <div className="mb-3">
+                  <Button
+                    type="primary"
+                    icon={<PlusOutlined />}
+                    ghost
+                    onClick={handleCreateCard}
+                  >
+                    Add User
+                  </Button>
+                </div>
               </Flex>
-              <div className="mb-3">
-                <Button
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  ghost
-                  onClick={handleUploadCard}
-                >
-                  Upload Logo
-                </Button>
+              <div className="table-responsive">
+                <Table
+                  bordered
+                  columns={tableColumns}
+                  dataSource={userList}
+                  rowKey="id"
+                />
               </div>
-              <div className="mb-3">
-                <Button
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  ghost
-                  onClick={handleCreateCard}
-                >
-                  Add User
-                </Button>
-              </div>
-            </Flex>
-            <div className="table-responsive">
-              <Table
-                bordered
-                columns={tableColumns}
-                dataSource={userList}
-                rowKey="id"
-              />
-            </div>
-          </Card>
+            </Card>
+          </Popconfirm>
         </Col>
         <Col sm={24} md={10} lg={10}>
           {isCreateVisible && <Create parentFunction={parentFunction} />}

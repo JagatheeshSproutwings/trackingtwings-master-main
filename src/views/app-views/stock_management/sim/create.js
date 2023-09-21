@@ -13,7 +13,6 @@ import {
 } from "antd";
 import Flex from "components/shared-components/Flex";
 import api from "configs/apiConfig";
-import moment from "moment";
 const dateFormat = "YYYY-MM-DD";
 
 const { Option } = Select;
@@ -40,23 +39,18 @@ const Create = (props) => {
   };
 
   const onFinish = async (values) => {
-    const validFrom = moment(values.valid_from).format("YYYY-MM-DD");
-    const validTo = moment(values.valid_to).format("YYYY-MM-DD");
-
     const data = {
       network_id: values.network_id,
       sim_imei_no: values.sim_imei_no,
       sim_mob_no1: values.sim_mob_no1,
       sim_mob_no2: values.sim_mob_no2,
-      valid_from: validFrom,
-      valid_to: validTo,
     };
 
     try {
       const valid_from = new Date(values["valid_from"]);
-      values["valid_from"] = valid_from.toISOString().split("T")[0];
+      data["valid_from"] = valid_from.toISOString().split("T")[0];
       const valid_to = new Date(values["valid_to"]);
-      values["valid_to"] = valid_to.toISOString().split("T")[0];
+      data["valid_to"] = valid_to.toISOString().split("T")[0];
 
       await api.post("sim/store", data);
       form.resetFields();
@@ -70,8 +64,8 @@ const Create = (props) => {
           if (validationErrors.hasOwnProperty("sim_imei_no")) {
             openNotification(
               "info",
-              "Sim IMEI",
-              "Given Sim IMEI No is Already Exists"
+              "Sim CCID",
+              "Given Sim CCID No is Already Exists"
             );
           }
           if (validationErrors.hasOwnProperty("sim_mob_no1")) {
@@ -155,13 +149,13 @@ const Create = (props) => {
                   <Col sm={12} md={12} lg={12}>
                     <Form.Item
                       size="small"
-                      label="Sim IMEI No"
+                      label="Sim CCID"
                       name="sim_imei_no"
                       id="sim_imei_no"
                       rules={[
                         {
                           required: true,
-                          message: "Please enter a Sim IMEI No",
+                          message: "Please enter a Sim CCID",
                         },
                       ]}
                     >
@@ -192,11 +186,11 @@ const Create = (props) => {
                       <Input />
                     </Form.Item>
                   </Col>
+
                   <Col sm={12} md={12} lg={12}>
                     <Form.Item name="valid_from" label="Valid From">
                       <DatePicker
                         style={{ width: "100%", fontSize: "16px" }}
-                        required
                         allowClear={false}
                         format={dateFormat}
                       ></DatePicker>
@@ -207,6 +201,7 @@ const Create = (props) => {
                       <DatePicker
                         style={{ width: "100%", fontSize: "16px" }}
                         allowClear={false}
+                        format={dateFormat}
                       ></DatePicker>
                     </Form.Item>
                   </Col>

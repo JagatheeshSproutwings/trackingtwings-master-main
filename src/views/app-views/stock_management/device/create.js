@@ -284,7 +284,7 @@ const Create = (props) => {
                   <Col sm={24} md={24} lg={24}>
                     <Form.Item
                       size="small"
-                      label="Description"
+                      label="Device Description"
                       name="description"
                     >
                       <Input />

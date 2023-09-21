@@ -333,7 +333,7 @@ export const User = () => {
               name="total_point"
               rules={[{ required: true, message: "Please Enter Points" }]}
             >
-              <Input type="number" max={100} />
+              <Input type="number" max={1000} />
             </Form.Item>
 
             <Form.Item>

@@ -31,6 +31,7 @@ const Create = (props) => {
   const [roleOptions, setRoleOptions] = useState([]);
   const [selectedCountryId, setSelectedCountryId] = useState();
   const [countryOptions, setCountryOptions] = useState([]);
+  const [userLabel, SetUserLabel] = useState("Name");
 
   //File Upload Ends
 
@@ -81,7 +82,6 @@ const Create = (props) => {
         setLoading(false);
         openNotification("success", "User", "User Created Successfully!");
       } catch (error) {
-        setLoading(false);
         if (error.response && error.response.status === 403) {
           const errorData = error.response.data;
           if (errorData.message && typeof errorData.message === "object") {
@@ -107,6 +107,7 @@ const Create = (props) => {
         }
       }
     } else {
+      setLoading(false);
       openNotification(
         "error",
         "Password",
@@ -116,6 +117,19 @@ const Create = (props) => {
   };
 
   const handleRoleIdChange = (roleID) => {
+    if (roleID == 2) {
+      SetUserLabel("Admin Name");
+    } else if (roleID == 3) {
+      SetUserLabel("Distributor Name");
+    } else if (roleID == 4) {
+      SetUserLabel("Dealer Name");
+    } else if (roleID == 5) {
+      SetUserLabel("SubDealer Name");
+    } else if (roleID == 6) {
+      SetUserLabel("Customer Name");
+    } else {
+      SetUserLabel("Name");
+    }
     setSelectedRoleId(roleID);
     SetroleType(roleID);
     getUserList();
@@ -519,7 +533,7 @@ const Create = (props) => {
                     <Row gutter={[8, 8]}>
                       <Col sm={12} md={12} lg={12}>
                         <Form.Item
-                          label="User Name"
+                          label={userLabel}
                           name="name"
                           rules={[
                             {
