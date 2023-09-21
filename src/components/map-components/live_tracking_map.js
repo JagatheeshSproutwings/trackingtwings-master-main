@@ -85,7 +85,7 @@ const center = data?.length>0 ? [data[0].latitude, data[0].longtitude]:[0.0000,0
         <LeafletTrackingMarker
           key={vehiclesData?.id}
           position={[vehiclesData?.latitude, vehiclesData?.longtitude]}
-          duration={4000}
+          duration={5000}
           rotationAngle={vehiclesData?.angle}
           icon={createIcon(vehiclesData?.icon_url)} 
           keepAtCenter={true}

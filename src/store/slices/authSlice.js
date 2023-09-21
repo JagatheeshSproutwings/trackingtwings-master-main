@@ -32,7 +32,7 @@ export const signIn = createAsyncThunk(
         const dealer_id = response.data.data.user.dealer_id;
         const subdealer_id = response.data.data.user.subdealer_id;
 
-        console.log(token);
+       
         localStorage.setItem("token", refresh_token);
         localStorage.setItem("role", role_id);
         localStorage.setItem("user_name", user_name);
@@ -47,13 +47,13 @@ export const signIn = createAsyncThunk(
         return { token, refresh_token };
       } else { 
         
-        console.log(response);
-        return rejectWithValue(response?.message|| "Invalid Login Credentials");
+        
+        return rejectWithValue("Invalid Login Credentials");
       }
     } catch (err) {
       localStorage.removeItem("token");
-      console.log(err.response);
-      return rejectWithValue(err.response?.data?.message || "Invalid Login Credentials");
+     
+      return rejectWithValue("Invalid Login Credentials");
     }
   }
 );
@@ -162,7 +162,7 @@ export const authSlice = createSlice({
         state.redirect = "/dashboard";
         state.token = action.payload.refresh_token;
         state.user_info = action.payload.token;
-        console.log(action.payload);
+        
       })
       .addCase(signIn.rejected, (state, action) => {
         state.message = action.payload;

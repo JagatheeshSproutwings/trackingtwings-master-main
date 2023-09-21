@@ -81,13 +81,14 @@ export const Admin = () => {
 const single_vehicle_live_data = () => {
   const customer_id = getCurrentCustomer();
   const vehicle_device_imei = getCurrentVehicle();
+  setCurrentVehicle(vehicle_device_imei);
   console.log(vehicle_device_imei);
 }
  
   const SingleVehicle = async (value) => {
     
     localStorage.setItem('current_vehicle_id',value);
-    
+    const current_vehicle_id = getCurrentVehicle();
     
     if(value && role_id===6)
     {
@@ -107,6 +108,7 @@ const single_vehicle_live_data = () => {
       last_duration:processedData?.last_duration,
       title: processedData?.vehicle_name||"TEST",
       description:processedData?.device_updatedtime|| "0000-00-00 00:00:00",
+      device_time:processedData?.device_updatedtime|| "0000-00-00 00:00:00",
       color:vehicle_color(processedData?.vehicle_current_status),
       angle:processedData?.angle ||0,
       speed:processedData?.speed||0,
@@ -122,11 +124,15 @@ const single_vehicle_live_data = () => {
     {
       
       const customer_data = {user_id:currentCustomerUser};
-      const singlevehicles_data = await api.post("client_single_dashboard",customer_data).then((res) => { return res;}).catch((err) => { return [];});
-      console.log(singlevehicles_data);
-      if(singlevehicles_data?.data)
+      const singlevehicles_data = await api.post("client_multi_dashboard",customer_data).then((res) => { return res;}).catch((err) => { return [];});
+      
+      
+      if(singlevehicles_data?.data?.data)
       {
-        const processedData = singlevehicles_data?.data?.data?.map((item) => ({
+       
+        const vehicle_data = singlevehicles_data?.data?.data.filter(item => item.device_imei === current_vehicle_id);
+         
+        const processedData = vehicle_data.map((item) => ({
           id:item?.id,
           device_imei:item?.device_imei,
           live_status:vehicle_live_status(item?.vehicle_current_status),
@@ -136,6 +142,7 @@ const single_vehicle_live_data = () => {
           last_duration:item?.last_duration,
           title: item?.vehicle_name||"TEST",
           description:item?.device_updatedtime|| "0000-00-00 00:00:00",
+          device_time:item?.device_updatedtime|| "0000-00-00 00:00:00",
           color:vehicle_color(item?.vehicle_current_status),
           angle:item?.angle ||0,
           speed:item?.speed||0,
@@ -457,6 +464,62 @@ const single_vehicle_live_data = () => {
 
         }
           
+      }else{
+        
+        if(currentCustomerUser)
+        {
+          const customer_input = {user_id:currentCustomerUser};
+          const customer_vehicles = await api.post("client_multi_dashboard",customer_input).then((res)=>{ return res;}).catch((err)=>{return [];});
+          if(customer_vehicles?.data?.data)
+          {
+            const single_data = customer_vehicles?.data?.data.filter(item => item.device_imei == currentVehicle);
+            
+            const vehicleData = single_data?.map((item) => ({
+              id:item?.id,
+              device_imei:item?.device_imei,
+              live_status:vehicle_live_status(item?.vehicle_current_status),
+              icon_url:vehicle_icon_url(item?.vehicle_current_status)+item?.short_name+'.png',
+              last_duration:item?.last_duration,
+              latitude:item?.lattitute || 0.00000,
+              longtitude:item?.longitute || 0.00000,
+              title: item?.vehicle_name||"TEST",
+              description:item?.device_updatedtime|| "0000-00-00 00:00:00",
+              device_time:item?.device_updatedtime|| "0000-00-00 00:00:00",
+              color:vehicle_color(item?.vehicle_current_status),
+              vehicle_current_status:item?.vehicle_current_status,
+              angle:item?.angle ||0,
+              speed:item?.speed||0,
+              gps_count:item?.gpssignal =='1'? GREEN_BASE : RED_BASE,
+              gsm_count:item?.gsm_status =='1'? GREEN_BASE : RED_BASE,
+              power_status : item?.power_status ? GREEN_BASE : RED_BASE,
+            }));
+            setmapvehicleDate(vehicleData);
+          }
+          if(customer_vehicles?.data?.data)
+          {
+            const AllvehicleData = customer_vehicles?.data?.data?.map((item) => ({
+              id:item?.id,
+              device_imei:item?.device_imei,
+              live_status:vehicle_live_status(item?.vehicle_current_status),
+              icon_url:vehicle_icon_url(item?.vehicle_current_status)+item?.short_name+'.png',
+              last_duration:item?.last_duration,
+              latitude:item?.lattitute || 0.00000,
+              longtitude:item?.longitute || 0.00000,
+              title: item?.vehicle_name||"TEST",
+              description:item?.device_updatedtime|| "0000-00-00 00:00:00",
+              device_time:item?.device_updatedtime|| "0000-00-00 00:00:00",
+              color:vehicle_color(item?.vehicle_current_status),
+              vehicle_current_status:item?.vehicle_current_status,
+              angle:item?.angle ||0,
+              speed:item?.speed||0,
+              gps_count:item?.gpssignal =='1'? GREEN_BASE : RED_BASE,
+              gsm_count:item?.gsm_status =='1'? GREEN_BASE : RED_BASE,
+              power_status : item?.power_status ? GREEN_BASE : RED_BASE,
+            }));
+            setMultiplevehiclesData(AllvehicleData);
+          }
+
+        }
       }
 
     } 
@@ -474,7 +537,7 @@ const single_vehicle_live_data = () => {
 
       const interval = setInterval(() => {
         vehicle_list(vehicle_status);
-      }, 10000);
+      }, 3000);
       return () => {
         clearInterval(interval);
        };
@@ -633,7 +696,7 @@ const single_vehicle_live_data = () => {
       const current_vehicle = getCurrentVehicle();
       const customer_input = {user_id:value};
       const customer_vehicles = await api.post("client_multi_dashboard",customer_input).then((res)=>{ return res;}).catch((err)=>{return [];});
-       console.log(customer_vehicles);
+       console.log(status_vehicle);
        if(customer_vehicles?.data?.data && status_vehicle!='')
         {
           const filteredItems = customer_vehicles?.data?.data.filter(item => item.vehicle_current_status === status_vehicle);
@@ -755,7 +818,9 @@ return(
                               {role_id==1 && (
                                 <Col md={12}>
                                 <Form.Item name="admin_id" label="Admin" size="small" initialValue="" rules={[{required:true,message:'Admin Value is Required!'}]}>
-                                <Select showSearch onChange={handleChange} placeholder="Admin">
+                                <Select showSearch optionFilterProp="children" onChange={handleChange} placeholder="Admin" filterOption={(input, option) =>
+        option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+      }>
                                 {Array.isArray(adminList) ? (
                         adminList?.map((admin) => (
                           <Select.Option 
@@ -777,7 +842,9 @@ return(
                                 
                                 <Col md={12}>
                                 <Form.Item name="distributor_id" label="Distributor" size="small" initialValue="" rules={[{required:true,message:'Admin Value is Required!'}]}>
-                                <Select showSearch onChange={currentDealerList} size="small" placeholder="Distributor">
+                                <Select  showSearch onChange={currentDealerList} size="small" placeholder="Distributor" optionFilterProp="children"  filterOption={(input, option) =>
+        option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+      }>
                                 
                                 {Array.isArray(distributorList) ? (
                         distributorList?.map((distributor) => (
@@ -800,10 +867,12 @@ return(
                               {(role_id==1 || role_id==2 || role_id==3) && (
                                 
                                 <Col md={12}>
-                                <Form.Item name="dealer_id" label="Dealer" size="small" initialValue="" rules={[{required:true,message:'Admin Value is Required!'}]}>
+                                <Form.Item name="dealer_id" label="Dealer" size="small" initialValue="" rules={[{required:true,message:'Dealer Value is Required!'}]}>
                                 {dealerLoading ? (
         <Spin size="large" />
-      ) : (<Select showSearch onChange={changeDealer} placeholder="Dealer">
+      ) : (<Select showSearch onChange={changeDealer} placeholder="Dealer" optionFilterProp="children"  filterOption={(input, option) =>
+        option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+      }>
       {Array.isArray(dealerList) ? (
 dealerList?.map((dealer) => (
 <Select.Option 
@@ -824,8 +893,10 @@ dealerList?.map((dealer) => (
                               )}
                               {(role_id==1 || role_id==2 || role_id==3 || role_id==4) && (
                                 <Col md={12}>
-                                <Form.Item name="subdealer_id" label="Sub Dealer" size="small" initialValue="" rules={[{required:true,message:'Admin Value is Required!'}]}>
-                                <Select showSearch onChange={changeSubDealer} placeholder="Sub Dealer">
+                                <Form.Item name="subdealer_id" label="Sub Dealer" size="small" initialValue="" rules={[{required:true,message:'Subdealer Value is Required!'}]}>
+                                <Select showSearch onChange={changeSubDealer} placeholder="Sub Dealer" optionFilterProp="children"  filterOption={(input, option) =>
+        option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+      }>
                                 {Array.isArray(subdealerList) ? (
                         subdealerList?.map((subdealer) => (
                           <Select.Option 
@@ -845,8 +916,10 @@ dealerList?.map((dealer) => (
                               )}
                               {(role_id==1 || role_id==2 || role_id==3 || role_id==4 || role_id==5 ) && (
                                 <Col md={12}>
-                                <Form.Item name="customer_id" label="Customer" size="small" initialValue="" rules={[{required:true,message:'Admin Value is Required!'}]}>
-                                <Select showSearch onChange={changeCustomer} placeholder="Customer">
+                                <Form.Item name="customer_id" label="Customer" size="small" initialValue="" rules={[{required:true,message:'Customer Value is Required!'}]}>
+                                <Select showSearch onChange={changeCustomer} placeholder="Customer" optionFilterProp="children"  filterOption={(input, option) =>
+        option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+      }>
                                 {Array.isArray(listCustomer) ? (
                         listCustomer?.map((customer) => (
                           <Select.Option 
