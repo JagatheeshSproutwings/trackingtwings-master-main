@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// const baseURL = "https://api.gpstrak.in/api/";
-const baseURL = "http://localhost/twings_api/public/api/";
+const baseURL = "https://api.gpstrak.in/api/";
+//const baseURL = "http://localhost/twings_api/public/api/";
 
 const api = axios.create({
   baseURL: baseURL,
