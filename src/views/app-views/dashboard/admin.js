@@ -197,9 +197,7 @@ const single_vehicle_live_data = () => {
       if(role_id===1)
       {
         setadminuser(true);
-        const admin_list = getUserList(currentUser);
-        SetAdminList(admin_list);
-        
+        getAdminList();
       }
       if(role_id===2)
       {
