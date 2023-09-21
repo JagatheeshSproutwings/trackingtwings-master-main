@@ -29,6 +29,7 @@ import utils from "utils";
 
 import AdminUpdate from "./admin_update";
 import CustomerUpdate from "./customer_update";
+import { faL } from "@fortawesome/free-solid-svg-icons";
 
 const { Option } = Select;
 
@@ -37,8 +38,8 @@ const Vehicle = () => {
   const [loading, setLoading] = useState(false);
   const [isComponentVisible, setIsComponentVisible] = useState(false);
 
-  // const [isComponentVisible, setIsComponentVisible] = useState(false);
-  // const [isComponentVisible, setIsComponentVisible] = useState(false);
+  const [isAdminUpdateVisible, setIsAdminUpdateVisible] = useState(false);
+  const [isCustomerUpdateVisible, setIsCustomerUpdateVisible] = useState(false);
 
   const [isConfigVisible, setIsConfigVisible] = useState(false);
 
@@ -564,8 +565,12 @@ const Vehicle = () => {
   };
 
   const handleEdit = async (record) => {
-    if (role == 6) {
+    if (currentRole == 6) {
+      setIsAdminUpdateVisible(false);
+      setIsCustomerUpdateVisible(true);
     } else {
+      setIsAdminUpdateVisible(true);
+      setIsCustomerUpdateVisible(false);
     }
   };
   const clickConfig = async () => {
@@ -658,6 +663,7 @@ const Vehicle = () => {
   const parentFunction = () => {
     setIsComponentVisible(false);
     setIsConfigVisible(false);
+    setIsAdminUpdateVisible(false);
   };
 
   const changeMutliVehicles = async (value) => {
@@ -673,6 +679,18 @@ const Vehicle = () => {
         {isConfigVisible && (
           <Configs
             parentToChild={mulitiVehicles}
+            parentFunction={parentFunction}
+          />
+        )}
+        {isAdminUpdateVisible && (
+          <AdminUpdate
+            parentToChild={editdata}
+            parentFunction={parentFunction}
+          />
+        )}
+        {isCustomerUpdateVisible && (
+          <CustomerUpdate
+            parentToChild={editdata}
             parentFunction={parentFunction}
           />
         )}

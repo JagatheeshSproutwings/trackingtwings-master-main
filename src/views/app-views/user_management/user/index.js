@@ -9,6 +9,7 @@ import {
   Form,
   Popconfirm,
   notification,
+  Drawer,
 } from "antd";
 import {
   PlusOutlined,
@@ -25,11 +26,25 @@ import Edit from "./edit";
 import Create from "./create";
 
 export const User = () => {
+  const [Createopen, setCreateDrawerOpen] = useState(false);
+  const [Editopen, setEditDrawerOpen] = useState(false);
+
+  const showCreateDrawer = () => {
+    setCreateDrawerOpen(true);
+  };
+  const onClose = () => {
+    setCreateDrawerOpen(false);
+    setEditDrawerOpen(false);
+  };
+
+  const showEditDrawer = () => {
+    setEditDrawerOpen(true);
+  };
+
   const [userList, setUserList] = useState();
   const [mainuserList, setMainUserList] = useState();
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [selectedRows, setSelectedRows] = useState([]);
   const [isCreateVisible, setIsCreateVisible] = useState(false);
   const [isEditVisible, setIsEditVisible] = useState(false);
   const [editdata, setEditData] = useState("");
@@ -42,7 +57,6 @@ export const User = () => {
   const [deleteID, setDeleteID] = useState("");
 
   const showPopconfirm = (record) => {
-    alert(record.id);
     setDeleteID(record.id);
     setOpen(true);
   };
@@ -52,7 +66,6 @@ export const User = () => {
   };
 
   const handleOk = async () => {
-    alert(deleteID);
     const data = { id: deleteID, user_id: user };
 
     try {
@@ -99,6 +112,8 @@ export const User = () => {
     setIsCreateVisible(false);
     setIsEditVisible(false);
     setUploadVisible(false);
+    setCreateDrawerOpen(false);
+    setEditDrawerOpen(false);
     loadUsers();
   };
 
@@ -133,6 +148,7 @@ export const User = () => {
   };
 
   function handleEditClick(record) {
+    showEditDrawer();
     setEditData([
       record.id,
       record.name,
@@ -240,6 +256,28 @@ export const User = () => {
 
   return (
     <>
+      <Drawer
+        width={500}
+        title="New User"
+        placement="right"
+        onClose={onClose}
+        open={Createopen}
+      >
+        <Create parentFunction={parentFunction} />
+      </Drawer>
+      <Drawer
+        width={500}
+        title="Edit User"
+        placement="right"
+        onClose={onClose}
+        open={Editopen}
+      >
+        <Edit
+          key={editdata[0]}
+          parentToChild={editdata}
+          parentFunction={parentFunction}
+        />
+      </Drawer>
       <Row gutter={6}>
         <Col sm={24} md={14} lg={14}>
           <Popconfirm
@@ -268,21 +306,23 @@ export const User = () => {
                   <div className="mb-3"></div>
                 </Flex>
                 <div className="mb-3">
-                  <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    ghost
-                    onClick={handleUploadCard}
-                  >
-                    Upload Logo
-                  </Button>
+                  {/* {role == 1 && (
+                    <Button
+                      type="primary"
+                      icon={<PlusOutlined />}
+                      ghost
+                      onClick={handleUploadCard}
+                    >
+                      Upload Logo
+                    </Button>
+                  )} */}
                 </div>
                 <div className="mb-3">
                   <Button
                     type="primary"
                     icon={<PlusOutlined />}
                     ghost
-                    onClick={handleCreateCard}
+                    onClick={showCreateDrawer}
                   >
                     Add User
                   </Button>
@@ -301,13 +341,7 @@ export const User = () => {
         </Col>
         <Col sm={24} md={10} lg={10}>
           {isCreateVisible && <Create parentFunction={parentFunction} />}
-          {isEditVisible && (
-            <Edit
-              key={editdata[0]}
-              parentToChild={editdata}
-              parentFunction={parentFunction}
-            />
-          )}
+
           {isuploadvisible && (
             <Card>
               <Flex>
