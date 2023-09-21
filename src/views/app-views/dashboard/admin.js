@@ -470,7 +470,7 @@ const single_vehicle_live_data = () => {
           const customer_vehicles = await api.post("client_multi_dashboard",customer_input).then((res)=>{ return res;}).catch((err)=>{return [];});
           if(customer_vehicles?.data?.data)
           {
-            const single_data = customer_vehicles?.data?.data.filter(item => item.device_imei == currentVehicle);
+            const single_data = customer_vehicles?.data?.data.filter(item => item.device_imei == current_vehicle);
             
             const vehicleData = single_data?.map((item) => ({
               id:item?.id,
