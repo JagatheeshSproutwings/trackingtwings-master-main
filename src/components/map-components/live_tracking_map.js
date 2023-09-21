@@ -5,6 +5,7 @@ import {
   LayersControl,
   Marker,
   Popup,
+  Polyline
 } from "react-leaflet";
 import L from "leaflet";
 import { LeafletTrackingMarker } from "react-leaflet-tracking-marker";
