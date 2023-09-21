@@ -63,9 +63,9 @@ export const Admin = () => {
   const handleTabChange = (e) => {
     const tab_value = e.target.getAttribute('value');
     console.log(tab_value);
-    setActiveKey(tab_value);
-    localStorage.setItem('current_vehicle_status',tab_value)
-    setVehicleStatus(tab_value);
+    // setActiveKey(tab_value);
+    // localStorage.setItem('current_vehicle_status',tab_value)
+    // setVehicleStatus(tab_value);
   };
   const getCurrentVehicleStatus = () => {
 
