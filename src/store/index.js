@@ -1,6 +1,7 @@
 import rootReducer from './rootReducer';
 import { configureStore } from '@reduxjs/toolkit';
-
+import { saveState, loadState } from 'loadState';
+const persistedState = loadState();
 const middlewares = [];
 
 const store = configureStore({

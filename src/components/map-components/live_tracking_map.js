@@ -39,9 +39,8 @@ export default function VehicleMarker({data}) {
   // Calculate map bounds that include all markers
   const bounds = L.latLngBounds(coordinates);
 const center = data?.length>0 ? [data[0].latitude, data[0].longtitude]:[0.0000,0.0000];
-console.log(coordinates);
   return (
-    <MapContainer center={center} bounds={coordinates[0]} zoom={4} style={{ height: '500px', width: '100%' }}>
+    <MapContainer center={center} bounds={coordinates} zoom={4} style={{ height: '300px', width: '100%' }}>
       <LayersControl>
       <LayersControl.BaseLayer checked name="Google-Street View">
         <TileLayer
@@ -64,12 +63,12 @@ console.log(coordinates);
                 />
         </LayersControl.BaseLayer>
       </LayersControl>
-
+      
       {Array.isArray(vehiclesData) ? vehiclesData?.map((vehicle) => (
         <LeafletTrackingMarker
           key={vehicle?.id}
-          position={[vehicle?.latitude, vehicle?.longtitude]}
-          duration={1000}
+          position={[vehicle?.latitude||0.0000, vehicle?.longtitude||0.0000]}
+          duration={2000}
           rotationAngle={vehicle?.angle}
           icon={createIcon(vehicle?.icon_url)} 
           keepAtCenter={true}
@@ -86,7 +85,7 @@ console.log(coordinates);
         <LeafletTrackingMarker
           key={vehiclesData?.id}
           position={[vehiclesData?.latitude, vehiclesData?.longtitude]}
-          duration={1000}
+          duration={4000}
           rotationAngle={vehiclesData?.angle}
           icon={createIcon(vehiclesData?.icon_url)} 
           keepAtCenter={true}

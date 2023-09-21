@@ -7,3 +7,12 @@
     .css-y7j3y9{
         margin-top:20px !important;
     }
+    .active_vehicle
+    {
+        background-color: lightblue;
+        border:solid 1px snow;
+    }
+    .normal_vehicle
+    {
+        background-color: white;
+    }

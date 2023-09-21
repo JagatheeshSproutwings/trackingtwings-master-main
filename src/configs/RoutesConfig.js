@@ -42,6 +42,11 @@ export const protectedRoutes = [
     path: `${APP_PREFIX_PATH}/dashboard/single_dashboard`,
     component: React.lazy(() => import("views/app-views/single_dashboard")),
   },
+  {
+    key: "dashboard.multiple",
+    path: `${APP_PREFIX_PATH}/dashboard/multi_dashboard`,
+    component: React.lazy(() => import("views/app-views/multi_dashboard")),
+  },
 
   {
     key: "reports",

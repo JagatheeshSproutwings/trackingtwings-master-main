@@ -58,40 +58,18 @@ export const Admin = () => {
   const [multiplevehiclesData,setMultiplevehiclesData] = useState([]);
   const [mapvehicleDate,setmapvehicleDate] = useState([]);
   const [singleVehicle,setSingleVehicle] = useState("");
-  const [currentVehicle,setCurrentVehicle] = useState("");
 
   const handleTabChange = (e) => {
     const tab_value = e.target.getAttribute('value');
     console.log(tab_value);
     setActiveKey(tab_value);
-    localStorage.setItem('current_vehicle_status',tab_value)
     setVehicleStatus(tab_value);
   };
-  const getCurrentVehicleStatus = () => {
-
-    return localStorage.getItem('current_vehicle_status') || "";
-  }
-  const getCurrentVehicle = () => {
-    return localStorage.getItem('current_vehicle_id') || "";
-  }
-  const getCurrentCustomer = () => {
-    return localStorage.getItem('current_customer_id') || "";
-  }
-
-const single_vehicle_live_data = () => {
-  const customer_id = getCurrentCustomer();
-  const vehicle_device_imei = getCurrentVehicle();
-  console.log(vehicle_device_imei);
-}
- 
   const SingleVehicle = async (value) => {
-    
-    localStorage.setItem('current_vehicle_id',value);
-    
-    
+    setSingleVehicle(value);
     if(value && role_id===6)
     {
-    const singlevehicles_data = await api.get("single_dashboard/"+value).then((res) => { return res;}).catch((err) => {return [];});
+    const singlevehicles_data = await api.get("single_dashboard/"+value).then((res) => { return res;}).catch((err) => {console.log(err)});
     const processedData = singlevehicles_data?.data?.data;
     // const single_map_data = Object.keys(processedData).map((key) => processedData[key]);
     // console.log(single_map_data[1]); 
@@ -120,32 +98,28 @@ const single_vehicle_live_data = () => {
 
     if(value && role_id!=6 && currentCustomerUser!='')
     {
-      
+      console.log(value);
+      console.log(currentCustomerUser);
       const customer_data = {user_id:currentCustomerUser};
       const singlevehicles_data = await api.post("client_single_dashboard",customer_data).then((res) => { return res;}).catch((err) => { return [];});
-      console.log(singlevehicles_data);
-      if(singlevehicles_data?.data)
-      {
-        const processedData = singlevehicles_data?.data?.data?.map((item) => ({
-          id:item?.id,
-          device_imei:item?.device_imei,
-          live_status:vehicle_live_status(item?.vehicle_current_status),
-          icon_url:vehicle_icon_url(item?.vehicle_current_status)+item?.short_name+'.png',
-          latitude:item.lattitute,
-          longtitude:item.longitute,
-          last_duration:item?.last_duration,
-          title: item?.vehicle_name||"TEST",
-          description:item?.device_updatedtime|| "0000-00-00 00:00:00",
-          color:vehicle_color(item?.vehicle_current_status),
-          angle:item?.angle ||0,
-          speed:item?.speed||0,
-          gps_count:20,
-          gsm_count:15,
-        }));
-  
-        setmapvehicleDate(processedData);
-      }
-      
+      const processedData = singlevehicles_data?.data?.data?.map((item) => ({
+        id:item?.id,
+        device_imei:item?.device_imei,
+        live_status:vehicle_live_status(item?.vehicle_current_status),
+        icon_url:vehicle_icon_url(item?.vehicle_current_status)+item?.short_name+'.png',
+        latitude:item.lattitute,
+        longtitude:item.longitute,
+        last_duration:item?.last_duration,
+        title: item?.vehicle_name||"TEST",
+        description:item?.device_updatedtime|| "0000-00-00 00:00:00",
+        color:vehicle_color(item?.vehicle_current_status),
+        angle:item?.angle ||0,
+        speed:item?.speed||0,
+        gps_count:20,
+        gsm_count:15,
+      }));
+
+      setmapvehicleDate(processedData);
   
     }
     
@@ -199,22 +173,6 @@ const single_vehicle_live_data = () => {
         setDistributoruser(true);
         getDistributorList();
       }
-      if(role_id===3)
-      {
-        setDistributoruser(true);
-        getDealerList();
-      }
-      if(role_id===4)
-      {
-        setDistributoruser(true);
-        getSubDealerList();
-        getCustomerList();
-      }
-      if(role_id===5)
-      {
-        setDistributoruser(true);
-        getCustomerList();
-      }
     }
     const getAdminList = async () => {
       const admin_data = { user_id: user_id};
@@ -241,8 +199,7 @@ const single_vehicle_live_data = () => {
     const getSubDealerList = async () => {
       const subdealer_data = { user_id: user_id};
       const subdealer_list = await api.post("role_based_user_list",subdealer_data).then((res) => { return res;}).catch((err) => { return [];});
-      SetSubdealerList(subdealer_list?.data?.data?.subdealer_list);
-      getCustomerList();
+      SetSubdealerList(subdealer_list?.data?.data?.user_list);
     }
     const getCustomerList = async () => {
       const customer_data = { user_id: user_id};
@@ -341,126 +298,64 @@ const single_vehicle_live_data = () => {
         }
   }
 
-    const single_vehicle_data = async () => {
-      
-      if(role_id ===6)
-      {
-        
-        console.log('working ');
-        console.log(currentVehicle);
-
-      }else{
-        if(currentVehicle!="")
-        {
-          const vehicle_data = await api.get("single_dashboard/"+currentVehicle).then((res) => { return res;}).catch((err) => { return [];});
-          console.log(vehicle_data);
-        }
-
-      }
-    
-    }
     const  vehicle_list = async (status) =>{
       
-      const current_vehicle = getCurrentVehicle();
-      const status_vehicle = getCurrentVehicleStatus();
-      
-
       if(role_id ===6)
       {
         
-        const multiple_vehicles_data = await api.get("multi_dashboard").then((res) => { return res;}).catch((err) => {return [];});
-        console.log(multiple_vehicles_data);
-        if(multiple_vehicles_data?.data?.data && status!='' )
+        const multiple_vehicles_data = await api.get("multi_dashboard").then((res) => { return res;}).catch((err) => {console.log(err)});
+        if(multiple_vehicles_data?.data?.data && status!='')
         {
-          const filteredItems = multiple_vehicles_data?.data?.data.filter(item => item.vehicle_current_status == status);
+          const filteredItems = multiple_vehicles_data?.data?.data.filter(item => item.vehicle_current_status === status);
           console.log(filteredItems);
-          if(filteredItems)
-          {
-            
-            const device_imei = current_vehicle!='' ?current_vehicle:filteredItems[0].device_imei;
-            console.log(device_imei);
-            const single_data = filteredItems.filter(item => item.device_imei == device_imei);
-            console.log(single_data);
-              const processedData = single_data?.map((item) => ({
-                id:item?.id,
-                device_imei:item?.device_imei,
-                live_status:vehicle_live_status(item?.vehicle_current_status),
-                icon_url:vehicle_icon_url(item?.vehicle_current_status)+item?.short_name+'.png',
-                latitude:item.lattitute,
-                longtitude:item.longitute,
-                last_duration:item?.last_duration,
-                title: item?.vehicle_name||"TEST",
-                description:item?.device_updatedtime|| "0000-00-00 00:00:00",
-                color:vehicle_color(item?.vehicle_current_status),
-                angle:item?.angle ||0,
-                speed:item?.speed||0,
-                gps_count:item?.gpssignal =='1'? GREEN_BASE : RED_BASE,
-                gsm_count:item?.gsm_status =='1'? GREEN_BASE : RED_BASE,
-                power_status : item?.power_status ? GREEN_BASE : RED_BASE,
-              }));
-              setMultiplevehiclesData(processedData);
-              setmapvehicleDate(processedData);
-  
-          }
+            const processedData = filteredItems?.map((item) => ({
+              id:item?.id,
+              device_imei:item?.device_imei,
+              live_status:vehicle_live_status(item?.vehicle_current_status),
+              icon_url:vehicle_icon_url(item?.vehicle_current_status)+item?.short_name+'.png',
+              latitude:item.lattitute,
+              longtitude:item.longitute,
+              last_duration:item?.last_duration,
+              title: item?.vehicle_name||"TEST",
+              description:item?.device_updatedtime|| "0000-00-00 00:00:00",
+              color:vehicle_color(item?.vehicle_current_status),
+              angle:item?.angle ||0,
+              speed:item?.speed||0,
+              gps_count:item?.gpssignal =='1'? GREEN_BASE : RED_BASE,
+              gsm_count:item?.gsm_status =='1'? GREEN_BASE : RED_BASE,
+              power_status : item?.power_status ? GREEN_BASE : RED_BASE,
+            }));
+            setMultiplevehiclesData(processedData);
+            setmapvehicleDate(processedData);
         }
         else{
           const filteredItems = multiple_vehicles_data?.data?.data;
-          if(filteredItems)
-          {
-            
-            const device_imei = current_vehicle!='' ?current_vehicle:filteredItems[0].device_imei;
-            console.log(filteredItems);
-            const single_data = filteredItems.filter(item => item.device_imei == device_imei);
-              const processedData = filteredItems?.map((item) => ({
-                
-                id:item?.id,
-                device_imei:item?.device_imei,
-                live_status:vehicle_live_status(item?.vehicle_current_status),
-                icon_url:vehicle_icon_url(item?.vehicle_current_status)+item?.short_name+'.png',
-                last_duration:item?.last_duration,
-                latitude:item?.lattitute || 0.00000,
-                longtitude:item?.longitute || 0.00000,
-                title: item?.vehicle_name||"TEST",
-                description:item?.device_updatedtime|| "0000-00-00 00:00:00",
-                device_time:item?.device_updatedtime|| "0000-00-00 00:00:00",
-                color:vehicle_color(item?.vehicle_current_status),
-                vehicle_current_status:item?.vehicle_current_status,
-                angle:item?.angle ||0,
-                speed:item?.speed||0,
-                gps_count:item?.gpssignal =='1'? GREEN_BASE : RED_BASE,
-                gsm_count:item?.gsm_status =='1'? GREEN_BASE : RED_BASE,
-                power_status : item?.power_status ? GREEN_BASE : RED_BASE,
-              }));
-              setMultiplevehiclesData(processedData);
-              const vehicleData = single_data?.map((item) => ({
-                id:item?.id,
-                device_imei:item?.device_imei,
-                live_status:vehicle_live_status(item?.vehicle_current_status),
-                icon_url:vehicle_icon_url(item?.vehicle_current_status)+item?.short_name+'.png',
-                last_duration:item?.last_duration,
-                latitude:item?.lattitute || 0.00000,
-                longtitude:item?.longitute || 0.00000,
-                title: item?.vehicle_name||"TEST",
-                description:item?.device_updatedtime|| "0000-00-00 00:00:00",
-                device_time:item?.device_updatedtime|| "0000-00-00 00:00:00",
-                color:vehicle_color(item?.vehicle_current_status),
-                vehicle_current_status:item?.vehicle_current_status,
-                angle:item?.angle ||0,
-                speed:item?.speed||0,
-                gps_count:item?.gpssignal =='1'? GREEN_BASE : RED_BASE,
-                gsm_count:item?.gsm_status =='1'? GREEN_BASE : RED_BASE,
-                power_status : item?.power_status ? GREEN_BASE : RED_BASE,
-              }));
-              console.log(single_data);
-              setmapvehicleDate(vehicleData);
-          }
-
+          
+            const processedData = filteredItems?.map((item) => ({
+              id:item?.id,
+              device_imei:item?.device_imei,
+              live_status:vehicle_live_status(item?.vehicle_current_status),
+              icon_url:vehicle_icon_url(item?.vehicle_current_status)+item?.short_name+'.png',
+              last_duration:item?.last_duration,
+              latitude:item?.lattitute || 0.00000,
+              longtitude:item?.longitute || 0.00000,
+              title: item?.vehicle_name||"TEST",
+              description:item?.device_updatedtime|| "0000-00-00 00:00:00",
+              device_time:item?.device_updatedtime|| "0000-00-00 00:00:00",
+              color:vehicle_color(item?.vehicle_current_status),
+              vehicle_current_status:item?.vehicle_current_status,
+              angle:item?.angle ||0,
+              speed:item?.speed||0,
+              gps_count:item?.gpssignal =='1'? GREEN_BASE : RED_BASE,
+              gsm_count:item?.gsm_status =='1'? GREEN_BASE : RED_BASE,
+              power_status : item?.power_status ? GREEN_BASE : RED_BASE,
+            }));
+            setMultiplevehiclesData(processedData);
+            setmapvehicleDate(processedData);
         }
           
       }
-
     } 
-
 
     useEffect(()=>{
       
@@ -469,12 +364,11 @@ const single_vehicle_live_data = () => {
       RoleBasedUserList();
       vehicle_list(vehicle_status);
       vehicle_count();
-      
-      single_vehicle_live_data();      
+      console.log(vehicle_status);
 
       const interval = setInterval(() => {
         vehicle_list(vehicle_status);
-      }, 10000);
+      }, 5000);
       return () => {
         clearInterval(interval);
        };
@@ -528,15 +422,15 @@ const single_vehicle_live_data = () => {
           },
     ];
 
-    // const tabs = [
-    //   { key: "1", tab: <p>All-{vehilcecount?.total_vehicles||0}</p>, content: <Dashboard_vehicles status={""} Customervalue={currentCustomerUser} map_vehicles_data={multiplevehiclesData} /> },
-    //   { key: "2", tab: <p>Parking -{vehilcecount?.stop||0}</p>, content: <Dashboard_vehicles status={1} Customervalue={currentCustomerUser} map_vehicles_data={multiplevehiclesData}/> },
-    //   { key: "3", tab: <p>Idle-{vehilcecount?.idle||0}</p>, content: <Dashboard_vehicles status={2} Customervalue={currentCustomerUser} map_vehicles_data={multiplevehiclesData}/>},
-    //   { key: "4", tab: <p>Moving-{vehilcecount?.running||0}</p>, content: <Dashboard_vehicles status={3} Customervalue={currentCustomerUser} map_vehicles_data={multiplevehiclesData}/> },
-    //   { key: "5", tab: <p>No Data-{vehilcecount?.no_data||0}</p>, content: <Dashboard_vehicles status={4} Customervalue={currentCustomerUser} map_vehicles_data={multiplevehiclesData}/> },
-    //   { key: "6", tab: <p>Inactive-{vehilcecount?.inactive||0}</p>, content: <Dashboard_vehicles status={5} Customervalue={currentCustomerUser} map_vehicles_data={multiplevehiclesData}/> },
-    //   { key: "7", tab: <p>Expired-{vehilcecount?.expired||0}</p>, content: <Dashboard_vehicles status={6} Customervalue={currentCustomerUser} map_vehicles_data={multiplevehiclesData}/> },
-    // ];
+    const tabs = [
+      { key: "1", tab: <p>All-{vehilcecount?.total_vehicles||0}</p>, content: <Dashboard_vehicles status={""} Customervalue={currentCustomerUser} map_vehicles_data={multiplevehiclesData} /> },
+      { key: "2", tab: <p>Parking -{vehilcecount?.stop||0}</p>, content: <Dashboard_vehicles status={1} Customervalue={currentCustomerUser} map_vehicles_data={multiplevehiclesData}/> },
+      { key: "3", tab: <p>Idle-{vehilcecount?.idle||0}</p>, content: <Dashboard_vehicles status={2} Customervalue={currentCustomerUser} map_vehicles_data={multiplevehiclesData}/>},
+      { key: "4", tab: <p>Moving-{vehilcecount?.running||0}</p>, content: <Dashboard_vehicles status={3} Customervalue={currentCustomerUser} map_vehicles_data={multiplevehiclesData}/> },
+      { key: "5", tab: <p>No Data-{vehilcecount?.no_data||0}</p>, content: <Dashboard_vehicles status={4} Customervalue={currentCustomerUser} map_vehicles_data={multiplevehiclesData}/> },
+      { key: "6", tab: <p>Inactive-{vehilcecount?.inactive||0}</p>, content: <Dashboard_vehicles status={5} Customervalue={currentCustomerUser} map_vehicles_data={multiplevehiclesData}/> },
+      { key: "7", tab: <p>Expired-{vehilcecount?.expired||0}</p>, content: <Dashboard_vehicles status={6} Customervalue={currentCustomerUser} map_vehicles_data={multiplevehiclesData}/> },
+    ];
 
     const currentDistributorList = async (value) => {
       SetDealerList([]); 
@@ -625,46 +519,37 @@ const single_vehicle_live_data = () => {
       setCurrentCustomerList(user_list?.data?.data?.user_list);
     }
     const changeCustomer = async (value) => {
-      
+      console.log(vehicle_status);
       setActiveKey(activeKey);
       SetSelectedCustomer(value);
       setCurrentCustomerUser(value);
-      const status_vehicle = getCurrentVehicleStatus();
-      const current_vehicle = getCurrentVehicle();
       const customer_input = {user_id:value};
       const customer_vehicles = await api.post("client_multi_dashboard",customer_input).then((res)=>{ return res;}).catch((err)=>{return [];});
        console.log(customer_vehicles);
-       if(customer_vehicles?.data?.data && status_vehicle!='')
+       if(customer_vehicles?.data?.data && vehicle_status!='')
         {
-          const filteredItems = customer_vehicles?.data?.data.filter(item => item.vehicle_current_status === status_vehicle);
-          if(filteredItems)
-          {
-            
-            const device_imei = current_vehicle!=''?current_vehicle:filteredItems[0].device_imei;
-            const single_vehicle_data = customer_vehicles?.data?.data.filter(item => item.device_imei === device_imei);
-            const processedData = single_vehicle_data?.map((item) => ({
-                id:item?.id,
-                device_imei:item?.device_imei,
-                live_status:vehicle_live_status(item?.vehicle_current_status),
-                icon_url:vehicle_icon_url(item?.vehicle_current_status)+item?.short_name+'.png',
-                last_duration:item?.last_duration,
-                latitude:item?.lattitute || 0.00000,
-                longtitude:item?.longitute || 0.00000,
-                title: item?.vehicle_name||"TEST",
-                description:item?.device_updatedtime|| "0000-00-00 00:00:00",
-                device_time:item?.device_updatedtime|| "0000-00-00 00:00:00",
-                color:vehicle_color(item?.vehicle_current_status),
-                vehicle_current_status:item?.vehicle_current_status,
-                angle:item?.angle ||0,
-                speed:item?.speed||0,
-                gps_count:item?.gpssignal =='1'? GREEN_BASE : RED_BASE,
-              gsm_count:item?.gsm_status =='1'? GREEN_BASE : RED_BASE,
-              power_status : item?.power_status ? GREEN_BASE : RED_BASE,
-              }));
-            setMultiplevehiclesData(processedData);
-            setmapvehicleDate(processedData);
-  
-          }
+          const filteredItems = customer_vehicles?.data?.data.filter(item => item.vehicle_current_status === vehicle_status);
+          const processedData = filteredItems?.map((item) => ({
+              id:item?.id,
+              device_imei:item?.device_imei,
+              live_status:vehicle_live_status(item?.vehicle_current_status),
+              icon_url:vehicle_icon_url(item?.vehicle_current_status)+item?.short_name+'.png',
+              last_duration:item?.last_duration,
+              latitude:item?.lattitute || 0.00000,
+              longtitude:item?.longitute || 0.00000,
+              title: item?.vehicle_name||"TEST",
+              description:item?.device_updatedtime|| "0000-00-00 00:00:00",
+              device_time:item?.device_updatedtime|| "0000-00-00 00:00:00",
+              color:vehicle_color(item?.vehicle_current_status),
+              vehicle_current_status:item?.vehicle_current_status,
+              angle:item?.angle ||0,
+              speed:item?.speed||0,
+              gps_count:item?.gpssignal =='1'? GREEN_BASE : RED_BASE,
+            gsm_count:item?.gsm_status =='1'? GREEN_BASE : RED_BASE,
+            power_status : item?.power_status ? GREEN_BASE : RED_BASE,
+            }));
+          setMultiplevehiclesData(processedData);
+          setmapvehicleDate(processedData);
         }else{
           const filteredItems = customer_vehicles?.data?.data;
           
@@ -688,29 +573,7 @@ const single_vehicle_live_data = () => {
             power_status : item?.power_status ? GREEN_BASE : RED_BASE,
         }));
             setMultiplevehiclesData(processedData);
-            
-            const device_imei = currentVehicle!=''?currentVehicle:filteredItems[0].device_imei;
-            const single_vehicle_data = customer_vehicles?.data?.data.filter(item => item.device_imei === device_imei);
-            const singleData = single_vehicle_data?.map((item) => ({
-              id:item?.id,
-              device_imei:item?.device_imei,
-              live_status:vehicle_live_status(item?.vehicle_current_status),
-              icon_url:vehicle_icon_url(item?.vehicle_current_status)+item?.short_name+'.png',
-              last_duration:item?.last_duration,
-              latitude:item?.lattitute || 0.00000,
-              longtitude:item?.longitute || 0.00000,
-              title: item?.vehicle_name||"TEST",
-              description:item?.device_updatedtime|| "0000-00-00 00:00:00",
-              device_time:item?.device_updatedtime|| "0000-00-00 00:00:00",
-              color:vehicle_color(item?.vehicle_current_status),
-              vehicle_current_status:item?.vehicle_current_status,
-              angle:item?.angle ||0,
-              speed:item?.speed||0,
-              gps_count:item?.gpssignal =='1'? GREEN_BASE : RED_BASE,
-              gsm_count:item?.gsm_status =='1'? GREEN_BASE : RED_BASE,
-              power_status : item?.power_status ? GREEN_BASE : RED_BASE,
-          }));
-            setmapvehicleDate(singleData);
+            setmapvehicleDate(processedData);
         }
       // Set vehicle count 
       const customer_data = {user_id:value};
@@ -872,7 +735,7 @@ dealerList?.map((dealer) => (
                             <StickyContainer style={{padding:0,margin:0}}>
                               <Col sm={24} md={24} lg={24}>
                                <Row>
-                               <Col md={4}  style={{border:'1px solid',textAlign:'center',margin:'0px'}} value="" onClick={handleTabChange}><p style={{fontSize:'10px',margin:'0px'}} value="" >All</p><p style={{backgroundColor:'#0dcaf0',margin:'0px',color:'white'}}>{vehilcecount?.total_vehicles||0}</p></Col>
+                               <Col md={4} style={{border:'1px solid',textAlign:'center',margin:'0px'}} value="" onClick={handleTabChange}><p style={{fontSize:'10px',margin:'0px'}} value="" >All</p><p style={{backgroundColor:'#0dcaf0',margin:'0px',color:'white'}}>{vehilcecount?.total_vehicles||0}</p></Col>
                               <Col md={4} style={{border:'1px solid',textAlign:'center',margin:'0px'}} value="1" onClick={handleTabChange}><p style={{fontSize:'10px',margin:'0px'}} value="1" >Parking</p><p style={{backgroundColor:'#0d6efd',margin:'0px',color:'white'}}>{vehilcecount?.stop||0}</p></Col>
                               <Col md={4} style={{border:'1px solid',textAlign:'center',margin:'0px'}} value="2" onClick={handleTabChange}><p style={{fontSize:'10px',margin:'0px'}} value="2" >Idle</p><p style={{backgroundColor:'#ffc107',margin:'0px',color:'white'}}>{vehilcecount?.idle||0}</p></Col>
                               <Col md={4} style={{border:'1px solid',textAlign:'center',margin:'0px'}} value="3" onClick={handleTabChange}><p style={{fontSize:'10px',margin:'0px'}} value="3" >Moving</p><p style={{backgroundColor:'#20c997',margin:'0px',color:'white'}}>{vehilcecount?.running||0}</p></Col>
@@ -889,19 +752,19 @@ dealerList?.map((dealer) => (
                                 </Tabs>
                               ))}
                             </Tabs> */}
-                             {/* <Search
+                             <Search
       placeholder="Search Vehicle.."
       options = {multiplevehiclesData}
       onChange={onSearch}
       allowClear
       
-    /> */}
+    />
     <List style={{padding:'1px',margin:'1px',fontSize:'10px',height:'300px',border:'1px',overflow: 'auto'}}
     itemLayout="horizontal"
     size='small'
     dataSource={multiplevehiclesData}
     renderItem={item => (
-      <List.Item   onClick={() => SingleVehicle(item?.device_imei)}  value={item?.id} actions={[ <a key="list-loadmore-more"><FontAwesomeIcon icon={faEllipsisVertical} style={{fontSize: '15px',padding:'0',color:GREEN_BASE}}/></a>]}>
+      <List.Item onClick={() => SingleVehicle(item?.device_imei)} value={item?.id} actions={[ <a key="list-loadmore-more"><FontAwesomeIcon icon={faEllipsisVertical} style={{fontSize: '15px',padding:'0',color:GREEN_BASE}}/></a>]}>
         <List.Item.Meta
           avatar={ <Avatar size="small"  style={{backgroundColor:'transparent'}} icon={<CarFilled style={{ fontSize: '20px',padding:'0',color: item.color } }/>}/>}
           title={<span style={{fontSize:'12px'}}>{item.title}</span>}
@@ -930,9 +793,9 @@ dealerList?.map((dealer) => (
       </List.Item>
     )}
   />
-</StickyContainer>
-</Card>
-</Col>
+                          </StickyContainer>
+                        </Card>
+                    </Col>
                     <Col sm={12} md={18} lg={18}>
                     <Button className='active' danger>Map</Button>
                     <Button>Charts</Button>
