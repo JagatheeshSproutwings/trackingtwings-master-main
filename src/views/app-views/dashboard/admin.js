@@ -17,7 +17,8 @@ import NoNetworkVehicles from 'components/map-components/noNetworkVehicles';
 import ExpiryVehicles from 'components/map-components/expiryVehicles';
 import TrackingMarker from 'components/map-components/trackingMarker';
 import Dashboard_vehicles from 'components/map-components/dashboard_vehicles'
-import api from 'configs/apiConfig';
+import persistedApi from 'configs/persistedApi';
+import api from "configs/apiConfig";
 import TestMovement from 'components/map-components/TestLiveTrack';
 import LiveTracking from 'components/map-components/live_tracking_map'
 import 'assets/styles/form_item.css'
@@ -49,9 +50,11 @@ export const Admin = () => {
   const [subdealerLoading,setSubdealerLoading] = useState(false);
   const [customerLoading,setCustomerLoading] = useState(false);
   const [currentCustomerUser,setCurrentCustomerUser] = useState("");
-  const token = useSelector((state) => state.auth);
-  const role_id = token?.user_info?.role_id;
-  const user_id = token?.user_info?.id;
+  const {token} = useSelector((state) => state.auth);
+  const {user_info} = useSelector((state) => state.auth);
+  console.log(user_info);
+  const role_id = user_info?.role_id;
+  const user_id = user_info?.id;
   const [activeKey, setActiveKey] = useState("1"); 
   const [vehilcecount,setvehiclecount] = useState([]);
   const [vehicleDisplayType,setvehicleDisplayType] = useState(1);
@@ -63,9 +66,9 @@ export const Admin = () => {
   const handleTabChange = (e) => {
     const tab_value = e.target.getAttribute('value');
     console.log(tab_value);
-    // setActiveKey(tab_value);
-    // localStorage.setItem('current_vehicle_status',tab_value)
-    // setVehicleStatus(tab_value);
+    setActiveKey(tab_value);
+    localStorage.setItem('current_vehicle_status',tab_value)
+    setVehicleStatus(tab_value);
   };
   const getCurrentVehicleStatus = () => {
 
@@ -88,11 +91,13 @@ const single_vehicle_live_data = () => {
   const SingleVehicle = async (value) => {
     
     localStorage.setItem('current_vehicle_id',value);
-    const current_vehicle_id = getCurrentVehicle();
     
+    const current_vehicle_id = getCurrentVehicle();
+    console.log(currentVehicle);
     if(value && role_id===6)
     {
-    const singlevehicles_data = await api.get("single_dashboard/"+value).then((res) => { return res;}).catch((err) => {return [];});
+    try {
+      const singlevehicles_data = await api.get("single_dashboard/"+value).then((res) => { return res;}).catch((err) => {return [];});
     const processedData = singlevehicles_data?.data?.data;
     // const single_map_data = Object.keys(processedData).map((key) => processedData[key]);
     // console.log(single_map_data[1]); 
@@ -117,6 +122,10 @@ const single_vehicle_live_data = () => {
     }];
     console.log(Array.isArray(mapData)?'True':'False');
     setmapvehicleDate(mapData);
+    } catch (error) {
+      console.error("Error Fetching Vehicle Data");
+    }
+    
     }
 
 
@@ -130,7 +139,7 @@ const single_vehicle_live_data = () => {
       if(singlevehicles_data?.data?.data)
       {
        
-        const vehicle_data = singlevehicles_data?.data?.data.filter(item => item.device_imei === current_vehicle_id);
+        const vehicle_data = singlevehicles_data?.data?.data.filter(item => item.device_imei === currentVehicle);
          
         const processedData = vehicle_data.map((item) => ({
           id:item?.id,
@@ -369,8 +378,8 @@ const single_vehicle_live_data = () => {
       const current_vehicle = getCurrentVehicle();
       const status_vehicle = getCurrentVehicleStatus();
       
-
-      if(role_id ===6)
+      try {
+        if(role_id ===6)
       {
         
         const multiple_vehicles_data = await api.get("multi_dashboard").then((res) => { return res;}).catch((err) => {return [];});
@@ -519,6 +528,10 @@ const single_vehicle_live_data = () => {
 
         }
       }
+      } catch (error) {
+        console.error("Error Listing.");
+      }
+      
 
     } 
 
@@ -591,8 +604,8 @@ const single_vehicle_live_data = () => {
 
     const tabs = [
       {key:"1",tab:"Map",content:'<Table></Table>'},
-      {key:"2",tab:"Chart",content:'<Table></Table>'},
-      {key:"3",tab:"Table",content:'<Table></Table>'},
+      {key:"1",tab:"Map",content:'<Table></Table>'},
+      {key:"1",tab:"Map",content:'<Table></Table>'},
     ];
     // const tabs = [
     //   { key: "1", tab: <p>All-{vehilcecount?.total_vehicles||0}</p>, content: <Dashboard_vehicles status={""} Customervalue={currentCustomerUser} map_vehicles_data={multiplevehiclesData} /> },
@@ -952,7 +965,7 @@ dealerList?.map((dealer) => (
                               <Col md={4} style={{border:'1px solid',textAlign:'center',margin:'0px'}} value="1" onClick={handleTabChange}><p style={{fontSize:'10px',margin:'0px'}} value="1" >Parking</p><p style={{backgroundColor:'#0d6efd',margin:'0px',color:'white'}}>{vehilcecount?.stop||0}</p></Col>
                               <Col md={4} style={{border:'1px solid',textAlign:'center',margin:'0px'}} value="2" onClick={handleTabChange}><p style={{fontSize:'10px',margin:'0px'}} value="2" >Idle</p><p style={{backgroundColor:'#ffc107',margin:'0px',color:'white'}}>{vehilcecount?.idle||0}</p></Col>
                               <Col md={4} style={{border:'1px solid',textAlign:'center',margin:'0px'}} value="3" onClick={handleTabChange}><p style={{fontSize:'10px',margin:'0px'}} value="3" >Moving</p><p style={{backgroundColor:'#20c997',margin:'0px',color:'white'}}>{vehilcecount?.running||0}</p></Col>
-                              <Col md={4} style={{border:'1px solid',textAlign:'center',margin:'0px'}} value="4" onClick={handleTabChange}><p style={{fontSize:'10px',margin:'0px'}} value="4" >NoData</p><p style={{backgroundColor:'#dc3545',margin:'0px',color:'white'}}>{vehilcecount?.no_data||0}</p></Col>
+                              <Col md={4} style={{border:'1px solid',textAlign:'center',margin:'0px'}} value="4" onClick={handleTabChange}><p style={{fontSize:'10px',margin:'0px'}} value="4" >No Data</p><p style={{backgroundColor:'#dc3545',margin:'0px',color:'white'}}>{vehilcecount?.no_data||0}</p></Col>
                               <Col md={4} style={{border:'1px solid',textAlign:'center',margin:'0px'}} value="5" onClick={handleTabChange}><p style={{fontSize:'10px',margin:'0px'}} value="5" >Inactive</p><p style={{backgroundColor:'#888d9599',margin:'0px',color:'white'}}>{vehilcecount?.inactive||0}</p></Col>
                               </Row> 
                               
@@ -972,12 +985,12 @@ dealerList?.map((dealer) => (
       allowClear
       
     /> */}
-    <List style={{padding:'1px',margin:'1px',fontSize:'10px',height:'300px',border:'1px',overflow: 'auto'}}
+    <List style={{padding:'1px',margin:'1px',fontSize:'10px',height:'700px',border:'1px',overflow: 'auto'}}
     itemLayout="horizontal"
     size='small'
     dataSource={multiplevehiclesData}
     renderItem={item => (
-      <List.Item   onClick={() => SingleVehicle(item?.device_imei)}  value={item?.id} actions={[ <a key="list-loadmore-more"><FontAwesomeIcon icon={faEllipsisVertical} style={{fontSize: '15px',padding:'0',color:GREEN_BASE}}/></a>]}>
+      <List.Item  className='{curr}' onClick={() => SingleVehicle(item?.device_imei)}  value={item?.id} actions={[ <a key="list-loadmore-more"><FontAwesomeIcon icon={faEllipsisVertical} style={{fontSize: '15px',padding:'0',color:GREEN_BASE}}/></a>]}>
         <List.Item.Meta
           avatar={ <Avatar size="small"  style={{backgroundColor:'transparent'}} icon={<CarFilled style={{ fontSize: '20px',padding:'0',color: item.color } }/>}/>}
           title={<span style={{fontSize:'12px'}}>{item.title}</span>}
@@ -1007,16 +1020,12 @@ dealerList?.map((dealer) => (
     )}
   />
 </StickyContainer>
-                        </Card>
-                    </Col>
-
+</Card>
+</Col>
                     <Col sm={12} md={18} lg={18}>
-
-                    <Button className='active' danger>Map</Button>
-                    <Button>Charts</Button>
-                    <Button>Table</Button>
+                    
                     <LiveTracking data={mapvehicleDate}/>
-                    <p><Table></Table></p>
+                    
                     </Col>
                 </Row>
             </Col>
