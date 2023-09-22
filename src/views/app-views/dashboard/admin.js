@@ -55,6 +55,7 @@ export const Admin = () => {
   console.log(user_info);
   const role_id = user_info?.role_id;
   const user_id = user_info?.id;
+  
   const [activeKey, setActiveKey] = useState("1"); 
   const [vehilcecount,setvehiclecount] = useState([]);
   const [vehicleDisplayType,setvehicleDisplayType] = useState(1);
@@ -80,12 +81,12 @@ export const Admin = () => {
   const getCurrentCustomer = () => {
     return localStorage.getItem('current_customer_id') || "";
   }
-
+  const live_vehicle = getCurrentVehicle();
 const single_vehicle_live_data = () => {
   const customer_id = getCurrentCustomer();
   const vehicle_device_imei = getCurrentVehicle();
   setCurrentVehicle(vehicle_device_imei);
-  console.log(vehicle_device_imei);
+  console.log('Current vehicle Data :'+vehicle_device_imei);
 }
  
   const SingleVehicle = async (value) => {
@@ -414,10 +415,11 @@ const single_vehicle_live_data = () => {
               }));
               setMultiplevehiclesData(processedData);
               setmapvehicleDate(processedData);
-  
+              
           }
         }
         else{
+          
           const filteredItems = multiple_vehicles_data?.data?.data;
           if(filteredItems)
           {
@@ -467,7 +469,8 @@ const single_vehicle_live_data = () => {
               }));
               console.log(single_data);
               setmapvehicleDate(vehicleData);
-          }
+              
+            }
 
         }
           
@@ -990,7 +993,7 @@ dealerList?.map((dealer) => (
     size='small'
     dataSource={multiplevehiclesData}
     renderItem={item => (
-      <List.Item  className='{curr}' onClick={() => SingleVehicle(item?.device_imei)}  value={item?.id} actions={[ <a key="list-loadmore-more"><FontAwesomeIcon icon={faEllipsisVertical} style={{fontSize: '15px',padding:'0',color:GREEN_BASE}}/></a>]}>
+      <List.Item  className={item?.device_imei==live_vehicle?"active_vehicle":"normal_vehicle"} onClick={() => SingleVehicle(item?.device_imei)}  value={item?.id} actions={[ <a key="list-loadmore-more"><FontAwesomeIcon icon={faEllipsisVertical} style={{fontSize: '15px',padding:'0',color:GREEN_BASE}}/></a>]}>
         <List.Item.Meta
           avatar={ <Avatar size="small"  style={{backgroundColor:'transparent'}} icon={<CarFilled style={{ fontSize: '20px',padding:'0',color: item.color } }/>}/>}
           title={<span style={{fontSize:'12px'}}>{item.title}</span>}
@@ -1023,9 +1026,9 @@ dealerList?.map((dealer) => (
 </Card>
 </Col>
                     <Col sm={12} md={18} lg={18}>
-                    
+                    {loading?(<Spin></Spin>):
                     <LiveTracking data={mapvehicleDate}/>
-                    
+    }
                     </Col>
                 </Row>
             </Col>
