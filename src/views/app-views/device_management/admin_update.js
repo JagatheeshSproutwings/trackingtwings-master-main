@@ -40,13 +40,14 @@ const AdminUpdate = ({ parentToChild, ...props }) => {
 
   const onSubmit = async (values) => {
     try {
-      await api.post("config/store", values);
+      values["id"] = parentToChild["id"];
+      await api.post("customer_vehicle_update", values);
       form.resetFields();
       props.parentFunction();
       openNotification(
         "success",
         "Vehicle",
-        "Vehicle Settings Saved Successfully!"
+        "Vehicle Settings Updated Successfully!"
       );
       handleOk();
     } catch (error) {
@@ -68,6 +69,8 @@ const AdminUpdate = ({ parentToChild, ...props }) => {
       });
     SetVehicleTypeList(vehicle_type_list?.data?.data);
   };
+
+  console.log(parentToChild);
 
   return (
     <Row gutter={6}>
@@ -92,6 +95,7 @@ const AdminUpdate = ({ parentToChild, ...props }) => {
                 <Row gutter={[6, 6]}>
                   <Col sm={24} md={24} lg={24}>
                     <Form.Item
+                      initialValue={parentToChild["vehicle_type_id"]}
                       label="Vehicle Type"
                       name="vehicle_type_id"
                       rules={[
@@ -104,6 +108,7 @@ const AdminUpdate = ({ parentToChild, ...props }) => {
                       <Select
                         showSearch
                         allowClear
+                        value={parentToChild["id"]}
                         placeholder="Select Vehicle Type"
                         optionFilterProp="children"
                         filterOption={(input, option) =>
@@ -134,6 +139,7 @@ const AdminUpdate = ({ parentToChild, ...props }) => {
                       size="small"
                       label="Vehicle Name"
                       name="vehicle_name"
+                      initialValue={parentToChild["vehicle_name"]}
                     >
                       <Input placeholder="Vehicle Name" />
                     </Form.Item>

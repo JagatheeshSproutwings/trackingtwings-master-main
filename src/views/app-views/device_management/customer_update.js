@@ -7,6 +7,10 @@ const CustomerUpdate = ({ parentToChild, ...props }) => {
   const [form] = Form.useForm();
   const [isModalOpen, setIsModalOpen] = useState(true);
 
+  const [currentUser, SetCurrentUser] = useState(
+    localStorage.getItem("id") || ""
+  );
+
   const handleOk = () => {
     props.parentFunction();
     setIsModalOpen(false);

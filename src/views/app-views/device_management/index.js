@@ -12,6 +12,7 @@ import {
   DatePicker,
   notification,
   Spin,
+  Popconfirm,
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import api from "configs/apiConfig";
@@ -22,6 +23,7 @@ import {
   SettingTwoTone,
   SearchOutlined,
   EditTwoTone,
+  DeleteTwoTone,
 } from "@ant-design/icons";
 import Config from "./config";
 import Configs from "./configs";
@@ -29,7 +31,6 @@ import utils from "utils";
 
 import AdminUpdate from "./admin_update";
 import CustomerUpdate from "./customer_update";
-import { faL } from "@fortawesome/free-solid-svg-icons";
 
 const { Option } = Select;
 
@@ -46,9 +47,13 @@ const Vehicle = () => {
   const [mulitiVehicles, setMulitiVehicles] = useState([]);
 
   const [editdata, setEditData] = useState("");
+  const [updatedata, setUpdateData] = useState("");
+
+  const [deleteID, setDeleteID] = useState("");
 
   const dateFormat = "YYYY-MM-DD";
   const [open, setOpen] = useState(false);
+  const [deleteopen, setDeleteOpen] = useState(false);
 
   const [adminList, SetAdminList] = useState([]);
   const [distributorList, SetDistributorList] = useState([]);
@@ -520,6 +525,26 @@ const Vehicle = () => {
     },
   ];
 
+  const showPopconfirm = (record) => {
+    setDeleteID(record.id);
+    setDeleteOpen(true);
+  };
+
+  const handleCancel = () => {
+    setDeleteOpen(false);
+  };
+
+  const handleOk = async () => {
+    const data = { id: deleteID };
+    try {
+      const response = await api.post("customer_vehicle_delete", data);
+      openNotification("success", "Vehicle", "Vehicle Deleted Successfully!");
+      setDeleteOpen(false);
+      loadVehicles();
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
   const getMenu = (record) => (
     <Menu>
       <Menu.Item
@@ -528,6 +553,13 @@ const Vehicle = () => {
         onClick={() => handleEdit(record)}
       >
         Edit
+      </Menu.Item>
+      <Menu.Item
+        key="delete"
+        icon={<DeleteTwoTone />}
+        onClick={() => showPopconfirm(record)}
+      >
+        Delete
       </Menu.Item>
       <Menu.Item
         key="config"
@@ -563,12 +595,15 @@ const Vehicle = () => {
       console.error("Error fetching users:", error);
     }
   };
-
   const handleEdit = async (record) => {
     if (currentRole == 6) {
+      console.log(record);
+      setUpdateData(record);
       setIsAdminUpdateVisible(false);
       setIsCustomerUpdateVisible(true);
     } else {
+      console.log(record);
+      setUpdateData(record);
       setIsAdminUpdateVisible(true);
       setIsCustomerUpdateVisible(false);
     }
@@ -589,6 +624,7 @@ const Vehicle = () => {
         const processedData = response.data.data.map((item) => ({
           id: item.id,
           vehicle_type: item.vehicle_type,
+          vehicle_type_id: item.vehicle_type_id,
           vehicle_name: item.vehicle_name,
           sim_mob_no: item.sim_mob_no,
           device_imei: item.device_imei,
@@ -659,13 +695,13 @@ const Vehicle = () => {
     const filteredUserList = utils.wildCardSearch(searchArray, searchValue);
     setVehicleList(filteredUserList);
   };
-
   const parentFunction = () => {
     setIsComponentVisible(false);
     setIsConfigVisible(false);
     setIsAdminUpdateVisible(false);
+    setIsCustomerUpdateVisible(false);
+    loadVehicles();
   };
-
   const changeMutliVehicles = async (value) => {
     setMulitiVehicles(value);
   };
@@ -684,100 +720,110 @@ const Vehicle = () => {
         )}
         {isAdminUpdateVisible && (
           <AdminUpdate
-            parentToChild={editdata}
+            parentToChild={updatedata}
             parentFunction={parentFunction}
           />
         )}
         {isCustomerUpdateVisible && (
           <CustomerUpdate
-            parentToChild={editdata}
+            parentToChild={updatedata}
             parentFunction={parentFunction}
           />
         )}
       </div>
+      <Popconfirm
+        size="big"
+        title="User"
+        description="Are you sure to delete this user"
+        open={deleteopen}
+        placement="rightTop"
+        onConfirm={handleOk}
+        onCancel={handleCancel}
+      >
+        <Card title="Vehicle List">
+          <Flex
+            alignItems="center"
+            justifyContent="space-between"
+            mobileFlex={false}
+          ></Flex>
 
-      <Card title="Vehicle List">
-        <Flex
-          alignItems="center"
-          justifyContent="space-between"
-          mobileFlex={false}
-        ></Flex>
-
-        <Row>
-          <Col sm={3} md={6} lg={6}>
-            <Input
-              style={{
-                width: "70%",
-              }}
-              placeholder="Search"
-              prefix={<SearchOutlined />}
-              onChange={(e) => onSearch(e)}
-            />
-          </Col>
-
-          <Col sm={3} md={6} lg={6}>
-            {currentRole == 6 && (
-              <Select
-                mode="tags"
+          <Row>
+            <Col sm={3} md={6} lg={6}>
+              <Input
                 style={{
-                  width: "95%",
+                  width: "70%",
                 }}
-                placeholder="Select Vehicle"
-                onChange={changeMutliVehicles}
-                allowClear
-                showSearch
-                filterOption={(input, option) =>
-                  option.children.toLowerCase().indexOf(input.toLowerCase()) >=
-                  0
-                }
-              >
-                {Array.isArray(vehicleList) ? (
-                  vehicleList.map((vehicle) => (
-                    <Option key={vehicle.id} value={vehicle.id}>
-                      {vehicle.vehicle_name}
+                placeholder="Search"
+                prefix={<SearchOutlined />}
+                onChange={(e) => onSearch(e)}
+              />
+            </Col>
+
+            <Col sm={3} md={6} lg={6}>
+              {currentRole == 6 && (
+                <Select
+                  mode="tags"
+                  style={{
+                    width: "95%",
+                  }}
+                  placeholder="Select Vehicle"
+                  onChange={changeMutliVehicles}
+                  allowClear
+                  showSearch
+                  filterOption={(input, option) =>
+                    option.children
+                      .toLowerCase()
+                      .indexOf(input.toLowerCase()) >= 0
+                  }
+                >
+                  {Array.isArray(vehicleList) ? (
+                    vehicleList.map((vehicle) => (
+                      <Option key={vehicle.id} value={vehicle.id}>
+                        {vehicle.vehicle_name}
+                      </Option>
+                    ))
+                  ) : (
+                    <Option value="Loading" disabled>
+                      Loading...
                     </Option>
-                  ))
-                ) : (
-                  <Option value="Loading" disabled>
-                    Loading...
-                  </Option>
-                )}
-              </Select>
-            )}
-          </Col>
+                  )}
+                </Select>
+              )}
+            </Col>
 
-          <Col sm={2} md={4} lg={4}>
-            {currentRole == 6 && (
-              <Button type="primary" ghost onClick={clickConfig}>
-                Config
-              </Button>
-            )}
-          </Col>
+            <Col sm={2} md={4} lg={4}>
+              {currentRole == 6 && (
+                <Button type="primary" ghost onClick={clickConfig}>
+                  Config
+                </Button>
+              )}
+            </Col>
 
-          <Col sm={2} md={4} lg={4}></Col>
-          <Col sm={2} md={4} lg={4}>
-            {currentRole <= 5 && (
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={showDrawer}
-                ghost
-              >
-                Add Vehicle
-              </Button>
-            )}
-          </Col>
-        </Row>
+            <Col sm={2} md={4} lg={4}></Col>
+            <Col sm={2} md={4} lg={4}>
+              {currentRole <= 5 && (
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  onClick={showDrawer}
+                  ghost
+                >
+                  Add Vehicle
+                </Button>
+              )}
+            </Col>
+          </Row>
 
-        <div className="table-responsive">
-          <Table
-            bordered
-            columns={tableColumns}
-            dataSource={vehicleList}
-            rowKey="id"
-          />
-        </div>
-      </Card>
+          <div className="table-responsive">
+            <Table
+              bordered
+              columns={tableColumns}
+              dataSource={vehicleList}
+              rowKey="id"
+            />
+          </div>
+        </Card>
+      </Popconfirm>
 
       <Drawer
         placement="right"
