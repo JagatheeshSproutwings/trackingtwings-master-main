@@ -5,6 +5,7 @@ import {
   LayersControl,
   Marker,
   Popup,
+  Polyline
 } from "react-leaflet";
 import L from "leaflet";
 import { LeafletTrackingMarker } from "react-leaflet-tracking-marker";
@@ -40,7 +41,8 @@ export default function VehicleMarker({data}) {
   const bounds = L.latLngBounds(coordinates);
 const center = data?.length>0 ? [data[0].latitude, data[0].longtitude]:[0.0000,0.0000];
   return (
-    <MapContainer center={center} bounds={coordinates} zoom={4} style={{ height: '300px', width: '100%' }}>
+    
+    <MapContainer center={center} bounds={coordinates} zoom={25} style={{ height: '500px', width: '100%' }}>
       <LayersControl>
       <LayersControl.BaseLayer checked name="Google-Street View">
         <TileLayer

@@ -675,7 +675,9 @@ const Vehicle = () => {
     }
   };
   const loadPlans = async () => {
-    SetPlanList([]);
+    try
+    {
+      SetPlanList([]);
 
     const data = { user_id: currentUser };
 
@@ -688,6 +690,10 @@ const Vehicle = () => {
         return err;
       });
     SetPlanList(plan_list?.data?.data);
+    }catch(error){
+      console.error("Error fetching users:", error);
+    }
+    
   };
   const onSearch = (e) => {
     const searchValue = e.currentTarget.value;

@@ -1,5 +1,6 @@
 import fetch from "auth/FetchInterceptor";
 import api, { setTokenInHeaders } from "configs/apiConfig";
+import persistApi from "configs/persistedApi"
 
 const AuthService = {};
 

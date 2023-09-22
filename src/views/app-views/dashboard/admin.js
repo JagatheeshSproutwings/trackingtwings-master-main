@@ -17,7 +17,8 @@ import NoNetworkVehicles from 'components/map-components/noNetworkVehicles';
 import ExpiryVehicles from 'components/map-components/expiryVehicles';
 import TrackingMarker from 'components/map-components/trackingMarker';
 import Dashboard_vehicles from 'components/map-components/dashboard_vehicles'
-import api from 'configs/apiConfig';
+import persistedApi from 'configs/persistedApi';
+import api from "configs/apiConfig";
 import TestMovement from 'components/map-components/TestLiveTrack';
 import LiveTracking from 'components/map-components/live_tracking_map'
 import 'assets/styles/form_item.css'
@@ -49,9 +50,12 @@ export const Admin = () => {
   const [subdealerLoading,setSubdealerLoading] = useState(false);
   const [customerLoading,setCustomerLoading] = useState(false);
   const [currentCustomerUser,setCurrentCustomerUser] = useState("");
-  const token = useSelector((state) => state.auth);
-  const role_id = token?.user_info?.role_id;
-  const user_id = token?.user_info?.id;
+  const {token} = useSelector((state) => state.auth);
+  const {user_info} = useSelector((state) => state.auth);
+  console.log(user_info);
+  const role_id = user_info?.role_id;
+  const user_id = user_info?.id;
+  
   const [activeKey, setActiveKey] = useState("1"); 
   const [vehilcecount,setvehiclecount] = useState([]);
   const [vehicleDisplayType,setvehicleDisplayType] = useState(1);
@@ -77,22 +81,24 @@ export const Admin = () => {
   const getCurrentCustomer = () => {
     return localStorage.getItem('current_customer_id') || "";
   }
-
+  const live_vehicle = getCurrentVehicle();
 const single_vehicle_live_data = () => {
   const customer_id = getCurrentCustomer();
   const vehicle_device_imei = getCurrentVehicle();
   setCurrentVehicle(vehicle_device_imei);
-  console.log(vehicle_device_imei);
+  console.log('Current vehicle Data :'+vehicle_device_imei);
 }
  
   const SingleVehicle = async (value) => {
     
     localStorage.setItem('current_vehicle_id',value);
-    const current_vehicle_id = getCurrentVehicle();
     
+    const current_vehicle_id = getCurrentVehicle();
+    console.log(currentVehicle);
     if(value && role_id===6)
     {
-    const singlevehicles_data = await api.get("single_dashboard/"+value).then((res) => { return res;}).catch((err) => {return [];});
+    try {
+      const singlevehicles_data = await api.get("single_dashboard/"+value).then((res) => { return res;}).catch((err) => {return [];});
     const processedData = singlevehicles_data?.data?.data;
     // const single_map_data = Object.keys(processedData).map((key) => processedData[key]);
     // console.log(single_map_data[1]); 
@@ -117,6 +123,10 @@ const single_vehicle_live_data = () => {
     }];
     console.log(Array.isArray(mapData)?'True':'False');
     setmapvehicleDate(mapData);
+    } catch (error) {
+      console.error("Error Fetching Vehicle Data");
+    }
+    
     }
 
 
@@ -130,7 +140,7 @@ const single_vehicle_live_data = () => {
       if(singlevehicles_data?.data?.data)
       {
        
-        const vehicle_data = singlevehicles_data?.data?.data.filter(item => item.device_imei === current_vehicle_id);
+        const vehicle_data = singlevehicles_data?.data?.data.filter(item => item.device_imei === currentVehicle);
          
         const processedData = vehicle_data.map((item) => ({
           id:item?.id,
@@ -197,9 +207,7 @@ const single_vehicle_live_data = () => {
       if(role_id===1)
       {
         setadminuser(true);
-        const admin_list = getUserList(currentUser);
-        SetAdminList(admin_list);
-        
+        getAdminList();
       }
       if(role_id===2)
       {
@@ -371,8 +379,8 @@ const single_vehicle_live_data = () => {
       const current_vehicle = getCurrentVehicle();
       const status_vehicle = getCurrentVehicleStatus();
       
-
-      if(role_id ===6)
+      try {
+        if(role_id ===6)
       {
         
         const multiple_vehicles_data = await api.get("multi_dashboard").then((res) => { return res;}).catch((err) => {return [];});
@@ -407,10 +415,11 @@ const single_vehicle_live_data = () => {
               }));
               setMultiplevehiclesData(processedData);
               setmapvehicleDate(processedData);
-  
+              
           }
         }
         else{
+          
           const filteredItems = multiple_vehicles_data?.data?.data;
           if(filteredItems)
           {
@@ -460,7 +469,8 @@ const single_vehicle_live_data = () => {
               }));
               console.log(single_data);
               setmapvehicleDate(vehicleData);
-          }
+              
+            }
 
         }
           
@@ -472,7 +482,7 @@ const single_vehicle_live_data = () => {
           const customer_vehicles = await api.post("client_multi_dashboard",customer_input).then((res)=>{ return res;}).catch((err)=>{return [];});
           if(customer_vehicles?.data?.data)
           {
-            const single_data = customer_vehicles?.data?.data.filter(item => item.device_imei == currentVehicle);
+            const single_data = customer_vehicles?.data?.data.filter(item => item.device_imei == current_vehicle);
             
             const vehicleData = single_data?.map((item) => ({
               id:item?.id,
@@ -521,6 +531,10 @@ const single_vehicle_live_data = () => {
 
         }
       }
+      } catch (error) {
+        console.error("Error Listing.");
+      }
+      
 
     } 
 
@@ -591,6 +605,11 @@ const single_vehicle_live_data = () => {
           },
     ];
 
+    const tabs = [
+      {key:"1",tab:"Map",content:'<Table></Table>'},
+      {key:"1",tab:"Map",content:'<Table></Table>'},
+      {key:"1",tab:"Map",content:'<Table></Table>'},
+    ];
     // const tabs = [
     //   { key: "1", tab: <p>All-{vehilcecount?.total_vehicles||0}</p>, content: <Dashboard_vehicles status={""} Customervalue={currentCustomerUser} map_vehicles_data={multiplevehiclesData} /> },
     //   { key: "2", tab: <p>Parking -{vehilcecount?.stop||0}</p>, content: <Dashboard_vehicles status={1} Customervalue={currentCustomerUser} map_vehicles_data={multiplevehiclesData}/> },
@@ -969,12 +988,12 @@ dealerList?.map((dealer) => (
       allowClear
       
     /> */}
-    <List style={{padding:'1px',margin:'1px',fontSize:'10px',height:'300px',border:'1px',overflow: 'auto'}}
+    <List style={{padding:'1px',margin:'1px',fontSize:'10px',height:'700px',border:'1px',overflow: 'auto'}}
     itemLayout="horizontal"
     size='small'
     dataSource={multiplevehiclesData}
     renderItem={item => (
-      <List.Item   onClick={() => SingleVehicle(item?.device_imei)}  value={item?.id} actions={[ <a key="list-loadmore-more"><FontAwesomeIcon icon={faEllipsisVertical} style={{fontSize: '15px',padding:'0',color:GREEN_BASE}}/></a>]}>
+      <List.Item  className={item?.device_imei==live_vehicle?"active_vehicle":"normal_vehicle"} onClick={() => SingleVehicle(item?.device_imei)}  value={item?.id} actions={[ <a key="list-loadmore-more"><FontAwesomeIcon icon={faEllipsisVertical} style={{fontSize: '15px',padding:'0',color:GREEN_BASE}}/></a>]}>
         <List.Item.Meta
           avatar={ <Avatar size="small"  style={{backgroundColor:'transparent'}} icon={<CarFilled style={{ fontSize: '20px',padding:'0',color: item.color } }/>}/>}
           title={<span style={{fontSize:'12px'}}>{item.title}</span>}
@@ -1007,11 +1026,9 @@ dealerList?.map((dealer) => (
 </Card>
 </Col>
                     <Col sm={12} md={18} lg={18}>
-                    <Button className='active' danger>Map</Button>
-                    <Button>Charts</Button>
-                    <Button>Table</Button>
+                    {loading?(<Spin></Spin>):
                     <LiveTracking data={mapvehicleDate}/>
-                    <p><Table></Table></p>
+    }
                     </Col>
                 </Row>
             </Col>

@@ -33,6 +33,7 @@
     "leaflet-marker-rotation": "^0.4.0",
     "leaflet-moving-rotated-marker": "^0.0.1",
     "Leaflet-MovingMaker": "^0.0.1",
+    "leaflet-rotatedmarker": "^0.2.0",
     "leaflet.motion": "^0.3.2",
     "lodash": "^4.17.20",
     "miragejs": "^0.1.43",
