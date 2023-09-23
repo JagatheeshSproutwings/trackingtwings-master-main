@@ -10,7 +10,7 @@
     .active_vehicle
     {
         background-color: lightblue;
-        border:solid 1px snow;
+        border:solid 2px #2eb3c5;
     }
     .normal_vehicle
     {

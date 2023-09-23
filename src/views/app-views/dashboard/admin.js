@@ -385,15 +385,16 @@ const single_vehicle_live_data = () => {
         
         const multiple_vehicles_data = await api.get("multi_dashboard").then((res) => { return res;}).catch((err) => {return [];});
         console.log(multiple_vehicles_data);
-        if(multiple_vehicles_data?.data?.data && status!='' )
+        if(multiple_vehicles_data?.data?.data && status_vehicle!='' )
         {
-          const filteredItems = multiple_vehicles_data?.data?.data.filter(item => item.vehicle_current_status == status);
-          console.log(filteredItems);
+          const filteredItems = multiple_vehicles_data?.data?.data.filter(item => item.vehicle_current_status == status_vehicle);
+          
           if(filteredItems)
           {
             
             const device_imei = current_vehicle!='' ?current_vehicle:filteredItems[0].device_imei;
             console.log(device_imei);
+            localStorage.setItem('current_vehicle_id',device_imei);
             const single_data = filteredItems.filter(item => item.device_imei == device_imei);
             console.log(single_data);
               const processedData = single_data?.map((item) => ({
@@ -413,9 +414,25 @@ const single_vehicle_live_data = () => {
                 gsm_count:item?.gsm_status =='1'? GREEN_BASE : RED_BASE,
                 power_status : item?.power_status ? GREEN_BASE : RED_BASE,
               }));
-              setMultiplevehiclesData(processedData);
+              const multipleData = filteredItems?.map((item) => ({
+                id:item?.id,
+                device_imei:item?.device_imei,
+                live_status:vehicle_live_status(item?.vehicle_current_status),
+                icon_url:vehicle_icon_url(item?.vehicle_current_status)+item?.short_name+'.png',
+                latitude:item.lattitute,
+                longtitude:item.longitute,
+                last_duration:item?.last_duration,
+                title: item?.vehicle_name||"TEST",
+                description:item?.device_updatedtime|| "0000-00-00 00:00:00",
+                color:vehicle_color(item?.vehicle_current_status),
+                angle:item?.angle ||0,
+                speed:item?.speed||0,
+                gps_count:item?.gpssignal =='1'? GREEN_BASE : RED_BASE,
+                gsm_count:item?.gsm_status =='1'? GREEN_BASE : RED_BASE,
+                power_status : item?.power_status ? GREEN_BASE : RED_BASE,
+              }));
+              setMultiplevehiclesData(multipleData);
               setmapvehicleDate(processedData);
-              
           }
         }
         else{
@@ -425,6 +442,7 @@ const single_vehicle_live_data = () => {
           {
             
             const device_imei = current_vehicle!='' ?current_vehicle:filteredItems[0].device_imei;
+            localStorage.setItem('current_vehicle_id',device_imei);
             console.log(filteredItems);
             const single_data = filteredItems.filter(item => item.device_imei == device_imei);
               const processedData = filteredItems?.map((item) => ({
@@ -484,6 +502,7 @@ const single_vehicle_live_data = () => {
           {
             const single_data = customer_vehicles?.data?.data.filter(item => item.device_imei == current_vehicle);
             
+            
             const vehicleData = single_data?.map((item) => ({
               id:item?.id,
               device_imei:item?.device_imei,
@@ -507,6 +526,7 @@ const single_vehicle_live_data = () => {
           }
           if(customer_vehicles?.data?.data)
           {
+            
             const AllvehicleData = customer_vehicles?.data?.data?.map((item) => ({
               id:item?.id,
               device_imei:item?.device_imei,
