@@ -171,6 +171,7 @@ const userManagementNavTree = [
     submenu: [],
   },
 ];
+
 const stockManagementNavTree = [
   {
     key: "stockmanagement",

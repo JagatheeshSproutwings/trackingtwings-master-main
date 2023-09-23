@@ -1,12 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  MapContainer,
-  TileLayer,
-  LayersControl,
-  Marker,
-  Popup,
-  Polyline,
-} from "react-leaflet";
+import { MapContainer, TileLayer, LayersControl, Popup } from "react-leaflet";
 import L from "leaflet";
 import { LeafletTrackingMarker } from "react-leaflet-tracking-marker";
 
@@ -24,13 +17,9 @@ export default function VehicleMarker({ data }) {
   const [vehiclesData, setVehiclesData] = useState(data || []);
 
   useEffect(() => {
-    //   const interval = setInterval(() => {
     setVehiclesData(data);
-    // }, 5000);
-    // return () => {
-    //   clearInterval(interval);
-    //  };
   }, [data]);
+
   // Extract coordinates of all vehicles
   const coordinates = vehiclesData?.map((vehicle) => [
     vehicle?.latitude,
@@ -38,9 +27,10 @@ export default function VehicleMarker({ data }) {
   ]);
 
   // Calculate map bounds that include all markers
-  const bounds = L.latLngBounds(coordinates);
   const center =
-    data?.length > 0 ? [data[0].latitude, data[0].longtitude] : [0.0, 0.0];
+    data?.length > 0
+      ? [data[0].latitude, data[0].longtitude]
+      : [11.0168, 76.9558];
   return (
     <MapContainer
       center={center}
@@ -86,11 +76,6 @@ export default function VehicleMarker({ data }) {
                 <b>Vehicle Name: </b> {vehicle?.title}
               </p>
               <p style={{ margin: 0 }}>
-                <b>Status: </b>
-                {vehicle?.live_status} ({vehicle?.last_duration || "00:00:00"})
-                HH:MM:SS{" "}
-              </p>
-              <p style={{ margin: 0 }}>
                 <b>Speed: </b> {vehicle?.speed} KMPH
               </p>
               <p style={{ margin: 0 }}>
@@ -111,11 +96,6 @@ export default function VehicleMarker({ data }) {
           <Popup>
             <p style={{ margin: 0 }}>
               <b>Vehicle Name: </b> {vehiclesData?.title}
-            </p>
-            <p style={{ margin: 0 }}>
-              <b>Status: </b>
-              {vehiclesData?.live_status} (
-              {vehiclesData?.last_duration || "00:00:00"}) HH:MM:SS{" "}
             </p>
             <p style={{ margin: 0 }}>
               <b>Speed: </b> {vehiclesData?.speed} KMPH

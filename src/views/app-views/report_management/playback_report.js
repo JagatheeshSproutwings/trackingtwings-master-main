@@ -1,54 +1,133 @@
-import React, {useState} from 'react'
-import {Table,Button,Card,Drawer,Select, Input,Form,DatePicker } from 'antd'
-import Flex from 'components/shared-components/Flex'
+import React, { useState, useEffect } from "react";
+import { Button, Card, Select, DatePicker } from "antd";
+import Flex from "components/shared-components/Flex";
+import { SearchOutlined } from "@ant-design/icons";
+import api from "configs/apiConfig";
+import LiveTrackings from "components/map-components/live_tracking_map_copy";
 
-import { PlusOutlined,FileExcelOutlined,SearchOutlined } from '@ant-design/icons';
-import utils from 'utils'
-import {MapContainer,TileLayer,Marker,Popup,LayersControl} from 'react-leaflet'
-const { Option } = Select
+const { Option } = Select;
 const { RangePicker } = DatePicker;
-const position = [11.0467, 76.9254];
-const { BaseLayer } = LayersControl;
 export const PlaybackHistory = () => {
-  const [playback_data,setplayBackData] = useState([]);
+  const [mapvehicleDate, setmapvehicleDate] = useState([]);
+  const [vehicleOptions, setVehicleOptions] = useState([]);
+  const [selectedVehicleId, setSelectedVehicleId] = useState("");
+  const [selectedDateRange, setSelectedDateRange] = useState(null);
 
-  const tableColumns = [
-    {
-      title: "S.No",
-      dataIndex: "s_no",
-    },
-    {
-      title: "Vehicle Name",
-      dataIndex: "vehicle_name",
-    },
-    {
-      title: "Start Date",
-      dataIndex: "start_date",
-    },
-    {
-      title: "End Date",
-      dataIndex: "end_date",
-    },
+  const SingleVehicle = async () => {
+    try {
+      const device_imei = "865167041351702";
+      const singlevehicles_data = await api
+        .get(`single_dashboard/${device_imei}`)
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return [];
+        });
 
-    {
-      title: "Location",
-      dataIndex: "location",
-    },
-    {
-      title: "Map View",
-      dataIndex: "map_view",
-    },
-]
-  const onFinish = values => {
-    console.log('Success:', values);
+      const processedData = singlevehicles_data?.data?.data;
+
+      const mapData = [
+        {
+          id: processedData?.id,
+          device_imei: processedData?.device_imei,
+          title: processedData?.vehicle_name || "TEST",
+          latitude: processedData?.lattitute || 0.0,
+          longtitude: processedData?.longitute || 0.0,
+          angle: processedData?.angle || 0,
+          speed: processedData?.speed || 0,
+          icon_url:
+            vehicle_icon_url(processedData?.vehicle_current_status) +
+            processedData?.short_name +
+            ".png",
+          device_time:
+            processedData?.device_updatedtime || "0000-00-00 00:00:00",
+        },
+      ];
+      // console.log(Array.isArray(mapData) ? "True" : "False");
+      setmapvehicleDate(mapData);
+    } catch (error) {
+      console.error("Error Fetching Vehicle Data");
+    }
   };
-  const DateChange = (values) =>{
-    alert("Selected Values "+values);
-}
-const Playback = (values) => {
-alert(values);
-console.log(values);
-}
+  useEffect(() => {
+    const interval = setInterval(() => {
+      SingleVehicle();
+    }, 3000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+  const vehicle_icon_url = (status) => {
+    switch (status) {
+      case 1:
+        return "/img/ICONS/BLUE/";
+        break;
+      case 2:
+        return "/img/ICONS/YELLOW/";
+        break;
+      case 3:
+        return "/img/ICONS/GREEN/";
+        break;
+      case 4:
+        return "/img/ICONS/RED/";
+        break;
+      case 5:
+        return "/img/ICONS/GRAY/";
+        break;
+      case 6:
+        return "/img/ICONS/PURPLE/";
+        break;
+      default:
+        return "/img/ICONS/GRAY/";
+        break;
+    }
+  };
+
+  const Playback = () => {
+    const data = {
+      start_day: selectedDateRange
+        ? selectedDateRange[0].format("YYYY-MM-DD HH:mm:ss")
+        : null,
+      end_day: selectedDateRange
+        ? selectedDateRange[1].format("YYYY-MM-DD HH:mm:ss")
+        : null,
+      device_imei: selectedVehicleId === "0" ? null : selectedVehicleId,
+    };
+
+    console.log("Selected Vehicle ID:", data);
+  };
+
+  const getUser = () => {
+    return localStorage.getItem("id");
+  };
+  const user = getUser();
+
+  const fetchVehicleOptions = async () => {
+    try {
+      const data = { user_id: user };
+      const response = await api.post("vehicle_list", data);
+      if (response.data.success) {
+        setVehicleOptions(response.data.data);
+      } else {
+        console.error("API request was not successful");
+      }
+    } catch (error) {
+      console.error("Error fetching vehicle options:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchVehicleOptions();
+  }, []);
+
+  const handleVehicleIdChange = (vehicleId) => {
+    setSelectedVehicleId(vehicleId);
+  };
+  const handleDateRangeChange = (dateRange) => {
+    setSelectedDateRange(dateRange);
+  };
+
   return (
     <>
       <Card title="Playback History">
@@ -58,36 +137,35 @@ console.log(values);
           mobileFlex={false}
         >
           <Flex className="mb-1" mobileFlex={false}>
-            <div className="mr-md-6 mr-3">
-              <Select
-                showSearch
-                defaultValue="Today"
-                className="w-100"
-                style={{ minWidth: 180 }}
-                onChange={DateChange}
-                name="date_selection"
-              >
-                <option value="1">Today</option>
-                <option value="2">Last 7 Days</option>
-                <option value="3">Last Month</option>
-                <option value="4">Custom</option>
-              </Select>
-            </div>
             <div className="mr-md-3 mr-3">
-              <RangePicker showTime name="date_range" onChange={DateChange} />
+              <RangePicker
+                onChange={handleDateRangeChange}
+                showTime
+                name="date_range"
+              />
             </div>
             <div className="mr-md-3 mb-3">
               <Select
-                mode="multiple"
-                name="vehicle_id"
-                onChange={DateChange}
-                defaultValue="All"
-                className="w-100"
+                showSearch
+                optionFilterProp="children"
                 style={{ minWidth: 180 }}
+                name="vehicle_id"
                 placeholder="Vehicle"
+                onChange={handleVehicleIdChange}
+                value={selectedVehicleId}
               >
-                <Option value="1">TN01AB1234</Option>
-                <Option value="2">TN02AB9874</Option>
+                {Array.isArray(vehicleOptions) ? (
+                  vehicleOptions.map((vehicle) => (
+                    <Option
+                      key={vehicle.device_imei}
+                      value={vehicle.device_imei}
+                    >
+                      {vehicle.vehicle_name}
+                    </Option>
+                  ))
+                ) : (
+                  <Option value="Loading">Loading...</Option>
+                )}
               </Select>
             </div>
 
@@ -104,33 +182,9 @@ console.log(values);
           </Flex>
         </Flex>
         <div className="table-responsive">
-          <Card>
-            <MapContainer center={position} zoom={13} scrollWheelZoom={true}>
-              <LayersControl>
-                <BaseLayer checked name="OpenStreetMap">
-                  <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  />
-                </BaseLayer>
-                <BaseLayer name="Google-Street View">
-                  <TileLayer
-                    attribution="Google Maps"
-                    url="https://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}"
-                  />
-                </BaseLayer>
-                <BaseLayer checked name="Google-Satelite">
-                  <TileLayer
-                    url="https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
-                    maxZoom={20}
-                    subdomains={["mt1", "mt2", "mt3"]}
-                  />
-                </BaseLayer>
-            </LayersControl>
-          </MapContainer>
-        </Card>
-      </div>
-    </Card>
+          <LiveTrackings data={mapvehicleDate}></LiveTrackings>
+        </div>
+      </Card>
     </>
   );
 };
