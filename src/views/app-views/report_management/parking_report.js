@@ -1,107 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Card, Select, DatePicker } from "antd";
+import { Card, Table, Button, Select, DatePicker } from "antd";
+import api from "configs/apiConfig";
 import Flex from "components/shared-components/Flex";
 import { FileExcelOutlined, SearchOutlined } from "@ant-design/icons";
-import api from "configs/apiConfig";
 import { Excel } from "antd-table-saveas-excel";
-
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
-export const ParkingReport = () => {
+const ParkingReport = ({ parentToChild, ...props }) => {
   const [parkingList, setParkingList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedDateRange, setSelectedDateRange] = useState(null);
   const [selectedVehicleId, setSelectedVehicleId] = useState("All");
   const [vehicleOptions, setVehicleOptions] = useState([]);
-
-  const getUser = () => {
-    return localStorage.getItem("id");
-  };
-
-  const user = getUser();
-
-  useEffect(() => {
-    async function fetchVehicleOptions() {
-      try {
-        const data = { user_id: user };
-
-        const response = await api.post("vehicle_list", data);
-        if (response.data.success) {
-          setVehicleOptions(response.data.data);
-        } else {
-          console.error("API request was not successful");
-        }
-      } catch (error) {
-        console.error("Error fetching vehicle options:", error);
-      }
-    }
-
-    fetchVehicleOptions();
-  }, []);
-
-  const handleDateRangeChange = (dateRange) => {
-    setSelectedDateRange(dateRange);
-  };
-
-  const handleVehicleIdChange = (vehicleId) => {
-    setSelectedVehicleId(vehicleId);
-  };
-
-  const handleSearchClick = async () => {
-    // Log the actual selected values
-    console.log("Selected Date Range:", selectedDateRange);
-    if (selectedDateRange) {
-      const [startDate, endDate] = selectedDateRange;
-      console.log("Start Date:", startDate.format("YYYY-MM-DD"));
-      console.log("End Date:", endDate.format("YYYY-MM-DD"));
-    }
-    console.log("Selected Vehicle ID:", selectedVehicleId);
-
-    const data = {
-      start_day: selectedDateRange
-        ? selectedDateRange[0].format("YYYY-MM-DD HH:mm:ss")
-        : null,
-      end_day: selectedDateRange
-        ? selectedDateRange[1].format("YYYY-MM-DD HH:mm:ss")
-        : null,
-      device_imei: selectedVehicleId === "0" ? null : selectedVehicleId,
-    };
-
-    setParkingList([]); // Clear previous data
-    setIsLoading(true);
-
-    try {
-      const parking_data = await api.post("get_parking_report", data);
-      console.log(parking_data.data);
-
-      if (parking_data.data && Array.isArray(parking_data.data.data)) {
-        const processedData = parking_data.data.data.map((item) => ({
-          s_no: item.id,
-          vehicle_name: item.vehicle_name,
-          start_date: item.start_datetime,
-          end_date: item.end_datetime,
-          location: item.start_latitude + ":" + item.start_longitude,
-          duration: item.parking_duration,
-        }));
-
-        console.log(processedData);
-
-        setParkingList(processedData);
-
-        console.log("parkingList:", parkingList);
-      } else {
-        setParkingList([]); // Clear the list when no data is found
-        console.log(
-          "Response data is not in the expected format:",
-          parking_data.data
-        );
-      }
-    } catch (err) {
-      console.error(err);
-    }
-    setIsLoading(false);
-  };
 
   const tableColumns = [
     {
@@ -134,6 +45,91 @@ export const ParkingReport = () => {
     },
   ];
 
+  const getUser = () => {
+    return localStorage.getItem("id");
+  };
+
+  const user = getUser();
+
+  const getRole = () => {
+    return localStorage.getItem("role");
+  };
+
+  const role = getRole();
+
+  useEffect(() => {
+    fetchVehicleOptions();
+  }, []);
+
+  const fetchVehicleOptions = async () => {
+    try {
+      setVehicleOptions([]);
+
+      if (role == 6) {
+        const data = { user_id: user };
+        const response = await api.post("vehicle_list", data);
+        if (response.data.success) {
+          setVehicleOptions(response.data.data);
+        } else {
+          console.error("API request was not successful");
+        }
+      } else {
+        const data = { user_id: parentToChild };
+        const response = await api.post("vehicle_list", data);
+        if (response.data.success) {
+          setVehicleOptions(response.data.data);
+        } else {
+          console.error("API request was not successful");
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching vehicle options:", error);
+    }
+  };
+
+  const handleDateRangeChange = (dateRange) => {
+    setSelectedDateRange(dateRange);
+  };
+
+  const handleVehicleIdChange = (vehicleId) => {
+    setSelectedVehicleId(vehicleId);
+  };
+
+  const handleSearchClick = async () => {
+    const data = {
+      start_day: selectedDateRange
+        ? selectedDateRange[0].format("YYYY-MM-DD HH:mm:ss")
+        : null,
+      end_day: selectedDateRange
+        ? selectedDateRange[1].format("YYYY-MM-DD HH:mm:ss")
+        : null,
+      device_imei: selectedVehicleId === "0" ? null : selectedVehicleId,
+    };
+
+    setParkingList([]); // Clear previous data
+    setIsLoading(true);
+
+    try {
+      const parking_data = await api.post("get_parking_report", data);
+
+      if (parking_data.data && Array.isArray(parking_data.data.data)) {
+        const processedData = parking_data.data.data.map((item) => ({
+          s_no: item.id,
+          vehicle_name: item.vehicle_name,
+          start_date: item.start_datetime,
+          end_date: item.end_datetime,
+          location: item.start_latitude + ":" + item.start_longitude,
+          duration: item.parking_duration,
+        }));
+        setParkingList(processedData);
+      } else {
+        setParkingList([]);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+    setIsLoading(false);
+  };
   const handleClick = () => {
     const excel = new Excel();
     excel
@@ -187,6 +183,7 @@ export const ParkingReport = () => {
                 )}
               </Select>
             </div>
+
             <div className="mb-3 mr-3">
               <Button
                 type="primary"

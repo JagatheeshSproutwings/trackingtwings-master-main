@@ -26,50 +26,40 @@ import Edit from "./edit";
 import Create from "./create";
 
 export const User = () => {
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [Createopen, setCreateDrawerOpen] = useState(false);
   const [Editopen, setEditDrawerOpen] = useState(false);
 
   const showCreateDrawer = () => {
     setCreateDrawerOpen(true);
   };
+  const showEditDrawer = () => {
+    setEditDrawerOpen(true);
+  };
   const onClose = () => {
     setCreateDrawerOpen(false);
     setEditDrawerOpen(false);
   };
 
-  const showEditDrawer = () => {
-    setEditDrawerOpen(true);
-  };
-
   const [userList, setUserList] = useState();
   const [mainuserList, setMainUserList] = useState();
 
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [isCreateVisible, setIsCreateVisible] = useState(false);
-  const [isEditVisible, setIsEditVisible] = useState(false);
   const [editdata, setEditData] = useState("");
+
+  const [isuploadvisible, setUploadVisible] = useState(false);
   const [domainname, setDomainName] = useState("");
   const [loginimage, setLoginImage] = useState("");
 
-  const [isuploadvisible, setUploadVisible] = useState(false);
-
   const [open, setOpen] = useState(false);
-  const [deleteID, setDeleteID] = useState("");
-
-  const showPopconfirm = (record) => {
-    setDeleteID(record.id);
-    setOpen(true);
-  };
 
   const handleCancel = () => {
     setOpen(false);
   };
 
-  const handleOk = async () => {
-    const data = { id: deleteID, user_id: user };
-
+  const handleOk = async (record) => {
+    const data = { id: record, user_id: user };
     try {
-      const response = await api.post("user/delete", data);
+      await api.post("user/delete", data);
       openNotification("success", "User", "User Deleted Successfully!");
       setOpen(false);
       loadUsers();
@@ -85,35 +75,19 @@ export const User = () => {
     });
   };
 
-  const handleCreateCard = () => {
-    setIsCreateVisible(true);
-    setIsEditVisible(false);
-    setUploadVisible(false);
-  };
-
-  const handleUploadCard = () => {
-    setIsCreateVisible(false);
-    setIsEditVisible(false);
-    setUploadVisible(true);
-  };
-
   const getUser = () => {
     return localStorage.getItem("id");
   };
-
   const user = getUser();
-
   const getRole = () => {
     return localStorage.getItem("role");
   };
   const role = getRole();
 
   const parentFunction = () => {
-    setIsCreateVisible(false);
-    setIsEditVisible(false);
-    setUploadVisible(false);
     setCreateDrawerOpen(false);
     setEditDrawerOpen(false);
+    setUploadVisible(false);
     loadUsers();
   };
 
@@ -121,7 +95,6 @@ export const User = () => {
     const data = { user_id: user, role_id: role };
     try {
       const response = await api.post("user_list", data);
-
       if (response.data && Array.isArray(response.data.data)) {
         const processedData = response.data.data.map((item) => ({
           id: item.id,
@@ -136,7 +109,6 @@ export const User = () => {
           address: item.address,
         }));
 
-        console.log(processedData);
         setUserList(processedData);
         setMainUserList(processedData);
       } else {
@@ -163,9 +135,7 @@ export const User = () => {
     ]);
 
     // Set isEditVisible to true
-    setIsEditVisible(true);
     setUploadVisible(false);
-    setIsCreateVisible(false);
     loadUsers();
   }
 
@@ -206,12 +176,17 @@ export const User = () => {
           >
             <EditTwoTone />
           </span>
-          <span
-            style={{ cursor: "pointer" }}
-            onClick={() => showPopconfirm(record)} // Replace handleEditClick with your custom action function
+          <Popconfirm
+            title="User"
+            description="Are you sure to delete this user"
+            placement="left"
+            onConfirm={() => handleOk(record.id)} // Call your delete function here
+            onCancel={() => handleCancel()}
           >
-            <DeleteTwoTone />
-          </span>
+            <span style={{ cursor: "pointer" }}>
+              <DeleteTwoTone />
+            </span>
+          </Popconfirm>
         </div>
       ),
     },
@@ -225,9 +200,7 @@ export const User = () => {
     setSelectedRowKeys([]);
   };
 
-  const myclick = async () => {
-    console.warn(domainname, loginimage);
-
+  const saveLogo = async () => {
     const formData = new FormData();
     formData.append("domain_name", domainname);
     formData.append("login_image", loginimage);
@@ -278,116 +251,70 @@ export const User = () => {
           parentFunction={parentFunction}
         />
       </Drawer>
-      <Row gutter={6}>
-        <Col sm={24} md={14} lg={14}>
-          <Popconfirm
-            size="big"
-            title="User"
-            description="Are you sure to delete this user"
-            open={open}
-            placement="rightTop"
-            onConfirm={handleOk}
-            onCancel={handleCancel}
-          >
-            <Card title="User">
-              <Flex
-                alignItems="center"
-                justifyContent="space-between"
-                mobileFlex={false}
-              >
-                <Flex className="mb-1" mobileFlex={false}>
-                  <div className="mr-md-3 mb-3">
-                    <Input
-                      placeholder="Search"
-                      prefix={<SearchOutlined />}
-                      onChange={(e) => onSearch(e)}
-                    />
-                  </div>
-                  <div className="mb-3"></div>
-                </Flex>
-                <div className="mb-3">
-                  {/* {role == 1 && (
-                    <Button
-                      type="primary"
-                      icon={<PlusOutlined />}
-                      ghost
-                      onClick={handleUploadCard}
-                    >
-                      Upload Logo
-                    </Button>
-                  )} */}
-                </div>
-                <div className="mb-3">
-                  <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    ghost
-                    onClick={showCreateDrawer}
-                  >
-                    Add User
-                  </Button>
-                </div>
-              </Flex>
-              <div className="table-responsive">
-                <Table
-                  bordered
-                  columns={tableColumns}
-                  dataSource={userList}
-                  rowKey="id"
-                />
-              </div>
-            </Card>
-          </Popconfirm>
-        </Col>
-        <Col sm={24} md={10} lg={10}>
-          {isCreateVisible && <Create parentFunction={parentFunction} />}
 
-          {isuploadvisible && (
-            <Card>
-              <Flex>
-                <div className="container">
-                  <Row gutter={[8, 8]}>
-                    <Col sm={12} md={12} lg={12}>
-                      <Form.Item
-                        size="small"
-                        label="Domain Name"
-                        name="domain_name"
-                      >
-                        <Input
-                          type="text"
-                          onChange={(e) => setDomainName(e.target.value)}
-                        />
-                      </Form.Item>
-                    </Col>
-                    <Col sm={12} md={12} lg={12}>
-                      <Form.Item
-                        size="small"
-                        label="Login Image"
-                        name="login_image"
-                      >
-                        <Input
-                          type="file"
-                          onChange={(e) => setLoginImage(e.target.files[0])}
-                        ></Input>
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                  <Button
-                    size="small"
-                    type="primary"
-                    style={{ backgroundColor: GREEN_BASE }}
-                    success
-                    shape="round"
-                    onClick={myclick}
-                  >
-                    SAVE
-                  </Button>
-                </div>
-              </Flex>
-            </Card>
-          )}
-        </Col>
-      </Row>
+      <Card title="User">
+        <Row justify="space-between">
+          <Col span={4}>
+            <Input
+              placeholder="Search"
+              prefix={<SearchOutlined />}
+              onChange={(e) => onSearch(e)}
+            />
+          </Col>
+          <Col span={4}>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              ghost
+              onClick={showCreateDrawer}
+            >
+              Add User
+            </Button>
+          </Col>
+        </Row>
+
+        <Table
+          bordered
+          columns={tableColumns}
+          dataSource={userList}
+          rowKey="id"
+        />
+      </Card>
+
+      {isuploadvisible && (
+        <Card>
+          <div className="container">
+            <Row gutter={[8, 8]}>
+              <Col sm={12} md={12} lg={12}>
+                <Form.Item size="small" label="Domain Name" name="domain_name">
+                  <Input
+                    type="text"
+                    onChange={(e) => setDomainName(e.target.value)}
+                  />
+                </Form.Item>
+              </Col>
+              <Col sm={12} md={12} lg={12}>
+                <Form.Item size="small" label="Login Image" name="login_image">
+                  <Input
+                    type="file"
+                    onChange={(e) => setLoginImage(e.target.files[0])}
+                  ></Input>
+                </Form.Item>
+              </Col>
+            </Row>
+            <Button
+              size="small"
+              type="primary"
+              style={{ backgroundColor: GREEN_BASE }}
+              success
+              shape="round"
+              onClick={saveLogo}
+            >
+              SAVE
+            </Button>
+          </div>
+        </Card>
+      )}
     </>
   );
 };

@@ -1,27 +1,19 @@
 import React, { useState, useEffect } from "react";
-import {
-  Card,
-  Table,
-  Button,
-  Select,
-  Input,
-  Form,
-  Space,
-  DatePicker,
-} from "antd";
+import { Card, Table, Button, Select, DatePicker } from "antd";
 import api from "configs/apiConfig";
 import Flex from "components/shared-components/Flex";
 import { FileExcelOutlined, SearchOutlined } from "@ant-design/icons";
-
 import { Excel } from "antd-table-saveas-excel";
 const { Option } = Select;
 const { RangePicker } = DatePicker;
-function Idlereport({}) {
+
+const Idlereport = ({ parentToChild, ...props }) => {
   const [idleList, setIdleList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedDateRange, setSelectedDateRange] = useState(null);
   const [selectedVehicleId, setSelectedVehicleId] = useState("All");
   const [vehicleOptions, setVehicleOptions] = useState([]);
+
   const tableColumns = [
     {
       title: "S.No",
@@ -59,23 +51,41 @@ function Idlereport({}) {
 
   const user = getUser();
 
-  useEffect(() => {
-    async function fetchVehicleOptions() {
-      try {
-        const data = { user_id: user };
+  const getRole = () => {
+    return localStorage.getItem("role");
+  };
 
+  const role = getRole();
+
+  useEffect(() => {
+    fetchVehicleOptions();
+  }, []);
+
+  const fetchVehicleOptions = async () => {
+    try {
+      setVehicleOptions([]);
+
+      if (role == 6) {
+        const data = { user_id: user };
         const response = await api.post("vehicle_list", data);
         if (response.data.success) {
           setVehicleOptions(response.data.data);
         } else {
           console.error("API request was not successful");
         }
-      } catch (error) {
-        console.error("Error fetching vehicle options:", error);
+      } else {
+        const data = { user_id: parentToChild };
+        const response = await api.post("vehicle_list", data);
+        if (response.data.success) {
+          setVehicleOptions(response.data.data);
+        } else {
+          console.error("API request was not successful");
+        }
       }
+    } catch (error) {
+      console.error("Error fetching vehicle options:", error);
     }
-    fetchVehicleOptions();
-  }, []);
+  };
 
   const handleDateRangeChange = (dateRange) => {
     setSelectedDateRange(dateRange);
@@ -86,15 +96,6 @@ function Idlereport({}) {
   };
 
   const handleSearchClick = async () => {
-    // Log the actual selected values
-    console.log("Selected Date Range:", selectedDateRange);
-    if (selectedDateRange) {
-      const [startDate, endDate] = selectedDateRange;
-      console.log("Start Date:", startDate.format("YYYY-MM-DD"));
-      console.log("End Date:", endDate.format("YYYY-MM-DD"));
-    }
-    console.log("Selected Vehicle ID:", selectedVehicleId);
-
     const data = {
       start_day: selectedDateRange
         ? selectedDateRange[0].format("YYYY-MM-DD HH:mm:ss")
@@ -110,7 +111,6 @@ function Idlereport({}) {
 
     try {
       const idle_data = await api.post("get_idle_report", data);
-      console.log(idle_data.data);
 
       if (idle_data.data && Array.isArray(idle_data.data.data)) {
         const processedData = idle_data.data.data.map((item) => ({
@@ -121,25 +121,14 @@ function Idlereport({}) {
           location: item.start_latitude + ":" + item.start_longitude,
           duration: item.idle_duration,
         }));
-
-        console.log(processedData);
-
         setIdleList(processedData);
-
-        console.log("idleList:", idleList);
       } else {
-        setIdleList([]); // Clear the list when no data is found
-        console.log(
-          "Response data is not in the expected format:",
-          idle_data.data
-        );
+        setIdleList([]);
       }
     } catch (err) {
       console.error(err);
     }
     setIsLoading(false);
-
-    // Perform additional actions based on the selected values
   };
   const handleClick = () => {
     const excel = new Excel();
@@ -151,6 +140,7 @@ function Idlereport({}) {
       })
       .saveAs("Excel.xlsx");
   };
+
   return (
     <div>
       <Card title="Idle Report">
@@ -215,15 +205,18 @@ function Idlereport({}) {
             </div>
           </Flex>
         </Flex>
-        <Table
-          bordered
-          rowKey="id"
-          columns={tableColumns}
-          dataSource={idleList}
-        ></Table>
+        <div className="table-responsive">
+          {isLoading ? (
+            <div>Loading...</div> // Display loading indicator
+          ) : idleList.length > 0 ? (
+            <Table bordered columns={tableColumns} dataSource={idleList} />
+          ) : (
+            <p>No Data Found</p>
+          )}
+        </div>
       </Card>
     </div>
   );
-}
+};
 
 export default Idlereport;

@@ -49,7 +49,7 @@ const Report = () => {
   const [selectSubDealer, setSubDealerSelect] = useState("");
   const [selectCustomer, setCustomerSelect] = useState("");
   const token = useSelector((state) => state.auth);
-
+  const [selectedValue, setSelectedValue] = useState(null);
   const handleShowStatus = (value) => {
     SetCurrentCustomer(value);
   };
@@ -278,13 +278,10 @@ const Report = () => {
 
     SetCustomerList(customer_list?.data?.data?.user_list);
   };
-  const CustomerChange = async (value, option) => {
+  const CustomerChange = async (value) => {
     SetCurrentCustomer(value);
-    // form.setFieldValue('');
-    // const user_get_data = {user_id:value};
-    // const customer_list = await api.post("role_based_user_list",user_get_data).then((res) => {return res}).catch((err) => {return err});
-    // console.log(customer_list?.data?.data?.user_list);
-    // SetCustomerList(customer_list?.data?.data?.user_list);
+    SetReport("");
+    setSelectedValue(null);
   };
   useEffect(() => {
     if (role() == 6 && user() != "") {
@@ -419,7 +416,7 @@ const Report = () => {
           ]}
           name="report_id"
         >
-          <Select onChange={handleReport}>
+          <Select value={selectedValue} onChange={handleReport}>
             <Select.Option value="1">Idle Report</Select.Option>
             <Select.Option value="2">Parking Report</Select.Option>
             <Select.Option value="3">Playback Report</Select.Option>
@@ -440,13 +437,13 @@ const Report = () => {
           {(() => {
             switch (currentReport) {
               case "1":
-                return <IdleReport />;
+                return <IdleReport parentToChild={currentCustomer} />;
               case "2":
-                return <ParkingReport />;
+                return <ParkingReport parentToChild={currentCustomer} />;
               case "3":
                 return <PlaybackReport />;
               case "4":
-                return <KeyonKeyOffReport />;
+                return <KeyonKeyOffReport parentToChild={currentCustomer} />;
               default:
                 return "";
             }
