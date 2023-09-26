@@ -7,8 +7,8 @@ import { Excel } from "antd-table-saveas-excel";
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
-const ParkingReport = ({ parentToChild, ...props }) => {
-  const [parkingList, setParkingList] = useState([]);
+const Distancereport = ({ parentToChild, ...props }) => {
+  const [distanceList, setdistanceList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedDateRange, setSelectedDateRange] = useState(null);
   const [selectedVehicleId, setSelectedVehicleId] = useState("All");
@@ -17,31 +17,35 @@ const ParkingReport = ({ parentToChild, ...props }) => {
   const tableColumns = [
     {
       title: "S.No",
-      dataIndex: "s_no",
+      dataIndex: "id",
     },
     {
       title: "Vehicle Name",
       dataIndex: "vehicle_name",
     },
     {
-      title: "Start Date",
-      dataIndex: "start_date",
+      title: "Date",
+      dataIndex: "date",
     },
     {
-      title: "End Date",
-      dataIndex: "end_date",
+      title: "Start Location",
+      dataIndex: "start_location",
     },
     {
-      title: "Location",
-      dataIndex: "location",
+      title: "Start Odometer",
+      dataIndex: "start_odometer",
     },
     {
-      title: "Duration",
-      dataIndex: "duration",
+      title: "End Location",
+      dataIndex: "end_location",
     },
     {
-      title: "Map View",
-      dataIndex: "map_view",
+      title: "End Odometer",
+      dataIndex: "end_odometer",
+    },
+    {
+      title: "Total kms",
+      dataIndex: "odometer_difference",
     },
   ];
 
@@ -107,24 +111,26 @@ const ParkingReport = ({ parentToChild, ...props }) => {
       user_id: parentToChild,
     };
 
-    setParkingList([]); // Clear previous data
+    setdistanceList([]); // Clear previous data
     setIsLoading(true);
 
     try {
-      const parking_data = await api.post("get_parking_report", data);
+      const distance_data = await api.post("get_distance_report", data);
 
-      if (parking_data.data && Array.isArray(parking_data.data.data)) {
-        const processedData = parking_data.data.data.map((item) => ({
+      if (distance_data.data && Array.isArray(distance_data.data.data)) {
+        const processedData = distance_data.data.data.map((item) => ({
           s_no: item.id,
           vehicle_name: item.vehicle_name,
-          start_date: item.start_datetime,
-          end_date: item.end_datetime,
-          location: item.start_latitude + ":" + item.start_longitude,
-          duration: item.parking_duration,
+          date: item.date,
+          start_location: item.start_latitude + ":" + item.start_longitude,
+          start_odometer: item.start_odometer,
+          end_location: item.end_latitude + ":" + item.end_longitude,
+          end_odometer: item.end_odometer,
+          odometer_difference: item.odometer_difference,
         }));
-        setParkingList(processedData);
+        setdistanceList(processedData);
       } else {
-        setParkingList([]);
+        setdistanceList([]);
       }
     } catch (err) {
       console.error(err);
@@ -136,15 +142,15 @@ const ParkingReport = ({ parentToChild, ...props }) => {
     excel
       .addSheet("test")
       .addColumns(tableColumns)
-      .addDataSource(parkingList, {
+      .addDataSource(distanceList, {
         str2Percent: true,
       })
       .saveAs("Excel.xlsx");
   };
 
   return (
-    <>
-      <Card title="Parking Report">
+    <div>
+      <Card title="Distance Report">
         <Flex
           alignItems="center"
           justifyContent="space-between"
@@ -164,7 +170,7 @@ const ParkingReport = ({ parentToChild, ...props }) => {
                 defaultValue="All"
                 className="w-100"
                 style={{ minWidth: 180 }}
-                name="device_imei"
+                name="vehicle_id"
                 placeholder="Vehicle"
                 onChange={handleVehicleIdChange}
                 value={selectedVehicleId}
@@ -209,15 +215,15 @@ const ParkingReport = ({ parentToChild, ...props }) => {
         <div className="table-responsive">
           {isLoading ? (
             <div>Loading...</div> // Display loading indicator
-          ) : parkingList.length > 0 ? (
-            <Table bordered columns={tableColumns} dataSource={parkingList} />
+          ) : distanceList.length > 0 ? (
+            <Table bordered columns={tableColumns} dataSource={distanceList} />
           ) : (
             <p>No Data Found</p>
           )}
         </div>
       </Card>
-    </>
+    </div>
   );
 };
 
-export default ParkingReport;
+export default Distancereport;

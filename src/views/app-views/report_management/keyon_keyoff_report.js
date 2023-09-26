@@ -120,6 +120,7 @@ const KeyOnKeyOffReport = ({ parentToChild, ...props }) => {
         ? selectedDateRange[1].format("YYYY-MM-DD HH:mm:ss")
         : null,
       device_imei: selectedVehicleId === "0" ? null : selectedVehicleId,
+      user_id: parentToChild,
     };
 
     setKeyOnOffList([]); // Clear previous data

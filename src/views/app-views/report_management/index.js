@@ -18,6 +18,7 @@ import IdleReport from "./idle_report";
 import ParkingReport from "./parking_report";
 import PlaybackReport from "./playback_report";
 import KeyonKeyOffReport from "./keyon_keyoff_report";
+import DistanceReport from "./distance_report";
 import { useSelector } from "react-redux";
 import Flex from "components/shared-components/Flex";
 import api from "configs/apiConfig";
@@ -421,6 +422,7 @@ const Report = () => {
             <Select.Option value="2">Parking Report</Select.Option>
             <Select.Option value="3">Playback Report</Select.Option>
             <Select.Option value="4">Keyon KeyOff Report</Select.Option>
+            <Select.Option value="5">Distance Report</Select.Option>
           </Select>
         </Form.Item>
       </Form>
@@ -444,6 +446,8 @@ const Report = () => {
                 return <PlaybackReport />;
               case "4":
                 return <KeyonKeyOffReport parentToChild={currentCustomer} />;
+              case "5":
+                return <DistanceReport parentToChild={currentCustomer} />;
               default:
                 return "";
             }
