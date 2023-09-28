@@ -104,6 +104,7 @@ export const Admin = () => {
     console.log(tab_value);
     setActiveKey(tab_value);
     localStorage.setItem("current_vehicle_status", tab_value);
+    localStorage.setItem("current_vehicle_id","");
     setVehicleStatus(tab_value);
   };
   const getCurrentVehicleStatus = () => {
@@ -462,7 +463,7 @@ export const Admin = () => {
   const vehicle_list = async (status) => {
     const current_vehicle = getCurrentVehicle();
     const status_vehicle = getCurrentVehicleStatus();
-
+    console.log('Vehicle Status'+status_vehicle);
     try {
       if (role_id === 6) {
         const multiple_vehicles_data = await api
@@ -474,9 +475,9 @@ export const Admin = () => {
             return [];
           });
         console.log(multiple_vehicles_data);
-        if (multiple_vehicles_data?.data?.data && status != "") {
+        if (multiple_vehicles_data?.data?.data && status_vehicle != "") {
           const filteredItems = multiple_vehicles_data?.data?.data.filter(
-            (item) => item.vehicle_current_status == status
+            (item) => item.vehicle_current_status == status_vehicle
           );
           console.log(filteredItems);
           if (filteredItems) {
@@ -485,6 +486,27 @@ export const Admin = () => {
                 ? current_vehicle
                 : filteredItems[0].device_imei;
             console.log(device_imei);
+            localStorage.setItem("current_vehicle_id", device_imei);
+            const multivehicleData = filteredItems?.map((item) => ({
+              id: item?.id,
+              device_imei: item?.device_imei,
+              live_status: vehicle_live_status(item?.vehicle_current_status),
+              icon_url:
+                vehicle_icon_url(item?.vehicle_current_status) +
+                item?.short_name +
+                ".png",
+              latitude: item.lattitute,
+              longtitude: item.longitute,
+              last_duration: item?.last_duration,
+              title: item?.vehicle_name || "TEST",
+              description: item?.device_updatedtime || "0000-00-00 00:00:00",
+              color: vehicle_color(item?.vehicle_current_status),
+              angle: item?.angle || 0,
+              speed: item?.speed || 0,
+              gps_count: item?.gpssignal == "1" ? GREEN_BASE : RED_BASE,
+              gsm_count: item?.gsm_status == "1" ? GREEN_BASE : RED_BASE,
+              power_status: item?.power_status ? GREEN_BASE : RED_BASE,
+            }));
             const single_data = filteredItems.filter(
               (item) => item.device_imei == device_imei
             );
@@ -509,7 +531,7 @@ export const Admin = () => {
               gsm_count: item?.gsm_status == "1" ? GREEN_BASE : RED_BASE,
               power_status: item?.power_status ? GREEN_BASE : RED_BASE,
             }));
-            setMultiplevehiclesData(processedData);
+            setMultiplevehiclesData(multivehicleData);
             setmapvehicleDate(processedData);
           }
         } else {
@@ -519,6 +541,7 @@ export const Admin = () => {
               current_vehicle != ""
                 ? current_vehicle
                 : filteredItems[0].device_imei;
+                localStorage.setItem("current_vehicle_id", device_imei);
             console.log(filteredItems);
             const single_data = filteredItems.filter(
               (item) => item.device_imei == device_imei
@@ -584,10 +607,11 @@ export const Admin = () => {
               return [];
             });
           if (customer_vehicles?.data?.data) {
+            
             const single_data = customer_vehicles?.data?.data.filter(
               (item) => item.device_imei == current_vehicle
             );
-
+             console.log(single_data); 
             const vehicleData = single_data?.map((item) => ({
               id: item?.id,
               device_imei: item?.device_imei,
@@ -613,6 +637,7 @@ export const Admin = () => {
             setmapvehicleDate(vehicleData);
           }
           if (customer_vehicles?.data?.data) {
+            
             const AllvehicleData = customer_vehicles?.data?.data?.map(
               (item) => ({
                 id: item?.id,
@@ -642,7 +667,8 @@ export const Admin = () => {
         }
       }
     } catch (error) {
-      console.error("Error Listing.");
+      setMultiplevehiclesData([]);
+      
     }
   };
 
