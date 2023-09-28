@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Row, Col, Card, Select, Form, Button, notification } from "antd";
+import { Col, Select, Form, Button, notification } from "antd";
 import api from "configs/apiConfig";
-import Flex from "components/shared-components/Flex";
 const { Option } = Select;
 
 const Assign = ({ parentToChild, ...props }) => {
@@ -143,132 +142,101 @@ const Assign = ({ parentToChild, ...props }) => {
   };
 
   return (
-    <Row gutter={6}>
-      {isComponentVisible && (
-        <Col>
-          <Card title="Assign Form">
-            <Flex>
-              <div className="container">
-                <Form layout="vertical" size="small" onFinish={onFinish}>
-                  <Col sm={12} md={12} lg={12}>
-                    {currentRole == 1 && (
-                      <Form.Item label="Admin" name="admin_id">
-                        <Select
-                          onChange={AdminChange}
-                          allowClear
-                          showSearch
-                          optionFilterProp="children"
-                        >
-                          {Array.isArray(adminList) ? (
-                            adminList.map((admin) => (
-                              <Select.Option
-                                key={admin?.id}
-                                role_id="2"
-                                value={admin?.id}
-                              >
-                                {admin?.name}
-                              </Select.Option>
-                            ))
-                          ) : (
-                            <Select.Option role_id="2" value=""></Select.Option>
-                          )}
-                        </Select>
-                      </Form.Item>
-                    )}
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    {(currentRole == 1 || currentRole == 2) && (
-                      <Form.Item label="Distributor" name="distributor_id">
-                        <Select
-                          onChange={DistributorChange}
-                          allowClear
-                          showSearch
-                          optionFilterProp="children"
-                        >
-                          {Array.isArray(distributorList) ? (
-                            distributorList.map((distributor) => (
-                              <Option
-                                key={distributor?.id}
-                                role_id="3"
-                                value={distributor?.id}
-                              >
-                                {distributor?.name}
-                              </Option>
-                            ))
-                          ) : (
-                            <Option role_id="3" value=""></Option>
-                          )}
-                        </Select>
-                      </Form.Item>
-                    )}
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    {(currentRole == 1 ||
-                      currentRole == 2 ||
-                      currentRole == 3) && (
-                      <Form.Item label="Dealer" name="dealer_id">
-                        <Select
-                          onChange={DealerChange}
-                          allowClear
-                          showSearch
-                          optionFilterProp="children"
-                        >
-                          {Array.isArray(dealerList) ? (
-                            dealerList.map((dealer) => (
-                              <Option
-                                key={dealer?.id}
-                                role_id="4"
-                                value={dealer?.id}
-                              >
-                                {dealer?.name}
-                              </Option>
-                            ))
-                          ) : (
-                            <Option role_id="4" value=""></Option>
-                          )}
-                        </Select>
-                      </Form.Item>
-                    )}
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    {(currentRole == 1 ||
-                      currentRole == 2 ||
-                      currentRole == 3 ||
-                      currentRole == 4) && (
-                      <Form.Item label="Subdealer" name="subdealer_id">
-                        <Select
-                          allowClear
-                          showSearch
-                          optionFilterProp="children"
-                        >
-                          {Array.isArray(subdealerList) &&
-                          subdealerList.length > 0 ? (
-                            subdealerList.map((subdealer) => (
-                              <Option
-                                key={subdealer?.id}
-                                role_id="5"
-                                value={subdealer?.id}
-                              >
-                                {subdealer?.name}
-                              </Option>
-                            ))
-                          ) : (
-                            <Option></Option>
-                          )}
-                        </Select>
-                      </Form.Item>
-                    )}
-                  </Col>
-                  <Button type="primary" htmlType="submit">
-                    Assign
-                  </Button>
-                </Form>
-              </div>
-            </Flex>
-          </Card>
-        </Col>
-      )}
-    </Row>
+    <Form layout="vertical" size="small" onFinish={onFinish}>
+      <Col sm={12} md={12} lg={12}>
+        {currentRole == 1 && (
+          <Form.Item label="Admin" name="admin_id">
+            <Select
+              onChange={AdminChange}
+              allowClear
+              showSearch
+              optionFilterProp="children"
+            >
+              {Array.isArray(adminList) ? (
+                adminList.map((admin) => (
+                  <Select.Option key={admin?.id} role_id="2" value={admin?.id}>
+                    {admin?.name}
+                  </Select.Option>
+                ))
+              ) : (
+                <Select.Option role_id="2" value=""></Select.Option>
+              )}
+            </Select>
+          </Form.Item>
+        )}
+      </Col>
+      <Col sm={12} md={12} lg={12}>
+        {(currentRole == 1 || currentRole == 2) && (
+          <Form.Item label="Distributor" name="distributor_id">
+            <Select
+              onChange={DistributorChange}
+              allowClear
+              showSearch
+              optionFilterProp="children"
+            >
+              {Array.isArray(distributorList) ? (
+                distributorList.map((distributor) => (
+                  <Option
+                    key={distributor?.id}
+                    role_id="3"
+                    value={distributor?.id}
+                  >
+                    {distributor?.name}
+                  </Option>
+                ))
+              ) : (
+                <Option role_id="3" value=""></Option>
+              )}
+            </Select>
+          </Form.Item>
+        )}
+      </Col>
+      <Col sm={12} md={12} lg={12}>
+        {(currentRole == 1 || currentRole == 2 || currentRole == 3) && (
+          <Form.Item label="Dealer" name="dealer_id">
+            <Select
+              onChange={DealerChange}
+              allowClear
+              showSearch
+              optionFilterProp="children"
+            >
+              {Array.isArray(dealerList) ? (
+                dealerList.map((dealer) => (
+                  <Option key={dealer?.id} role_id="4" value={dealer?.id}>
+                    {dealer?.name}
+                  </Option>
+                ))
+              ) : (
+                <Option role_id="4" value=""></Option>
+              )}
+            </Select>
+          </Form.Item>
+        )}
+      </Col>
+      <Col sm={12} md={12} lg={12}>
+        {(currentRole == 1 ||
+          currentRole == 2 ||
+          currentRole == 3 ||
+          currentRole == 4) && (
+          <Form.Item label="Subdealer" name="subdealer_id">
+            <Select allowClear showSearch optionFilterProp="children">
+              {Array.isArray(subdealerList) && subdealerList.length > 0 ? (
+                subdealerList.map((subdealer) => (
+                  <Option key={subdealer?.id} role_id="5" value={subdealer?.id}>
+                    {subdealer?.name}
+                  </Option>
+                ))
+              ) : (
+                <Option></Option>
+              )}
+            </Select>
+          </Form.Item>
+        )}
+      </Col>
+      <Button type="primary" htmlType="submit">
+        Assign
+      </Button>
+    </Form>
   );
 };
 

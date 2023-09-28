@@ -443,7 +443,7 @@ const Report = () => {
               case "2":
                 return <ParkingReport parentToChild={currentCustomer} />;
               case "3":
-                return <PlaybackReport />;
+                return <PlaybackReport parentToChild={currentCustomer} />;
               case "4":
                 return <KeyonKeyOffReport parentToChild={currentCustomer} />;
               case "5":

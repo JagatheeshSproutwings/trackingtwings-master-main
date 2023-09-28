@@ -95,7 +95,8 @@ export const User = () => {
     try {
       const response = await api.post("user_list", data);
       if (response.data && Array.isArray(response.data.data)) {
-        const processedData = response.data.data.map((item) => ({
+        const processedData = response.data.data.map((item, index) => ({
+          s_no: index + 1, // Increment the serial number for each item
           id: item.id,
           name: item.name,
           email: item.email,
@@ -143,6 +144,11 @@ export const User = () => {
   }, []);
 
   const tableColumns = [
+    {
+      title: "S No",
+      dataIndex: "s_no",
+      fixed: "left",
+    },
     {
       title: "Name",
       dataIndex: "name",

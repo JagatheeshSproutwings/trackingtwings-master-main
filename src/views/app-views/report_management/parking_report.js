@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Card, Table, Button, Select, DatePicker } from "antd";
+import { Card, Table, Button, Select, DatePicker, Drawer } from "antd";
 import api from "configs/apiConfig";
 import Flex from "components/shared-components/Flex";
-import { FileExcelOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  FileExcelOutlined,
+  SearchOutlined,
+  GlobalOutlined,
+} from "@ant-design/icons";
 import { Excel } from "antd-table-saveas-excel";
+
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
@@ -14,10 +19,33 @@ const ParkingReport = ({ parentToChild, ...props }) => {
   const [selectedVehicleId, setSelectedVehicleId] = useState("All");
   const [vehicleOptions, setVehicleOptions] = useState([]);
 
+  const [open, setOpen] = useState(false);
+  const showDrawer = () => {
+    setOpen(true);
+  };
+  const onClose = () => {
+    setOpen(false);
+  };
+  const [mapvehicleDate, setmapvehicleDate] = useState([]);
+  const handleMapViewClick = async (record) => {
+    const idle_data = {
+      id: record.id,
+      latitude: record.s_lat || 0.0,
+      longtitude: record.s_lng || 0.0,
+      title: record.vehicle_name || "TEST",
+      duration: record.duration,
+      icon_url: "/img/ICONS/BLUE/" + record?.short_name + ".png",
+      device_time: record.start_date,
+    };
+    setmapvehicleDate(idle_data);
+    showDrawer();
+  };
+
   const tableColumns = [
     {
       title: "S.No",
       dataIndex: "s_no",
+      fixed: "left",
     },
     {
       title: "Vehicle Name",
@@ -42,6 +70,14 @@ const ParkingReport = ({ parentToChild, ...props }) => {
     {
       title: "Map View",
       dataIndex: "map_view",
+      fixed: "right",
+      render: (_, record) => (
+        <div>
+          <span onClick={() => handleMapViewClick(record)}>
+            <GlobalOutlined />
+          </span>
+        </div>
+      ),
     },
   ];
 
@@ -114,13 +150,17 @@ const ParkingReport = ({ parentToChild, ...props }) => {
       const parking_data = await api.post("get_parking_report", data);
 
       if (parking_data.data && Array.isArray(parking_data.data.data)) {
-        const processedData = parking_data.data.data.map((item) => ({
-          s_no: item.id,
+        const processedData = parking_data.data.data.map((item, index) => ({
+          s_no: index + 1, // Increment the serial number for each item
+          id: item.id,
           vehicle_name: item.vehicle_name,
           start_date: item.start_datetime,
           end_date: item.end_datetime,
           location: item.start_latitude + ":" + item.start_longitude,
           duration: item.parking_duration,
+          s_lat: item.start_latitude,
+          s_lng: item.start_longitude,
+          short_name: item.short_name,
         }));
         setParkingList(processedData);
       } else {
@@ -144,6 +184,13 @@ const ParkingReport = ({ parentToChild, ...props }) => {
 
   return (
     <>
+      <Drawer
+        width={500}
+        title="Map View"
+        placement="right"
+        onClose={onClose}
+        open={open}
+      ></Drawer>
       <Card title="Parking Report">
         <Flex
           alignItems="center"

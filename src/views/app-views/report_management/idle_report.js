@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Card, Table, Button, Select, DatePicker } from "antd";
+import { Card, Table, Button, Select, DatePicker, Drawer } from "antd";
 import api from "configs/apiConfig";
 import Flex from "components/shared-components/Flex";
-import { FileExcelOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  FileExcelOutlined,
+  SearchOutlined,
+  GlobalOutlined,
+} from "@ant-design/icons";
 import { Excel } from "antd-table-saveas-excel";
+import MapView from "./map_view";
+
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
@@ -14,10 +20,33 @@ const Idlereport = ({ parentToChild, ...props }) => {
   const [selectedVehicleId, setSelectedVehicleId] = useState("All");
   const [vehicleOptions, setVehicleOptions] = useState([]);
 
+  const [open, setOpen] = useState(false);
+  const showDrawer = () => {
+    setOpen(true);
+  };
+  const onClose = () => {
+    setOpen(false);
+  };
+  const [mapvehicleDate, setmapvehicleDate] = useState([]);
+  const handleMapViewClick = async (record) => {
+    const idle_data = {
+      id: record.id,
+      latitude: record.s_lat || 0.0,
+      longitude: record.s_lng || 0.0,
+      title: record.vehicle_name || "TEST",
+      duration: record.duration,
+      icon_url: "/img/ICONS/BLUE/" + record?.short_name + ".png",
+      device_time: record.start_date,
+    };
+    setmapvehicleDate(idle_data);
+    showDrawer();
+  };
+
   const tableColumns = [
     {
-      title: "S.No",
+      title: "S No",
       dataIndex: "s_no",
+      fixed: "left",
     },
     {
       title: "Vehicle Name",
@@ -42,6 +71,14 @@ const Idlereport = ({ parentToChild, ...props }) => {
     {
       title: "Map View",
       dataIndex: "map_view",
+      fixed: "right",
+      render: (_, record) => (
+        <div>
+          <span onClick={() => handleMapViewClick(record)}>
+            <GlobalOutlined />
+          </span>
+        </div>
+      ),
     },
   ];
 
@@ -60,7 +97,6 @@ const Idlereport = ({ parentToChild, ...props }) => {
   useEffect(() => {
     fetchVehicleOptions();
   }, []);
-
   const fetchVehicleOptions = async () => {
     try {
       setVehicleOptions([]);
@@ -86,15 +122,12 @@ const Idlereport = ({ parentToChild, ...props }) => {
       console.error("Error fetching vehicle options:", error);
     }
   };
-
   const handleDateRangeChange = (dateRange) => {
     setSelectedDateRange(dateRange);
   };
-
   const handleVehicleIdChange = (vehicleId) => {
     setSelectedVehicleId(vehicleId);
   };
-
   const handleSearchClick = async () => {
     const data = {
       start_day: selectedDateRange
@@ -114,13 +147,17 @@ const Idlereport = ({ parentToChild, ...props }) => {
       const idle_data = await api.post("get_idle_report", data);
 
       if (idle_data.data && Array.isArray(idle_data.data.data)) {
-        const processedData = idle_data.data.data.map((item) => ({
-          s_no: item.id,
+        const processedData = idle_data.data.data.map((item, index) => ({
+          s_no: index + 1, // Increment the serial number for each item
+          id: item.id,
           vehicle_name: item.vehicle_name,
           start_date: item.start_datetime,
           end_date: item.end_datetime,
           location: item.start_latitude + ":" + item.start_longitude,
           duration: item.idle_duration,
+          s_lat: item.start_latitude,
+          s_lng: item.start_longitude,
+          short_name: item.short_name,
         }));
         setIdleList(processedData);
       } else {
@@ -144,6 +181,15 @@ const Idlereport = ({ parentToChild, ...props }) => {
 
   return (
     <div>
+      <Drawer
+        width={500}
+        title="Map View"
+        placement="right"
+        onClose={onClose}
+        open={open}
+      >
+        <MapView data={mapvehicleDate} />
+      </Drawer>
       <Card title="Idle Report">
         <Flex
           alignItems="center"

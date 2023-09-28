@@ -17,7 +17,7 @@ const Distancereport = ({ parentToChild, ...props }) => {
   const tableColumns = [
     {
       title: "S.No",
-      dataIndex: "id",
+      dataIndex: "s_no",
     },
     {
       title: "Vehicle Name",
@@ -118,8 +118,9 @@ const Distancereport = ({ parentToChild, ...props }) => {
       const distance_data = await api.post("get_distance_report", data);
 
       if (distance_data.data && Array.isArray(distance_data.data.data)) {
-        const processedData = distance_data.data.data.map((item) => ({
-          s_no: item.id,
+        const processedData = distance_data.data.data.map((item, index) => ({
+          s_no: index + 1, // Increment the serial number for each item
+          id: item.id,
           vehicle_name: item.vehicle_name,
           date: item.date,
           start_location: item.start_latitude + ":" + item.start_longitude,

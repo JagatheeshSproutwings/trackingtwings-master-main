@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
   Button,
-  Card,
   Select,
   Input,
   Form,
@@ -11,7 +10,6 @@ import {
   DatePicker,
   notification,
 } from "antd";
-import Flex from "components/shared-components/Flex";
 import api from "configs/apiConfig";
 const dateFormat = "YYYY-MM-DD";
 
@@ -95,138 +93,123 @@ const Create = (props) => {
   }
 
   return (
-    <Row gutter={6}>
-      <Col>
-        <Card title="New Sim">
-          <Flex>
-            <div className="container">
-              <Form
-                form={form}
-                size="small"
-                name="registrationForm"
-                onFinish={onFinish}
-                layout="vertical"
-              >
-                <Row gutter={[8, 8]}>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      size="small"
-                      label="Network"
-                      name="network_id"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please Select a Network",
-                        },
-                      ]}
-                    >
-                      <Select
-                        allowClear
-                        showSearch
-                        optionFilterProp="children"
-                        onChange={handleNetworkIdChange}
-                        value={selectedNetworkId}
-                        filterOption={(input, option) =>
-                          option.children
-                            .toLowerCase()
-                            .indexOf(input.toLowerCase()) >= 0
-                        }
-                      >
-                        {Array.isArray(networkOptions) ? (
-                          networkOptions.map((network) => (
-                            <Option key={network.id} value={network.id}>
-                              {network.network_provider_name}
-                            </Option>
-                          ))
-                        ) : (
-                          <Option value="Loading" disabled>
-                            Loading...
-                          </Option>
-                        )}
-                      </Select>
-                    </Form.Item>
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      size="small"
-                      label="Sim CCID"
-                      name="sim_imei_no"
-                      id="sim_imei_no"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please enter a Sim CCID",
-                        },
-                      ]}
-                    >
-                      <Input id="sim_imei_no" />
-                    </Form.Item>
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      size="small"
-                      label="Primary Number"
-                      name="sim_mob_no1"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please enter a Primary Number",
-                        },
-                      ]}
-                    >
-                      <Input />
-                    </Form.Item>
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      size="small"
-                      label="Secondary Mobile No"
-                      name="sim_mob_no2"
-                    >
-                      <Input />
-                    </Form.Item>
-                  </Col>
+    <Form
+      form={form}
+      size="small"
+      name="registrationForm"
+      onFinish={onFinish}
+      layout="vertical"
+    >
+      <Row gutter={[8, 8]}>
+        <Col sm={12} md={12} lg={12}>
+          <Form.Item
+            size="small"
+            label="Network"
+            name="network_id"
+            rules={[
+              {
+                required: true,
+                message: "Please Select a Network",
+              },
+            ]}
+          >
+            <Select
+              allowClear
+              showSearch
+              optionFilterProp="children"
+              onChange={handleNetworkIdChange}
+              value={selectedNetworkId}
+              filterOption={(input, option) =>
+                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+              }
+            >
+              {Array.isArray(networkOptions) ? (
+                networkOptions.map((network) => (
+                  <Option key={network.id} value={network.id}>
+                    {network.network_provider_name}
+                  </Option>
+                ))
+              ) : (
+                <Option value="Loading" disabled>
+                  Loading...
+                </Option>
+              )}
+            </Select>
+          </Form.Item>
+        </Col>
+        <Col sm={12} md={12} lg={12}>
+          <Form.Item
+            size="small"
+            label="Sim CCID"
+            name="sim_imei_no"
+            id="sim_imei_no"
+            rules={[
+              {
+                required: true,
+                message: "Please enter a Sim CCID",
+              },
+            ]}
+          >
+            <Input id="sim_imei_no" />
+          </Form.Item>
+        </Col>
+        <Col sm={12} md={12} lg={12}>
+          <Form.Item
+            size="small"
+            label="Primary Number"
+            name="sim_mob_no1"
+            rules={[
+              {
+                required: true,
+                message: "Please enter a Primary Number",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+        </Col>
+        <Col sm={12} md={12} lg={12}>
+          <Form.Item
+            size="small"
+            label="Secondary Mobile No"
+            name="sim_mob_no2"
+          >
+            <Input />
+          </Form.Item>
+        </Col>
 
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item name="valid_from" label="Valid From">
-                      <DatePicker
-                        style={{ width: "100%", fontSize: "16px" }}
-                        allowClear={false}
-                        format={dateFormat}
-                      ></DatePicker>
-                    </Form.Item>
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item name="valid_to" label="Valid To">
-                      <DatePicker
-                        style={{ width: "100%", fontSize: "16px" }}
-                        allowClear={false}
-                        format={dateFormat}
-                      ></DatePicker>
-                    </Form.Item>
-                  </Col>
-                </Row>
+        <Col sm={12} md={12} lg={12}>
+          <Form.Item name="valid_from" label="Valid From">
+            <DatePicker
+              style={{ width: "100%", fontSize: "16px" }}
+              allowClear={false}
+              format={dateFormat}
+            ></DatePicker>
+          </Form.Item>
+        </Col>
+        <Col sm={12} md={12} lg={12}>
+          <Form.Item name="valid_to" label="Valid To">
+            <DatePicker
+              style={{ width: "100%", fontSize: "16px" }}
+              allowClear={false}
+              format={dateFormat}
+            ></DatePicker>
+          </Form.Item>
+        </Col>
+      </Row>
 
-                <Row align={"middle"}>
-                  <Col span={12}>
-                    <Form.Item>
-                      <Space wrap>
-                        <Button type="primary" shape="round" htmlType="submit">
-                          Save
-                        </Button>
-                        <Button type="primary" shape="round">
-                          Back
-                        </Button>
-                      </Space>
-                    </Form.Item>
-                  </Col>
-                </Row>
-              </Form>
-            </div>
-          </Flex>
-        </Card>
-      </Col>
-    </Row>
+      <Row align={"middle"}>
+        <Col span={12}>
+          <Form.Item>
+            <Space wrap>
+              <Button type="primary" shape="round" htmlType="submit">
+                Save
+              </Button>
+            </Space>
+          </Form.Item>
+        </Col>
+      </Row>
+    </Form>
   );
 };
 

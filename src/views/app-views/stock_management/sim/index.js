@@ -8,38 +8,36 @@ import {
   Input,
   Popconfirm,
   notification,
+  Drawer,
 } from "antd";
 import {
   PlusOutlined,
   SearchOutlined,
   EditTwoTone,
   DeleteTwoTone,
+  SwapOutlined,
 } from "@ant-design/icons";
-import Flex from "components/shared-components/Flex";
 import utils from "utils";
-
 import api from "configs/apiConfig";
+
 import Create from "./create";
 import Edit from "./edit";
 import Assign from "../demo/index";
 
 export const Sim = () => {
   const [open, setOpen] = useState(false);
-  const [deleteID, setDeleteID] = useState("");
-
-  const showPopconfirm = (record) => {
-    setDeleteID(record.id);
-    setOpen(true);
-  };
 
   const handleCancel = () => {
     setOpen(false);
   };
 
-  const handleOk = async () => {
-    alert(deleteID);
-    const data = { id: deleteID, user_id: currentUser };
+  const getUser = () => {
+    return localStorage.getItem("id");
+  };
+  const user = getUser();
 
+  const handleDelete = async (record) => {
+    const data = { id: record, user_id: user };
     try {
       const response = await api.post("sim/delete", data);
       openNotification("success", "Sim", "Sim Deleted Successfully!");
@@ -57,32 +55,34 @@ export const Sim = () => {
     });
   };
 
-  const currentUser = localStorage.getItem("id") || "";
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-
   const [simList, setSimList] = useState([]);
   const [mainsimList, seMainSimList] = useState([]);
-
-  const [isCreateVisible, setIsCreateVisible] = useState(false);
-  const [isEditVisible, setIsEditVisible] = useState(false);
-  const [isAssignVisible, setIsAssignVisible] = useState(false);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
   const [editdata, setEditData] = useState("");
   const [assigndata, setAssignData] = useState("");
 
-  const handleCreateCard = () => {
-    setIsCreateVisible(true);
-    setIsEditVisible(false);
-    setIsAssignVisible(false);
+  const [Createopen, setCreateDrawerOpen] = useState(false);
+  const [Editopen, setEditDrawerOpen] = useState(false);
+  const [Assignopen, setAssignDrawerOpen] = useState(false);
+
+  const showCreateDrawer = () => {
+    setCreateDrawerOpen(true);
   };
-  const handleAssignCard = () => {
-    setIsCreateVisible(false);
-    setIsEditVisible(false);
-    setIsAssignVisible(true);
+  const showEditDrawer = () => {
+    setEditDrawerOpen(true);
+  };
+  const showAssignDrawer = () => {
+    setAssignDrawerOpen(true);
+  };
+  const onClose = () => {
+    setCreateDrawerOpen(false);
+    setEditDrawerOpen(false);
+    setAssignDrawerOpen(false);
   };
   const parentFunction = () => {
-    setIsEditVisible(false);
     loadSims();
+    onClose();
   };
 
   const loadSims = async () => {
@@ -90,7 +90,8 @@ export const Sim = () => {
       const response = await api.post("sim_list");
 
       if (response.data && Array.isArray(response.data.data)) {
-        const processedData = response.data.data.map((item) => ({
+        const processedData = response.data.data.map((item, index) => ({
+          s_no: index + 1, // Increment the serial number for each item
           id: item.id,
           network_id: item.network_id,
           network_provider_name: item.network_provider_name,
@@ -113,8 +114,9 @@ export const Sim = () => {
       console.error("Error fetching users:", error);
     }
   };
-
   function handleEditClick(record) {
+    showEditDrawer();
+
     setEditData([
       record.id,
       record.network_id,
@@ -125,30 +127,25 @@ export const Sim = () => {
       record.valid_form,
       record.valid_to,
     ]);
-
-    // Set isEditVisible to true
-    setIsEditVisible(true);
-    setIsCreateVisible(false);
-    setIsAssignVisible(false);
   }
-
   function handleAssignClick(record) {
-    handleAssignCard();
-
+    showAssignDrawer();
     const id = record.id;
     const type = "Sim";
     const sim_imei_no = record.sim_imei_no;
-
     const data = [id, type, sim_imei_no];
-
     setAssignData(data);
   }
 
   useEffect(() => {
     loadSims();
   }, []);
-
   const tableColumns = [
+    {
+      title: "S No",
+      dataIndex: "s_no",
+      fixed: "left",
+    },
     {
       title: "Network",
       dataIndex: "network_provider_name",
@@ -173,22 +170,27 @@ export const Sim = () => {
         <div>
           <span
             style={{ cursor: "pointer", marginRight: "8px" }}
+            onClick={() => handleAssignClick(record)}
+          >
+            <SwapOutlined />
+          </span>
+          <span
+            style={{ cursor: "pointer", marginRight: "8px" }}
             onClick={() => handleEditClick(record)}
           >
             <EditTwoTone />
           </span>
-          <span
-            style={{ cursor: "pointer", marginRight: "8px" }}
-            onClick={() => handleAssignClick(record)}
+          <Popconfirm
+            title="Sim"
+            description="Are you sure to delete this sim"
+            placement="left"
+            onConfirm={() => handleDelete(record.id)} // Call your delete function here
+            onCancel={() => handleCancel()}
           >
-            <EditTwoTone />
-          </span>
-          <span
-            style={{ cursor: "pointer" }}
-            onClick={() => showPopconfirm(record)}
-          >
-            <DeleteTwoTone />
-          </span>
+            <span style={{ cursor: "pointer" }}>
+              <DeleteTwoTone />
+            </span>
+          </Popconfirm>
         </div>
       ),
     },
@@ -204,76 +206,70 @@ export const Sim = () => {
 
   return (
     <>
-      <Row gutter={6}>
-        <Col sm={24} md={14} lg={14}>
-          <Popconfirm
-            size="big"
-            title="Sim"
-            description="Click OK to Delete this Sim"
-            open={open}
-            placement="rightTop"
-            onConfirm={handleOk}
-            onCancel={handleCancel}
-          >
-            <Card title="Sim">
-              <Flex
-                alignItems="center"
-                justifyContent="space-between"
-                mobileFlex={false}
-              >
-                <Flex className="mb-1" mobileFlex={false}>
-                  <div className="mr-md-3 mb-3">
-                    <Input
-                      placeholder="Search"
-                      prefix={<SearchOutlined />}
-                      onChange={(e) => onSearch(e)}
-                    />
-                  </div>
+      <Drawer
+        width={500}
+        title="New Sim"
+        placement="right"
+        onClose={onClose}
+        open={Createopen}
+      >
+        <Create parentFunction={parentFunction} />
+      </Drawer>
+      <Drawer
+        width={500}
+        title="Edit Sim"
+        placement="right"
+        onClose={onClose}
+        open={Editopen}
+      >
+        <Edit
+          key={editdata[0]}
+          parentToChild={editdata}
+          parentFunction={parentFunction}
+        />
+      </Drawer>
+      <Drawer
+        width={500}
+        title="Assign Sim"
+        placement="right"
+        onClose={onClose}
+        open={Assignopen}
+      >
+        <Assign
+          key={assigndata[0]}
+          parentToChild={assigndata}
+          parentFunction={parentFunction}
+        />
+      </Drawer>
 
-                  <div className="mb-3"></div>
-                </Flex>
-                <div className="mb-3">
-                  <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    ghost
-                    onClick={handleCreateCard}
-                  >
-                    Add Sim
-                  </Button>
-                </div>
-              </Flex>
-
-              <div className="table-responsive">
-                <Table
-                  bordered
-                  columns={tableColumns}
-                  dataSource={simList}
-                  rowKey="id"
-                />
-              </div>
-            </Card>
-          </Popconfirm>
-        </Col>
-        <Col sm={24} md={10} lg={10}>
-          {isCreateVisible && <Create parentFunction={parentFunction} />}
-
-          {isAssignVisible && (
-            <Assign
-              key={assigndata[0]}
-              parentToChild={assigndata}
-              parentFunction={parentFunction}
+      <Card title="Sim">
+        <Row justify="space-between">
+          <Col span={4}>
+            <Input
+              placeholder="Search"
+              prefix={<SearchOutlined />}
+              onChange={(e) => onSearch(e)}
             />
-          )}
-          {isEditVisible && (
-            <Edit
-              key={editdata[0]}
-              parentToChild={editdata}
-              parentFunction={parentFunction}
-            />
-          )}
-        </Col>
-      </Row>
+          </Col>
+          <Col span={4}>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              ghost
+              onClick={showCreateDrawer}
+            >
+              Add Sim
+            </Button>
+          </Col>
+        </Row>
+
+        <Table
+          bordered
+          columns={tableColumns}
+          dataSource={simList}
+          rowKey="id"
+        />
+      </Card>
     </>
   );
 };
