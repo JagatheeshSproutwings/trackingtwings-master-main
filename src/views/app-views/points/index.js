@@ -139,7 +139,8 @@ export const User = () => {
       const response = await api.post("point_stock_list", data);
 
       if (response.data && Array.isArray(response.data.data)) {
-        const processedData = response.data.data.map((item) => ({
+        const processedData = response.data.data.map((item, index) => ({
+          s_no: index + 1, // Increment the serial number for each item
           id: item.id,
           point_type: item.point_type,
           package_code: item.package_code,
@@ -173,6 +174,11 @@ export const User = () => {
   };
 
   const tableColumns = [
+    {
+      title: "S No",
+      dataIndex: "s_no",
+      fixed: "left",
+    },
     {
       title: "Point Type",
       dataIndex: "point_type",
@@ -253,9 +259,9 @@ export const User = () => {
         </div>
       </Card>
 
-      <Drawer placement="left" closable={false} onClose={onClose} open={open}>
+      <Drawer placement="right" closable={false} onClose={onClose} open={open}>
         <div className="container">
-          <h2>Point Info</h2>
+          <h2>New Point</h2>
           <Form
             name="registrationForm"
             onFinish={onFinish}

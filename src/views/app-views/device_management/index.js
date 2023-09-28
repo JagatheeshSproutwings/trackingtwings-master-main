@@ -475,7 +475,16 @@ const Vehicle = () => {
     }
   };
 
+  let serialNumber = 0;
   const tableColumns = [
+    {
+      title: "S No",
+      render: () => {
+        serialNumber++; // Increment the counter for each row
+        return <span>{serialNumber}</span>;
+      },
+      fixed: "left", // If you want it to be a fixed column on the left
+    },
     {
       title: "Type",
       dataIndex: "vehicle_type",
@@ -675,25 +684,23 @@ const Vehicle = () => {
     }
   };
   const loadPlans = async () => {
-    try
-    {
+    try {
       SetPlanList([]);
 
-    const data = { user_id: currentUser };
+      const data = { user_id: currentUser };
 
-    const plan_list = await api
-      .post("user_plan_list", data)
-      .then((res) => {
-        return res;
-      })
-      .catch((err) => {
-        return err;
-      });
-    SetPlanList(plan_list?.data?.data);
-    }catch(error){
+      const plan_list = await api
+        .post("user_plan_list", data)
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err;
+        });
+      SetPlanList(plan_list?.data?.data);
+    } catch (error) {
       console.error("Error fetching users:", error);
     }
-    
   };
   const onSearch = (e) => {
     const searchValue = e.currentTarget.value;

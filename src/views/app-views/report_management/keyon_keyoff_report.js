@@ -16,8 +16,9 @@ const KeyOnKeyOffReport = ({ parentToChild, ...props }) => {
 
   const tableColumns = [
     {
-      title: "S.No",
+      title: "S No",
       dataIndex: "s_no",
+      fixed: "left",
     },
     {
       title: "Vehicle Name",
@@ -120,6 +121,7 @@ const KeyOnKeyOffReport = ({ parentToChild, ...props }) => {
         ? selectedDateRange[1].format("YYYY-MM-DD HH:mm:ss")
         : null,
       device_imei: selectedVehicleId === "0" ? null : selectedVehicleId,
+      user_id: parentToChild,
     };
 
     setKeyOnOffList([]); // Clear previous data
@@ -129,8 +131,9 @@ const KeyOnKeyOffReport = ({ parentToChild, ...props }) => {
       const keyonoff_data = await api.post("get_keyonoff_report", data);
 
       if (keyonoff_data.data && Array.isArray(keyonoff_data.data.data)) {
-        const processedData = keyonoff_data.data.data.map((item) => ({
-          s_no: item.id,
+        const processedData = keyonoff_data.data.data.map((item, index) => ({
+          s_no: index + 1,
+          id: item.id,
           vehicle_name: item.vehicle_name,
           start_time: item.start_datetime,
           start_location: item.start_latitude + ":" + item.start_longitude,

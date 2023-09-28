@@ -1,84 +1,51 @@
 import React, { useState, useEffect } from "react";
-import { Card, Table, Button, Select, DatePicker, Drawer } from "antd";
+import { Card, Table, Button, Select, DatePicker } from "antd";
 import api from "configs/apiConfig";
 import Flex from "components/shared-components/Flex";
-import {
-  FileExcelOutlined,
-  SearchOutlined,
-  GlobalOutlined,
-} from "@ant-design/icons";
+import { FileExcelOutlined, SearchOutlined } from "@ant-design/icons";
 import { Excel } from "antd-table-saveas-excel";
-import MapView from "./map_view";
-
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
-const Idlereport = ({ parentToChild, ...props }) => {
-  const [idleList, setIdleList] = useState([]);
+const Distancereport = ({ parentToChild, ...props }) => {
+  const [distanceList, setdistanceList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedDateRange, setSelectedDateRange] = useState(null);
   const [selectedVehicleId, setSelectedVehicleId] = useState("All");
   const [vehicleOptions, setVehicleOptions] = useState([]);
 
-  const [open, setOpen] = useState(false);
-  const showDrawer = () => {
-    setOpen(true);
-  };
-  const onClose = () => {
-    setOpen(false);
-  };
-  const [mapvehicleDate, setmapvehicleDate] = useState([]);
-  const handleMapViewClick = async (record) => {
-    const idle_data = {
-      id: record.id,
-      latitude: record.s_lat || 0.0,
-      longitude: record.s_lng || 0.0,
-      title: record.vehicle_name || "TEST",
-      duration: record.duration,
-      icon_url: "/img/ICONS/BLUE/" + record?.short_name + ".png",
-      device_time: record.start_date,
-    };
-    setmapvehicleDate(idle_data);
-    showDrawer();
-  };
-
   const tableColumns = [
     {
-      title: "S No",
+      title: "S.No",
       dataIndex: "s_no",
-      fixed: "left",
     },
     {
       title: "Vehicle Name",
       dataIndex: "vehicle_name",
     },
     {
-      title: "Start Date",
-      dataIndex: "start_date",
+      title: "Date",
+      dataIndex: "date",
     },
     {
-      title: "End Date",
-      dataIndex: "end_date",
+      title: "Start Location",
+      dataIndex: "start_location",
     },
     {
-      title: "Location",
-      dataIndex: "location",
+      title: "Start Odometer",
+      dataIndex: "start_odometer",
     },
     {
-      title: "Duration",
-      dataIndex: "duration",
+      title: "End Location",
+      dataIndex: "end_location",
     },
     {
-      title: "Map View",
-      dataIndex: "map_view",
-      fixed: "right",
-      render: (_, record) => (
-        <div>
-          <span onClick={() => handleMapViewClick(record)}>
-            <GlobalOutlined />
-          </span>
-        </div>
-      ),
+      title: "End Odometer",
+      dataIndex: "end_odometer",
+    },
+    {
+      title: "Total kms",
+      dataIndex: "odometer_difference",
     },
   ];
 
@@ -97,6 +64,7 @@ const Idlereport = ({ parentToChild, ...props }) => {
   useEffect(() => {
     fetchVehicleOptions();
   }, []);
+
   const fetchVehicleOptions = async () => {
     try {
       setVehicleOptions([]);
@@ -122,12 +90,15 @@ const Idlereport = ({ parentToChild, ...props }) => {
       console.error("Error fetching vehicle options:", error);
     }
   };
+
   const handleDateRangeChange = (dateRange) => {
     setSelectedDateRange(dateRange);
   };
+
   const handleVehicleIdChange = (vehicleId) => {
     setSelectedVehicleId(vehicleId);
   };
+
   const handleSearchClick = async () => {
     const data = {
       start_day: selectedDateRange
@@ -140,28 +111,27 @@ const Idlereport = ({ parentToChild, ...props }) => {
       user_id: parentToChild,
     };
 
-    setIdleList([]); // Clear previous data
+    setdistanceList([]); // Clear previous data
     setIsLoading(true);
 
     try {
-      const idle_data = await api.post("get_idle_report", data);
+      const distance_data = await api.post("get_distance_report", data);
 
-      if (idle_data.data && Array.isArray(idle_data.data.data)) {
-        const processedData = idle_data.data.data.map((item, index) => ({
+      if (distance_data.data && Array.isArray(distance_data.data.data)) {
+        const processedData = distance_data.data.data.map((item, index) => ({
           s_no: index + 1, // Increment the serial number for each item
           id: item.id,
           vehicle_name: item.vehicle_name,
-          start_date: item.start_datetime,
-          end_date: item.end_datetime,
-          location: item.start_latitude + ":" + item.start_longitude,
-          duration: item.idle_duration,
-          s_lat: item.start_latitude,
-          s_lng: item.start_longitude,
-          short_name: item.short_name,
+          date: item.date,
+          start_location: item.start_latitude + ":" + item.start_longitude,
+          start_odometer: item.start_odometer,
+          end_location: item.end_latitude + ":" + item.end_longitude,
+          end_odometer: item.end_odometer,
+          odometer_difference: item.odometer_difference,
         }));
-        setIdleList(processedData);
+        setdistanceList(processedData);
       } else {
-        setIdleList([]);
+        setdistanceList([]);
       }
     } catch (err) {
       console.error(err);
@@ -173,7 +143,7 @@ const Idlereport = ({ parentToChild, ...props }) => {
     excel
       .addSheet("test")
       .addColumns(tableColumns)
-      .addDataSource(idleList, {
+      .addDataSource(distanceList, {
         str2Percent: true,
       })
       .saveAs("Excel.xlsx");
@@ -181,16 +151,7 @@ const Idlereport = ({ parentToChild, ...props }) => {
 
   return (
     <div>
-      <Drawer
-        width={500}
-        title="Map View"
-        placement="right"
-        onClose={onClose}
-        open={open}
-      >
-        <MapView data={mapvehicleDate} />
-      </Drawer>
-      <Card title="Idle Report">
+      <Card title="Distance Report">
         <Flex
           alignItems="center"
           justifyContent="space-between"
@@ -255,8 +216,8 @@ const Idlereport = ({ parentToChild, ...props }) => {
         <div className="table-responsive">
           {isLoading ? (
             <div>Loading...</div> // Display loading indicator
-          ) : idleList.length > 0 ? (
-            <Table bordered columns={tableColumns} dataSource={idleList} />
+          ) : distanceList.length > 0 ? (
+            <Table bordered columns={tableColumns} dataSource={distanceList} />
           ) : (
             <p>No Data Found</p>
           )}
@@ -266,4 +227,4 @@ const Idlereport = ({ parentToChild, ...props }) => {
   );
 };
 
-export default Idlereport;
+export default Distancereport;

@@ -1,15 +1,25 @@
-import React, { useState } from "react";
-import { Row, Col, Button, Form, Input, Modal, notification } from "antd";
+import React, { useState, useEffect } from "react";
+import {
+  Row,
+  Col,
+  Button,
+  Form,
+  Input,
+  Modal,
+  notification,
+  Select,
+} from "antd";
 import api from "configs/apiConfig";
 import Flex from "components/shared-components/Flex";
 
-const CustomerUpdate = ({ parentToChild, ...props }) => {
+const AdminUpdate = ({ parentToChild, ...props }) => {
   const [form] = Form.useForm();
   const [isModalOpen, setIsModalOpen] = useState(true);
+  const [vehicleTypeList, SetVehicleTypeList] = useState([]);
 
-  const [currentUser, SetCurrentUser] = useState(
-    localStorage.getItem("id") || ""
-  );
+  useEffect(() => {
+    CustomerChange();
+  }, []);
 
   const handleOk = () => {
     props.parentFunction();
@@ -30,13 +40,14 @@ const CustomerUpdate = ({ parentToChild, ...props }) => {
 
   const onSubmit = async (values) => {
     try {
-      await api.post("config/store", values);
+      values["id"] = parentToChild["id"];
+      await api.post("customer_vehicle_update", values);
       form.resetFields();
       props.parentFunction();
       openNotification(
         "success",
         "Vehicle",
-        "Vehicle Settings Saved Successfully!"
+        "Vehicle Settings Updated Successfully!"
       );
       handleOk();
     } catch (error) {
@@ -46,12 +57,28 @@ const CustomerUpdate = ({ parentToChild, ...props }) => {
     }
   };
 
+  const CustomerChange = async () => {
+    SetVehicleTypeList([]);
+    const vehicle_type_list = await api
+      .get("vehicle_type")
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err;
+      });
+    SetVehicleTypeList(vehicle_type_list?.data?.data);
+  };
+
+  console.log(parentToChild);
+
   return (
     <Row gutter={6}>
       <Col>
         <Flex>
           <div className="container">
             <Modal
+              width={300}
               title="Vehicle Settings"
               visible={isModalOpen} // Change "open" to "visible"
               onOk={handleOk}
@@ -65,70 +92,56 @@ const CustomerUpdate = ({ parentToChild, ...props }) => {
                 layout="vertical"
                 onFinish={onSubmit}
               >
-                <Row gutter={[8, 8]}>
-                  <Col sm={12} md={12} lg={12}>
+                <Row gutter={[6, 6]}>
+                  <Col sm={24} md={24} lg={24}>
                     <Form.Item
-                      name="vehicle_id"
-                      hidden
-                      initialValue={parentToChild.vehicle_id}
+                      initialValue={parentToChild["vehicle_type_id"]}
+                      label="Vehicle Type"
+                      name="vehicle_type_id"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please Select Vehicle Type",
+                        },
+                      ]}
                     >
-                      <Input type="text"></Input>
+                      <Select
+                        showSearch
+                        allowClear
+                        value={parentToChild["id"]}
+                        placeholder="Select Vehicle Type"
+                        optionFilterProp="children"
+                        filterOption={(input, option) =>
+                          option.children
+                            .toLowerCase()
+                            .indexOf(input.toLowerCase()) >= 0
+                        }
+                      >
+                        {Array.isArray(vehicleTypeList) ? (
+                          vehicleTypeList.map((vehicletype) => (
+                            <Select.Option
+                              key={vehicletype?.id}
+                              value={vehicletype?.id}
+                            >
+                              {vehicletype?.vehicle_type}
+                            </Select.Option>
+                          ))
+                        ) : (
+                          <Select.Option></Select.Option>
+                        )}
+                      </Select>
                     </Form.Item>
                   </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      name="device_imei"
-                      hidden
-                      initialValue={parentToChild.device_imei}
-                    >
-                      <Input type="text"></Input>
-                    </Form.Item>
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
+                </Row>
+                <Row gutter={[6, 6]}>
+                  <Col sm={24} md={24} lg={24}>
                     <Form.Item
                       size="small"
-                      label="Parking Alert Time"
-                      name="parking_alert_time"
-                      initialValue={parentToChild.parking_alert_time}
+                      label="Vehicle Name"
+                      name="vehicle_name"
+                      initialValue={parentToChild["vehicle_name"]}
                     >
-                      <Input placeholder="Parking Alert Time" />
-                    </Form.Item>
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      size="small"
-                      label="Idle Alert Time"
-                      name="idle_alert_time"
-                      initialValue={parentToChild.idle_alert_time}
-                    >
-                      <Input placeholder="Idle Alert Time" />
-                    </Form.Item>
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      label="Speed Limit"
-                      name="speed_limit"
-                      initialValue={parentToChild.speed_limit}
-                    >
-                      <Input placeholder="Speed Limit"></Input>
-                    </Form.Item>
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      label="Expected Mileage"
-                      name="expected_mileage"
-                      initialValue={parentToChild.expected_mileage}
-                    >
-                      <Input placeholder="Expected Mileage"></Input>
-                    </Form.Item>
-                  </Col>
-                  <Col sm={12} md={12} lg={12}>
-                    <Form.Item
-                      label="Idle RPM"
-                      name="idle_rpm"
-                      initialValue={parentToChild.idle_rpm}
-                    >
-                      <Input placeholder="Idle RPM"></Input>
+                      <Input placeholder="Vehicle Name" />
                     </Form.Item>
                   </Col>
                 </Row>
@@ -146,4 +159,4 @@ const CustomerUpdate = ({ parentToChild, ...props }) => {
   );
 };
 
-export default CustomerUpdate;
+export default AdminUpdate;
