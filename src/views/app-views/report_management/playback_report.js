@@ -1,21 +1,30 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Button, Card, Select, DatePicker, Row, Col } from "antd";
-import Flex from "components/shared-components/Flex";
+import { Button, Card, Select, DatePicker, Row, Col, notification } from "antd";
 import {
   SearchOutlined,
   PauseOutlined,
   PlayCircleOutlined,
+  StopOutlined,
 } from "@ant-design/icons";
 import api from "configs/apiConfig";
 import L from "leaflet";
-import { MapContainer, TileLayer, LayersControl } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  LayersControl,
+  Marker,
+  Popup,
+  Polyline,
+} from "react-leaflet";
 import "leaflet-rotatedmarker";
-import { Polyline } from "react-leaflet";
-
+import "leaflet-arrowheads";
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
 export const PlaybackHistory = ({ parentToChild, ...props }) => {
+  const [startCoordinate, setStartCoordinate] = useState(null);
+  const [endCoordinate, setEndCoordinate] = useState(null);
+
   const [isPaused, setIsPaused] = useState(false);
   const handlePauseClick = () => {
     setIsPaused(true);
@@ -24,11 +33,22 @@ export const PlaybackHistory = ({ parentToChild, ...props }) => {
     setIsPaused(false);
   };
 
+  const openNotification = (type, message, description) => {
+    notification[type]({
+      message,
+      description,
+    });
+  };
+
   const [vehicleOptions, setVehicleOptions] = useState([]);
   const [selectedVehicleId, setSelectedVehicleId] = useState("");
   const [selectedDateRange, setSelectedDateRange] = useState(null);
   const [currentPopup, setCurrentPopup] = useState(null);
   const [polylineCoordinates, setPolylineCoordinates] = useState([]);
+  const [polylineData, setPolylineData] = useState([]);
+  const [isShowButton, setShowButton] = useState(false);
+  const [moveInterval, setMoveInterval] = useState("1000");
+
   const getUser = () => {
     return localStorage.getItem("id");
   };
@@ -88,9 +108,9 @@ export const PlaybackHistory = ({ parentToChild, ...props }) => {
       user_id: parentToChild,
     };
     setMultiVehicles([]);
+    setShowButton(false);
     try {
       const parking_data = await api.post("get_playback_report", data);
-
       if (parking_data.data && Array.isArray(parking_data.data.data)) {
         const processedData = parking_data.data.data.map((item, index) => ({
           s_no: index + 1,
@@ -108,23 +128,38 @@ export const PlaybackHistory = ({ parentToChild, ...props }) => {
           ignition: item.ignition,
           ac_status: item.ac_status,
         }));
-        console.log(processedData);
+        setShowButton(true);
         setMultiVehicles(processedData);
       } else {
+        setShowButton(false);
         setMultiVehicles([]);
+        openNotification("error", "Playback", "No Playback Found");
       }
     } catch (err) {
-      console.error(err);
+      setShowButton(false);
+      setMultiVehicles([]);
+      openNotification("error", "Playback", "No Playback Found");
     }
   };
 
-  const moveInterval = 500;
+  const handleSpeedChange = async (value) => {
+    alert(value);
+    setMoveInterval(value);
+  };
+
+  // const moveInterval = 1000;
 
   const [multiVehicles, setMultiVehicles] = useState([]);
   const [currentMarkerIndex, setCurrentMarkerIndex] = useState(0);
   const [currentMarker, setCurrentMarker] = useState(null);
 
   useEffect(() => {
+    const coordinates = multiVehicles.map((item) => [
+      item.latitude,
+      item.longitude,
+    ]);
+    setPolylineData(coordinates);
+
     let intervalId;
 
     if (!isPaused) {
@@ -133,6 +168,14 @@ export const PlaybackHistory = ({ parentToChild, ...props }) => {
           const vehicle = multiVehicles[currentMarkerIndex];
           const newPosition = [vehicle.latitude, vehicle.longitude];
           const newRotationAngle = vehicle.angle;
+
+          if (currentMarkerIndex === 0) {
+            // Set the start coordinate for the marker
+            setStartCoordinate([vehicle.latitude, vehicle.longitude]);
+          } else if (currentMarkerIndex === multiVehicles.length - 1) {
+            // Set the end coordinate for the marker
+            setEndCoordinate([vehicle.latitude, vehicle.longitude]);
+          }
 
           // Remove previous marker and popup
           if (currentMarker) {
@@ -152,6 +195,17 @@ export const PlaybackHistory = ({ parentToChild, ...props }) => {
           // Save the new marker reference
           setCurrentMarker(newMarker);
 
+          const polyline = L.polyline(polylineCoordinates, {
+            color: "blue",
+          }).addTo(mapRef.current);
+
+          // Add arrowheads to the Polyline using the arrowheads extension
+          polyline.arrowheads({
+            arrowheadLength: "20px",
+            color: "green",
+            arrowheadFrequency: "endonly",
+          });
+
           // Add a new popup at the current position
           const newPopup = L.popup({
             style: {
@@ -167,8 +221,10 @@ export const PlaybackHistory = ({ parentToChild, ...props }) => {
               <div>
                 Vehicle Name: <b>${vehicle?.vehicle_name || ""}</b><br />
                 Speed: <b>${vehicle?.speed} KMPH</b><br />
-                Last Updated at: <b>${vehicle?.device_datetime}</b><br />
-                Odometer: <b>${vehicle?.odometer} (HH:MM:SS)</b>
+                Last Updated at: <b>${
+                  vehicle?.device_datetime
+                } (HH:MM:SS)</b><br />
+                Odometer: <b>${vehicle?.odometer} </b>
               </div>
             `
             )
@@ -213,91 +269,137 @@ export const PlaybackHistory = ({ parentToChild, ...props }) => {
     popupAnchor: [0, -32], // Anchor point for popups relative to the icon
   });
 
+  const handleStopClick = () => {
+    setMultiVehicles([]);
+    setCurrentMarkerIndex(0);
+    setPolylineCoordinates([]);
+    setStartCoordinate(null);
+    setEndCoordinate(null);
+    mapRef.current.eachLayer((layer) => {
+      if (layer instanceof L.Marker) {
+        layer.remove();
+      }
+    });
+
+    if (currentMarker) {
+      currentMarker.remove();
+    }
+    if (currentPopup) {
+      currentPopup.remove();
+    }
+    setShowButton(false);
+  };
+
   return (
     <>
       <Card title="Playback History">
-        <Flex
-          alignItems="center"
-          justifyContent="space-between"
-          mobileFlex={false}
-        >
-          <Flex className="mb-1" mobileFlex={false}>
-            <div className="mr-md-3 mr-3">
-              <RangePicker
-                showTime
-                name="range_picker"
-                format={"YYYY-MM-DD hh:mm:ss"}
-                onChange={handleDateRangeChange}
-              />
-            </div>
-            <div className="mr-md-3 mb-3">
-              <Select
-                defaultValue="All"
-                className="w-100"
-                style={{ minWidth: 180 }}
-                name="device_imei"
-                placeholder="Vehicle"
-                onChange={handleVehicleIdChange}
-                value={selectedVehicleId}
-              >
-                <Option value="All">All</Option>
-                {Array.isArray(vehicleOptions) ? (
-                  vehicleOptions.map((vehicle) => (
-                    <Option
-                      key={vehicle.device_imei}
-                      value={vehicle.device_imei}
-                    >
-                      {vehicle.vehicle_name}
-                    </Option>
-                  ))
-                ) : (
-                  <Option value="Loading">Loading...</Option>
-                )}
-              </Select>
-            </div>
+        <Row>
+          <Col span={8} order={1}>
+            <RangePicker
+              showTime
+              name="range_picker"
+              format={"YYYY-MM-DD hh:mm:ss"}
+              onChange={handleDateRangeChange}
+            />
+          </Col>
+          <Col span={4} order={2}>
+            <Select
+              showSearch
+              allowClear
+              optionFilterProp="children"
+              defaultValue="All"
+              className="w-100"
+              name="device_imei"
+              placeholder="Vehicle"
+              onChange={handleVehicleIdChange}
+              value={selectedVehicleId}
+            >
+              {Array.isArray(vehicleOptions) ? (
+                vehicleOptions.map((vehicle) => (
+                  <Option key={vehicle.device_imei} value={vehicle.device_imei}>
+                    {vehicle.vehicle_name}
+                  </Option>
+                ))
+              ) : (
+                <Option value="Loading">Loading...</Option>
+              )}
+            </Select>
+          </Col>
 
-            <div className="mb-3 mr-3">
+          <Col span={12} order={3}>
+            <Button
+              style={{ marginLeft: "10px" }}
+              type="primary"
+              success
+              icon={<SearchOutlined />}
+              onClick={handleSearchClick}
+            >
+              Search
+            </Button>
+            {isShowButton && (
               <Button
+                style={{ marginLeft: "10px" }}
+                type="primary"
+                danger
+                icon={<PauseOutlined />}
+                onClick={handlePauseClick}
+                disabled={isPaused}
+              >
+                Pause
+              </Button>
+            )}
+            {isShowButton && (
+              <Button
+                style={{ marginLeft: "10px" }}
+                type="primary"
+                icon={<PlayCircleOutlined />}
+                onClick={handlePlayClick}
+                disabled={!isPaused}
+              >
+                Play
+              </Button>
+            )}
+            {isShowButton && (
+              <Button
+                style={{ marginLeft: "10px" }}
                 type="primary"
                 success
-                icon={<SearchOutlined />}
-                onClick={handleSearchClick}
+                icon={<StopOutlined />}
+                onClick={handleStopClick}
               >
-                Search
+                Stop
               </Button>
-            </div>
-          </Flex>
-        </Flex>
+            )}
+            {isShowButton && (
+              <Select
+                defaultValue="All"
+                name="device_imei"
+                style={{ marginLeft: "5px" }}
+                onChange={handleSpeedChange}
+                value={moveInterval}
+              >
+                <Option value="2000">Slow</Option>
+                <Option value="1000">Normal</Option>
+                <Option value="350">Speed</Option>
+              </Select>
+            )}
+          </Col>
+        </Row>
 
-        <div className="mb-3 mr-3">
-          <Button
-            type="primary"
-            danger
-            icon={<PauseOutlined />}
-            onClick={handlePauseClick}
-            disabled={isPaused}
-          >
-            Pause
-          </Button>
-          <Button
-            type="primary"
-            icon={<PlayCircleOutlined />}
-            onClick={handlePlayClick}
-            disabled={!isPaused}
-          >
-            Play
-          </Button>
-        </div>
         <div>
           <Row>
             <Col span={24}>
               <MapContainer
+                style={{ height: "500px" }}
                 ref={mapRef}
                 center={position}
                 zoom={12}
                 keepCenter={true}
                 scrollWheelZoom={true}
               >
+                {polylineData.length > 0 && (
+                  <Polyline positions={polylineData} color="blue" />
+                )}
                 <LayersControl>
                   <BaseLayer name="OpenStreetMap">
                     <TileLayer
@@ -319,10 +421,30 @@ export const PlaybackHistory = ({ parentToChild, ...props }) => {
                     />
                   </BaseLayer>
                 </LayersControl>
-                <Polyline
-                  positions={polylineCoordinates}
-                  color="blue" // You can customize the color and other properties
-                />
+                {startCoordinate && (
+                  <Marker position={startCoordinate}>
+                    <Popup>
+                      Start Point:
+                      <br />
+                      Latitude: {startCoordinate[0]}
+                      <br />
+                      Longitude: {startCoordinate[1]}
+                    </Popup>
+                  </Marker>
+                )}
+
+                {/* Add a marker for the end coordinate */}
+                {endCoordinate && (
+                  <Marker position={endCoordinate}>
+                    <Popup>
+                      End Point:
+                      <br />
+                      Latitude: {endCoordinate[0]}
+                      <br />
+                      Longitude: {endCoordinate[1]}
+                    </Popup>
+                  </Marker>
+                )}
               </MapContainer>
             </Col>
           </Row>
