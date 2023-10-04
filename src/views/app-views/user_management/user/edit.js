@@ -52,21 +52,11 @@ const Edit = ({ parentToChild, ...props }) => {
         const errorData = error.response.data;
         if (errorData.message && typeof errorData.message === "object") {
           const validationErrors = errorData.message;
-          if (validationErrors.hasOwnProperty("name")) {
-            openNotification("info", "Name", "Given Name is Already Exists");
-          }
           if (validationErrors.hasOwnProperty("email")) {
             openNotification(
               "info",
               "E-Mail ID",
               "Given E-Mail ID is Already Exists"
-            );
-          }
-          if (validationErrors.hasOwnProperty("mobile_no")) {
-            openNotification(
-              "info",
-              "Mobile No",
-              "Given Mobile No is Already Exists"
             );
           }
         }

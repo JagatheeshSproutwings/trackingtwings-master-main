@@ -80,6 +80,7 @@ const Create = (props) => {
 
         openNotification("success", "User", "User Created Successfully!");
       } catch (error) {
+        setLoading(false);
         if (error.response && error.response.status === 403) {
           const errorData = error.response.data;
           if (errorData.message && typeof errorData.message === "object") {

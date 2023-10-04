@@ -1297,6 +1297,15 @@ const Vehicle = () => {
                   ></Input>
                 </Form.Item>
               </Col>
+              <Col sm={3} md={6} lg={6} xxl={6}>
+                <Form.Item name="due_amount" label="Due Amount">
+                  <Input
+                    type="number"
+                    name="due_amount"
+                    placeholder="Due Amount"
+                  ></Input>
+                </Form.Item>
+              </Col>
             </Row>
             <Row>
               <Form.Item>
