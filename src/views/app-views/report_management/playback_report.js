@@ -24,6 +24,7 @@ const { RangePicker } = DatePicker;
 export const PlaybackHistory = ({ parentToChild, ...props }) => {
   const [startCoordinate, setStartCoordinate] = useState(null);
   const [endCoordinate, setEndCoordinate] = useState(null);
+  const [polylineRef, setPolylineRef] = useState(null);
 
   const [isPaused, setIsPaused] = useState(false);
   const handlePauseClick = () => {
@@ -143,8 +144,22 @@ export const PlaybackHistory = ({ parentToChild, ...props }) => {
   };
 
   const handleSpeedChange = async (value) => {
-    alert(value);
     setMoveInterval(value);
+  };
+
+  const resetMap = () => {
+    mapRef.current.eachLayer((layer) => {
+      // Remove all layers except the base layers
+      if (!(layer instanceof L.TileLayer)) {
+        layer.remove();
+      }
+    });
+
+    mapRef.current.setView(position, 12);
+    setPolylineData([]);
+    setPolylineCoordinates([]);
+    setStartCoordinate(null);
+    setEndCoordinate(null);
   };
 
   // const moveInterval = 1000;
@@ -198,7 +213,7 @@ export const PlaybackHistory = ({ parentToChild, ...props }) => {
           const polyline = L.polyline(polylineCoordinates, {
             color: "blue",
           }).addTo(mapRef.current);
-
+          setPolylineRef(polyline);
           // Add arrowheads to the Polyline using the arrowheads extension
           polyline.arrowheads({
             arrowheadLength: "20px",
@@ -270,16 +285,12 @@ export const PlaybackHistory = ({ parentToChild, ...props }) => {
   });
 
   const handleStopClick = () => {
+    setPolylineData([]);
     setMultiVehicles([]);
     setCurrentMarkerIndex(0);
     setPolylineCoordinates([]);
     setStartCoordinate(null);
     setEndCoordinate(null);
-    mapRef.current.eachLayer((layer) => {
-      if (layer instanceof L.Marker) {
-        layer.remove();
-      }
-    });
 
     if (currentMarker) {
       currentMarker.remove();
@@ -288,6 +299,27 @@ export const PlaybackHistory = ({ parentToChild, ...props }) => {
       currentPopup.remove();
     }
     setShowButton(false);
+
+    // Remove the polyline if it exists
+    if (polylineRef) {
+      mapRef.current.removeLayer(polylineRef);
+    }
+
+    if (currentMarker) {
+      currentMarker.remove();
+    }
+    if (currentPopup) {
+      currentPopup.remove();
+    }
+    setShowButton(false);
+
+    // Remove the polyline if it exists
+    if (polylineRef) {
+      polylineRef.remove();
+    }
+
+    // Reset the map
+    resetMap();
   };
 
   return (

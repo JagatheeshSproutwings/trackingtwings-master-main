@@ -534,25 +534,17 @@ const Vehicle = () => {
     },
   ];
 
-  const showPopconfirm = (record) => {
-    setDeleteID(record.id);
-    setDeleteOpen(true);
-  };
-
-  const handleCancel = () => {
-    setDeleteOpen(false);
-  };
-
-  const handleOk = async () => {
-    const data = { id: deleteID };
-    try {
-      const response = await api.post("customer_vehicle_delete", data);
-      openNotification("success", "Vehicle", "Vehicle Deleted Successfully!");
-      setDeleteOpen(false);
-      loadVehicles();
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    }
+  const handleDelete = async (record) => {
+    alert(record);
+    // const data = { id: record };
+    // try {
+    //   const response = await api.post("customer_vehicle_delete", data);
+    //   openNotification("success", "Vehicle", "Vehicle Deleted Successfully!");
+    //   setDeleteOpen(false);
+    //   loadVehicles();
+    // } catch (error) {
+    //   console.error("Error fetching users:", error);
+    // }
   };
   const getMenu = (record) => (
     <Menu>
@@ -563,12 +555,15 @@ const Vehicle = () => {
       >
         Edit
       </Menu.Item>
-      <Menu.Item
-        key="delete"
-        icon={<DeleteTwoTone />}
-        onClick={() => showPopconfirm(record)}
-      >
-        Delete
+      <Menu.Item key="delete">
+        <Popconfirm
+          title="Are you sure to delete this Vehicle?"
+          onConfirm={() => handleDelete(record.id)} // Define your delete function here
+          okText="Yes"
+          cancelText="No"
+        >
+          <DeleteTwoTone /> Delete
+        </Popconfirm>
       </Menu.Item>
       <Menu.Item
         key="config"
@@ -744,99 +739,89 @@ const Vehicle = () => {
           />
         )}
       </div>
-      <Popconfirm
-        size="big"
-        title="User"
-        description="Are you sure to delete this user"
-        open={deleteopen}
-        placement="rightTop"
-        onConfirm={handleOk}
-        onCancel={handleCancel}
-      >
-        <Card title="Vehicle List">
-          <Flex
-            alignItems="center"
-            justifyContent="space-between"
-            mobileFlex={false}
-          ></Flex>
 
-          <Row>
-            <Col sm={3} md={6} lg={6}>
-              <Input
-                style={{
-                  width: "70%",
-                }}
-                placeholder="Search"
-                prefix={<SearchOutlined />}
-                onChange={(e) => onSearch(e)}
-              />
-            </Col>
+      <Card title="Vehicle List">
+        <Flex
+          alignItems="center"
+          justifyContent="space-between"
+          mobileFlex={false}
+        ></Flex>
 
-            <Col sm={3} md={6} lg={6}>
-              {currentRole == 6 && (
-                <Select
-                  mode="tags"
-                  style={{
-                    width: "95%",
-                  }}
-                  placeholder="Select Vehicle"
-                  onChange={changeMutliVehicles}
-                  allowClear
-                  showSearch
-                  filterOption={(input, option) =>
-                    option.children
-                      .toLowerCase()
-                      .indexOf(input.toLowerCase()) >= 0
-                  }
-                >
-                  {Array.isArray(vehicleList) ? (
-                    vehicleList.map((vehicle) => (
-                      <Option key={vehicle.id} value={vehicle.id}>
-                        {vehicle.vehicle_name}
-                      </Option>
-                    ))
-                  ) : (
-                    <Option value="Loading" disabled>
-                      Loading...
-                    </Option>
-                  )}
-                </Select>
-              )}
-            </Col>
-
-            <Col sm={2} md={4} lg={4}>
-              {currentRole == 6 && (
-                <Button type="primary" ghost onClick={clickConfig}>
-                  Config
-                </Button>
-              )}
-            </Col>
-
-            <Col sm={2} md={4} lg={4}></Col>
-            <Col sm={2} md={4} lg={4}>
-              {currentRole <= 5 && (
-                <Button
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  onClick={showDrawer}
-                  ghost
-                >
-                  Add Vehicle
-                </Button>
-              )}
-            </Col>
-          </Row>
-
-          <div className="table-responsive">
-            <Table
-              bordered
-              columns={tableColumns}
-              dataSource={vehicleList}
-              rowKey="id"
+        <Row>
+          <Col sm={3} md={6} lg={6}>
+            <Input
+              style={{
+                width: "70%",
+              }}
+              placeholder="Search"
+              prefix={<SearchOutlined />}
+              onChange={(e) => onSearch(e)}
             />
-          </div>
-        </Card>
-      </Popconfirm>
+          </Col>
+
+          <Col sm={3} md={6} lg={6}>
+            {currentRole == 6 && (
+              <Select
+                mode="tags"
+                style={{
+                  width: "95%",
+                }}
+                placeholder="Select Vehicle"
+                onChange={changeMutliVehicles}
+                allowClear
+                showSearch
+                filterOption={(input, option) =>
+                  option.children.toLowerCase().indexOf(input.toLowerCase()) >=
+                  0
+                }
+              >
+                {Array.isArray(vehicleList) ? (
+                  vehicleList.map((vehicle) => (
+                    <Option key={vehicle.id} value={vehicle.id}>
+                      {vehicle.vehicle_name}
+                    </Option>
+                  ))
+                ) : (
+                  <Option value="Loading" disabled>
+                    Loading...
+                  </Option>
+                )}
+              </Select>
+            )}
+          </Col>
+
+          <Col sm={2} md={4} lg={4}>
+            {currentRole == 6 && (
+              <Button type="primary" ghost onClick={clickConfig}>
+                Config
+              </Button>
+            )}
+          </Col>
+
+          <Col sm={2} md={4} lg={4}></Col>
+          <Col sm={2} md={4} lg={4}>
+            {currentRole <= 5 && (
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={showDrawer}
+                ghost
+              >
+                Add Vehicle
+              </Button>
+            )}
+          </Col>
+        </Row>
+
+        <div className="table-responsive">
+          <Table
+            bordered
+            columns={tableColumns}
+            dataSource={vehicleList}
+            rowKey="id"
+          />
+        </div>
+      </Card>
 
       <Drawer
         placement="right"

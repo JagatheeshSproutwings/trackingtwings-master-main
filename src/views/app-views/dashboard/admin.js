@@ -87,7 +87,6 @@ export const Admin = () => {
   const [currentCustomerUser, setCurrentCustomerUser] = useState("");
   const { token } = useSelector((state) => state.auth);
   const { user_info } = useSelector((state) => state.auth);
-  console.log(user_info);
   const role_id = user_info?.role_id;
   const user_id = user_info?.id;
 
@@ -101,7 +100,6 @@ export const Admin = () => {
 
   const handleTabChange = (e) => {
     const tab_value = e.target.getAttribute("value");
-    console.log(tab_value);
     setActiveKey(tab_value);
     localStorage.setItem("current_vehicle_status", tab_value);
     localStorage.setItem("current_vehicle_id", "");
@@ -121,14 +119,12 @@ export const Admin = () => {
     const customer_id = getCurrentCustomer();
     const vehicle_device_imei = getCurrentVehicle();
     setCurrentVehicle(vehicle_device_imei);
-    console.log("Current vehicle Data :" + vehicle_device_imei);
   };
 
   const SingleVehicle = async (value) => {
     localStorage.setItem("current_vehicle_id", value);
 
     const current_vehicle_id = getCurrentVehicle();
-    console.log(currentVehicle);
     if (value && role_id === 6) {
       try {
         const singlevehicles_data = await api
@@ -140,8 +136,6 @@ export const Admin = () => {
             return [];
           });
         const processedData = singlevehicles_data?.data?.data;
-        // const single_map_data = Object.keys(processedData).map((key) => processedData[key]);
-        // console.log(single_map_data[1]);
 
         const mapData = [
           {
@@ -169,7 +163,6 @@ export const Admin = () => {
             gsm_count: 15,
           },
         ];
-        console.log(Array.isArray(mapData) ? "True" : "False");
         setmapvehicleDate(mapData);
       } catch (error) {
         console.error("Error Fetching Vehicle Data");
@@ -222,9 +215,6 @@ export const Admin = () => {
     const selected_vehicles = multiplevehiclesData?.filter(
       (item) => item.vehicle_name === search_value
     );
-    console.log(search_value);
-    console.log(selected_vehicles);
-    //setMultiVehicles(selected_vehicles);
   };
   const user = () => {
     return localStorage.getItem("id");
@@ -242,10 +232,8 @@ export const Admin = () => {
         .catch((err) => {
           return [];
         });
-      console.log(count_vehicles?.data?.data);
       setvehiclecount(count_vehicles?.data?.data);
     } else {
-      console.log(selectedCustomer);
       if (selectedCustomer != "") {
         const customer_data = { user_id: selectedCustomer };
         const count_vehicles = await api
@@ -256,7 +244,6 @@ export const Admin = () => {
           .catch((err) => {
             return [];
           });
-        console.log(count_vehicles?.data?.data);
         setvehiclecount(count_vehicles?.data?.data);
       }
     }
@@ -298,7 +285,6 @@ export const Admin = () => {
     SetAdminList(admin_list?.data?.data?.user_list);
   };
   const getDistributorList = async () => {
-    console.log(user_id);
     const distributor_data = { user_id: user_id };
     const distributor_list = await api
       .post("role_based_user_list", distributor_data)
@@ -351,7 +337,6 @@ export const Admin = () => {
         return [];
       });
     setCurrentCustomerList(customer_list?.data?.data?.user_list);
-    console.log(customer_list?.data?.data?.user_list);
   };
   const getUserList = async (current_user_id) => {
     const user_data = { user_id: current_user_id };
@@ -444,8 +429,6 @@ export const Admin = () => {
 
   const single_vehicle_data = async () => {
     if (role_id === 6) {
-      console.log("working ");
-      console.log(currentVehicle);
     } else {
       if (currentVehicle != "") {
         const vehicle_data = await api
@@ -456,14 +439,12 @@ export const Admin = () => {
           .catch((err) => {
             return [];
           });
-        console.log(vehicle_data);
       }
     }
   };
   const vehicle_list = async (status) => {
     const current_vehicle = getCurrentVehicle();
     const status_vehicle = getCurrentVehicleStatus();
-    console.log("Vehicle Status" + status_vehicle);
     try {
       if (role_id === 6) {
         const multiple_vehicles_data = await api
@@ -474,18 +455,15 @@ export const Admin = () => {
           .catch((err) => {
             return [];
           });
-        console.log(multiple_vehicles_data);
         if (multiple_vehicles_data?.data?.data && status_vehicle != "") {
           const filteredItems = multiple_vehicles_data?.data?.data.filter(
             (item) => item.vehicle_current_status == status_vehicle
           );
-          console.log(filteredItems);
           if (filteredItems) {
             const device_imei =
               current_vehicle != ""
                 ? current_vehicle
                 : filteredItems[0].device_imei;
-            console.log(device_imei);
             localStorage.setItem("current_vehicle_id", device_imei);
             const multivehicleData = filteredItems?.map((item) => ({
               id: item?.id,
@@ -510,7 +488,6 @@ export const Admin = () => {
             const single_data = filteredItems.filter(
               (item) => item.device_imei == device_imei
             );
-            console.log(single_data);
             const processedData = single_data?.map((item) => ({
               id: item?.id,
               device_imei: item?.device_imei,
@@ -542,7 +519,6 @@ export const Admin = () => {
                 ? current_vehicle
                 : filteredItems[0].device_imei;
             localStorage.setItem("current_vehicle_id", device_imei);
-            console.log(filteredItems);
             const single_data = filteredItems.filter(
               (item) => item.device_imei == device_imei
             );
@@ -591,7 +567,6 @@ export const Admin = () => {
               gsm_count: item?.gsm_status == "1" ? GREEN_BASE : RED_BASE,
               power_status: item?.power_status ? GREEN_BASE : RED_BASE,
             }));
-            console.log(single_data);
             setmapvehicleDate(vehicleData);
           }
         }
@@ -610,7 +585,6 @@ export const Admin = () => {
             const single_data = customer_vehicles?.data?.data.filter(
               (item) => item.device_imei == current_vehicle
             );
-            console.log(single_data);
             const vehicleData = single_data?.map((item) => ({
               id: item?.id,
               device_imei: item?.device_imei,
@@ -786,7 +760,6 @@ export const Admin = () => {
     setLoading(true);
     SetSubdealerList([]);
     SetCustomerList([]);
-    console.log(value);
     const user_data = { user_id: value };
     const user_list = await api
       .post("role_based_user_list", user_data)
@@ -847,7 +820,6 @@ export const Admin = () => {
       .catch((err) => {
         return [];
       });
-    console.log(status_vehicle);
     if (customer_vehicles?.data?.data && status_vehicle != "") {
       const filteredItems = customer_vehicles?.data?.data.filter(
         (item) => item.vehicle_current_status === status_vehicle
