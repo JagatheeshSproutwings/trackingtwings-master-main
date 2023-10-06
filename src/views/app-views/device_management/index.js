@@ -13,6 +13,7 @@ import {
   notification,
   Spin,
   Popconfirm,
+  Modal,
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import api from "configs/apiConfig";
@@ -28,6 +29,9 @@ import {
 import Config from "./config";
 import Configs from "./configs";
 import utils from "utils";
+
+import Sim from "./sim";
+import Device from "./device";
 
 import AdminUpdate from "./admin_update";
 import CustomerUpdate from "./customer_update";
@@ -502,10 +506,6 @@ const Vehicle = () => {
       dataIndex: "device_imei",
     },
     {
-      title: "License No",
-      dataIndex: "license_no",
-    },
-    {
       title: "Installation Date",
       dataIndex: "installation_date",
     },
@@ -620,6 +620,7 @@ const Vehicle = () => {
   };
   const loadVehicles = async () => {
     try {
+      setLoading(true);
       const user_data = { user_id: currentUser };
       const response = await api.post("vehicle_list", user_data);
 
@@ -638,10 +639,13 @@ const Vehicle = () => {
         }));
         setVehicleList(processedData);
         setMainVehicleList(processedData);
+        setLoading(false);
       } else {
+        setLoading(false);
         console.error("API request was not successful");
       }
     } catch (error) {
+      setLoading(false);
       console.error("Error fetching users:", error);
     }
   };
@@ -707,10 +711,31 @@ const Vehicle = () => {
     setIsConfigVisible(false);
     setIsAdminUpdateVisible(false);
     setIsCustomerUpdateVisible(false);
+    loadsims();
+    loaddevices();
     loadVehicles();
+    onClose();
   };
   const changeMutliVehicles = async (value) => {
     setMulitiVehicles(value);
+  };
+
+  const [isSimModalOpen, setIsSimModalOpen] = useState(false);
+  const showSimModal = () => {
+    setIsSimModalOpen(true);
+  };
+  const handleOk = () => {
+    setIsSimModalOpen(false);
+    setIsDeviceModalOpen(false);
+  };
+  const handleCancel = () => {
+    setIsSimModalOpen(false);
+    setIsDeviceModalOpen(false);
+  };
+
+  const [isDeviceModalOpen, setIsDeviceModalOpen] = useState(false);
+  const showDeviceModal = () => {
+    setIsDeviceModalOpen(true);
   };
 
   return (
@@ -738,6 +763,26 @@ const Vehicle = () => {
           />
         )}
       </div>
+
+      <Modal
+        title="Sim Modal"
+        open={isSimModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        <Sim parentFunction={parentFunction}></Sim>
+      </Modal>
+
+      <Modal
+        title="Device Modal"
+        open={isDeviceModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        <Device parentFunction={parentFunction}></Device>
+      </Modal>
 
       <Card title="Vehicle List">
         <Flex
@@ -812,14 +857,16 @@ const Vehicle = () => {
           </Col>
         </Row>
 
-        <div className="table-responsive">
-          <Table
-            bordered
-            columns={tableColumns}
-            dataSource={vehicleList}
-            rowKey="id"
-          />
-        </div>
+        <Spin spinning={loading}>
+          <div className="table-responsive">
+            <Table
+              bordered
+              columns={tableColumns}
+              dataSource={vehicleList}
+              rowKey="id"
+            />
+          </div>
+        </Spin>
       </Card>
 
       <Drawer
@@ -998,6 +1045,11 @@ const Vehicle = () => {
               </Col>
               <Col sm={12} md={12} lg={12} xxl={12}>
                 <h4>SIM Details :</h4>
+                {currentRole == 4 && (
+                  <Button type="primary" size="small" onClick={showSimModal}>
+                    Add Sim
+                  </Button>
+                )}
               </Col>
             </Row>
             <Row gutter={6}>
@@ -1106,6 +1158,12 @@ const Vehicle = () => {
               </Col>
             </Row>
             <h4>Device Details :</h4>
+            {currentRole == 4 && (
+              <Button type="primary" size="small" onClick={showDeviceModal}>
+                Add Device
+              </Button>
+            )}
+
             <Row gutter={6}>
               <Col sm={3} md={6} lg={6} xxl={6}>
                 <Form.Item
