@@ -536,15 +536,15 @@ const Vehicle = () => {
 
   const handleDelete = async (record) => {
     alert(record);
-    // const data = { id: record };
-    // try {
-    //   const response = await api.post("customer_vehicle_delete", data);
-    //   openNotification("success", "Vehicle", "Vehicle Deleted Successfully!");
-    //   setDeleteOpen(false);
-    //   loadVehicles();
-    // } catch (error) {
-    //   console.error("Error fetching users:", error);
-    // }
+    const data = { id: record };
+    try {
+      const response = await api.post("customer_vehicle_delete", data);
+      openNotification("success", "Vehicle", "Vehicle Deleted Successfully!");
+      setDeleteOpen(false);
+      loadVehicles();
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
   };
   const getMenu = (record) => (
     <Menu>
