@@ -535,7 +535,6 @@ const Vehicle = () => {
   ];
 
   const handleDelete = async (record) => {
-    alert(record);
     const data = { id: record };
     try {
       const response = await api.post("customer_vehicle_delete", data);
