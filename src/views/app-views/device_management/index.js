@@ -53,8 +53,6 @@ const Vehicle = () => {
   const [editdata, setEditData] = useState("");
   const [updatedata, setUpdateData] = useState("");
 
-  const [deleteID, setDeleteID] = useState("");
-
   const dateFormat = "YYYY-MM-DD";
   const [open, setOpen] = useState(false);
   const [deleteopen, setDeleteOpen] = useState(false);
@@ -74,6 +72,9 @@ const Vehicle = () => {
   const [vehicleList, setVehicleList] = useState([]);
   const [mainvehicleList, setMainVehicleList] = useState([]);
 
+  const [simButton, setSimButton] = useState(false);
+  const [deviceButton, setDeviceButton] = useState(false);
+
   const [simData, SetSimData] = useState("");
 
   const [deviceData, SetDeviceData] = useState("");
@@ -85,6 +86,21 @@ const Vehicle = () => {
   const [installationDate, SetInstallationDate] = useState("");
   const [expireDate, SetExpireDate] = useState("");
   const [extendDate, SetExtendDate] = useState("");
+
+  const [dataFromChildSim, setDataFromChildSim] = useState(null);
+
+  // Define a function to receive data from the child component
+  const handleDataFromChildSim = (data) => {
+    setDataFromChildSim(data);
+  };
+
+  const [dataFromChildDev, setDataFromChildDev] = useState(null);
+
+  // Define a function to receive data from the child component
+  const handleDataFromChildDev = (data) => {
+    setDataFromChildDev(data);
+  };
+
   // Function to format the date as a string in the desired format
 
   const [currentUser, SetCurrentUser] = useState(
@@ -109,6 +125,17 @@ const Vehicle = () => {
   };
 
   const [userValue, setUserValue] = useState(localStorage.getItem("id") || "");
+
+  const [adminVal, setAdminValue] = useState(
+    localStorage.getItem("admin_id") || ""
+  );
+  const [distVal, setDistValue] = useState(
+    localStorage.getItem("distributor_id") || ""
+  );
+  const [dealerVal, setDealerValue] = useState(
+    localStorage.getItem("id") || ""
+  );
+  const [subdealerVal, setSubDealerValue] = useState("");
 
   const getUserList = async () => {
     const user_data = { user_id: currentUser };
@@ -182,7 +209,9 @@ const Vehicle = () => {
     SetDealerList("");
     SetSubdealerList("");
     SetCustomerList("");
+    setDistValue("");
     if (value != null) {
+      setDistValue(value);
       const user_get_data = { user_id: value };
       const dealer_list = await api
         .post("role_based_user_list", user_get_data)
@@ -203,8 +232,15 @@ const Vehicle = () => {
     SetPlanList([]);
     SetSimList([]);
     SetDeviceList([]);
+    setDealerValue("");
+    setSimButton(false);
+    setDeviceButton(false);
 
     if (value != null) {
+      setDealerValue(value);
+      setSimButton(true);
+      setDeviceButton(true);
+
       const user_get_data = { user_id: value };
       const subdealer_list = await api
         .post("role_based_user_list", user_get_data)
@@ -262,8 +298,15 @@ const Vehicle = () => {
     SetMakeData("");
     SetModelData("");
     SetSimData("");
+    setSubDealerValue("");
+
+    setSimButton(false);
+    setDeviceButton(false);
 
     if (value != null) {
+      setSubDealerValue(value);
+      setSimButton(true);
+      setDeviceButton(true);
       const user_get_data = { user_id: value };
       const customer_list = await api
         .post("role_based_user_list", user_get_data)
@@ -425,7 +468,6 @@ const Vehicle = () => {
       console.error("Error fetching device data:", error);
     }
   };
-
   const SimChange = async (value) => {
     SetSimData("");
     try {
@@ -439,7 +481,6 @@ const Vehicle = () => {
       console.error("Error fetching device data:", error);
     }
   };
-
   const onFinish = async (values) => {
     try {
       setLoading(true);
@@ -478,16 +519,11 @@ const Vehicle = () => {
       }
     }
   };
-
-  let serialNumber = 0;
   const tableColumns = [
     {
       title: "S No",
-      render: () => {
-        serialNumber++; // Increment the counter for each row
-        return <span>{serialNumber}</span>;
-      },
-      fixed: "left", // If you want it to be a fixed column on the left
+      dataIndex: "s_no",
+      fixed: "left",
     },
     {
       title: "Type",
@@ -502,8 +538,20 @@ const Vehicle = () => {
       dataIndex: "sim_mob_no",
     },
     {
+      title: "Device Make",
+      dataIndex: "device_make",
+    },
+    {
+      title: "Device Model",
+      dataIndex: "device_model",
+    },
+    {
       title: "Device IMEI",
       dataIndex: "device_imei",
+    },
+    {
+      title: "Speed Limit",
+      dataIndex: "speed_limit",
     },
     {
       title: "Installation Date",
@@ -533,7 +581,6 @@ const Vehicle = () => {
       ),
     },
   ];
-
   const handleDelete = async (record) => {
     const data = { id: record };
     try {
@@ -625,13 +672,17 @@ const Vehicle = () => {
       const response = await api.post("vehicle_list", user_data);
 
       if (response.data && Array.isArray(response.data.data)) {
-        const processedData = response.data.data.map((item) => ({
+        const processedData = response.data.data.map((item, index) => ({
+          s_no: index + 1, // Increment the serial number for each item
           id: item.id,
           vehicle_type: item.vehicle_type,
           vehicle_type_id: item.vehicle_type_id,
           vehicle_name: item.vehicle_name,
           sim_mob_no: item.sim_mob_no,
           device_imei: item.device_imei,
+          device_make: item.device_make,
+          device_model: item.device_model,
+          speed_limit: item.speed_limit,
           license_no: item.license_no,
           installation_date: item.installation_date,
           expire_date: item.expire_date,
@@ -706,24 +757,42 @@ const Vehicle = () => {
     const filteredUserList = utils.wildCardSearch(searchArray, searchValue);
     setVehicleList(filteredUserList);
   };
-  const parentFunction = () => {
+  const parentFunction = async () => {
     setIsComponentVisible(false);
     setIsConfigVisible(false);
     setIsAdminUpdateVisible(false);
     setIsCustomerUpdateVisible(false);
-    loadsims();
-    loaddevices();
-    loadVehicles();
-    onClose();
+    setIsSimModalOpen(false);
+    setIsDeviceModalOpen(false);
+
+    try {
+      const user_get_data = { user_id: dealerVal };
+
+      const sim_response = await api.post("sim_stock_list", user_get_data);
+      const sim_data = sim_response.data.data;
+      SetSimList(sim_data);
+
+      const device_response = await api.post(
+        "device_stock_list",
+        user_get_data
+      );
+      const device_data = device_response.data.data;
+      SetDeviceList(device_data);
+
+      // Call the loadVehicles function here.
+      loadVehicles();
+    } catch (err) {
+      console.error("An error occurred:", err);
+    }
   };
+
   const changeMutliVehicles = async (value) => {
     setMulitiVehicles(value);
   };
 
   const [isSimModalOpen, setIsSimModalOpen] = useState(false);
-  const showSimModal = () => {
-    setIsSimModalOpen(true);
-  };
+  const [isDeviceModalOpen, setIsDeviceModalOpen] = useState(false);
+
   const handleOk = () => {
     setIsSimModalOpen(false);
     setIsDeviceModalOpen(false);
@@ -733,8 +802,35 @@ const Vehicle = () => {
     setIsDeviceModalOpen(false);
   };
 
-  const [isDeviceModalOpen, setIsDeviceModalOpen] = useState(false);
+  useEffect(() => {
+    if (currentRole == 3 || currentRole == 4) {
+      setSimButton(true);
+      setDeviceButton(true);
+    } else {
+      setSimButton(false);
+      setDeviceButton(false);
+    }
+  }, [currentRole]);
+
+  const showSimModal = () => {
+    const data = {
+      admin_id: adminVal,
+      distributor_id: distVal,
+      dealer_id: dealerVal,
+      subdealer_id: subdealerVal,
+    };
+    setEditData(data);
+    setIsSimModalOpen(true);
+  };
+
   const showDeviceModal = () => {
+    const data = {
+      admin_id: adminVal,
+      distributor_id: distVal,
+      dealer_id: dealerVal,
+      subdealer_id: subdealerVal,
+    };
+    setEditData(data);
     setIsDeviceModalOpen(true);
   };
 
@@ -771,7 +867,11 @@ const Vehicle = () => {
         onCancel={handleCancel}
         footer={null}
       >
-        <Sim parentFunction={parentFunction}></Sim>
+        <Sim
+          parentToChild={editdata}
+          sendDataToParent={handleDataFromChildSim}
+          parentFunction={parentFunction}
+        ></Sim>
       </Modal>
 
       <Modal
@@ -781,7 +881,11 @@ const Vehicle = () => {
         onCancel={handleCancel}
         footer={null}
       >
-        <Device parentFunction={parentFunction}></Device>
+        <Device
+          parentToChild={editdata}
+          sendDataToParent={handleDataFromChildDev}
+          parentFunction={parentFunction}
+        ></Device>
       </Modal>
 
       <Card title="Vehicle List">
@@ -1045,7 +1149,7 @@ const Vehicle = () => {
               </Col>
               <Col sm={12} md={12} lg={12} xxl={12}>
                 <h4>SIM Details :</h4>
-                {currentRole == 4 && (
+                {currentRole != 1 && simButton == true && (
                   <Button type="primary" size="small" onClick={showSimModal}>
                     Add Sim
                   </Button>
@@ -1158,7 +1262,7 @@ const Vehicle = () => {
               </Col>
             </Row>
             <h4>Device Details :</h4>
-            {currentRole == 4 && (
+            {currentRole != 1 && deviceButton == true && (
               <Button type="primary" size="small" onClick={showDeviceModal}>
                 Add Device
               </Button>

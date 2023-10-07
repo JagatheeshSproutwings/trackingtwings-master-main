@@ -27,7 +27,7 @@ export const Customer = () => {
       dataIndex: "name",
     },
     {
-      title: "Email",
+      title: "User Name / Email",
       dataIndex: "email",
     },
     {

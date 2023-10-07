@@ -13,7 +13,8 @@ import api from "configs/apiConfig";
 
 const { Option } = Select;
 
-const Create = (props) => {
+const Create = ({ parentToChild, ...props }) => {
+  const { sendDataToParent } = props;
   const [form] = Form.useForm();
 
   const [selectedSupplierId, setselectedSupplierId] = useState();
@@ -61,6 +62,8 @@ const Create = (props) => {
   }, []);
 
   const onFinish = async (values) => {
+    sendDataToParent(values.device_imei_no);
+
     const data = {
       supplier_id: values.supplier_id,
       device_make_id: values.device_make_id,
@@ -69,10 +72,14 @@ const Create = (props) => {
       uid: values.uid,
       ccid: values.ccid,
       description: values.description,
+      admin_id: parentToChild["admin_id"],
+      distributor_id: parentToChild["distributor_id"],
+      dealer_id: parentToChild["dealer_id"],
+      subdealer_id: parentToChild["subdealer_id"],
     };
 
     try {
-      await api.post("device/store", data);
+      await api.post("device_store", data);
       form.resetFields();
       props.parentFunction();
       openNotification("success", "Device", "Device Inserted Successfully!");

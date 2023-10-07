@@ -10,24 +10,29 @@ import {
   Popconfirm,
   notification,
   Drawer,
+  Spin,
 } from "antd";
 import {
   PlusOutlined,
   SearchOutlined,
   EditTwoTone,
   DeleteTwoTone,
+  SettingTwoTone,
 } from "@ant-design/icons";
 import api from "configs/apiConfig";
 import utils from "utils";
 import { GREEN_BASE } from "constants/ThemeConstant";
-
-import Edit from "./edit";
 import Create from "./create";
+import Edit from "./edit";
+import ChangePassword from "./change_password";
 
 export const User = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [loading, setLoading] = useState(false);
+
   const [Createopen, setCreateDrawerOpen] = useState(false);
   const [Editopen, setEditDrawerOpen] = useState(false);
+  const [passopen, setPassDrawerOpen] = useState(false);
 
   const showCreateDrawer = () => {
     setCreateDrawerOpen(true);
@@ -35,9 +40,13 @@ export const User = () => {
   const showEditDrawer = () => {
     setEditDrawerOpen(true);
   };
+  const showPassDrawer = () => {
+    setPassDrawerOpen(true);
+  };
   const onClose = () => {
     setCreateDrawerOpen(false);
     setEditDrawerOpen(false);
+    setPassDrawerOpen(false);
   };
 
   const [userList, setUserList] = useState();
@@ -58,8 +67,8 @@ export const User = () => {
   const handleDelete = async (record) => {
     const data = { id: record, user_id: user };
     try {
-      await api.post("user/delete", data);
-      openNotification("success", "User", "User Deleted Successfully!");
+      const res = await api.post("user/delete", data);
+      openNotification("success", "User", res?.data);
       setOpen(false);
       loadUsers();
     } catch (error) {
@@ -92,30 +101,33 @@ export const User = () => {
 
   const loadUsers = async () => {
     const data = { user_id: user, role_id: role };
+    setLoading(true);
     try {
       const response = await api.post("user_list", data);
-      if (response.data && Array.isArray(response.data.data)) {
-        const processedData = response.data.data.map((item, index) => ({
-          s_no: index + 1, // Increment the serial number for each item
-          id: item.id,
-          name: item.name,
-          email: item.email,
-          mobile_no: item.mobile_no,
-          password: item.password,
-          role_id: item.role_id,
-          role: item.role,
-          country_id: item.country_id,
-          country: item.country_name,
-          address: item.address,
-        }));
-
-        setUserList(processedData);
-        setMainUserList(processedData);
-      } else {
+      if (!response.data || !Array.isArray(response.data.data)) {
         console.error("API request was not successful");
+        return;
       }
+
+      const processedData = response.data.data.map((item, index) => ({
+        s_no: index + 1, // Increment the serial number for each item
+        id: item.id,
+        name: item.name,
+        email: item.email,
+        mobile_no: item.mobile_no,
+        password: item.password,
+        role_id: item.role_id,
+        role: item.role,
+        country_id: item.country_id,
+        country: item.country_name,
+        address: item.address,
+      }));
+      setLoading(false);
+      setUserList(processedData);
+      setMainUserList(processedData);
     } catch (error) {
       console.error("Error fetching users:", error);
+      setLoading(true);
     }
   };
 
@@ -139,6 +151,15 @@ export const User = () => {
     loadUsers();
   }
 
+  function handlePassClick(record) {
+    showPassDrawer();
+    setEditData([record.id]);
+
+    // Set isEditVisible to true
+    setUploadVisible(false);
+    loadUsers();
+  }
+
   useEffect(() => {
     loadUsers();
   }, []);
@@ -154,9 +175,10 @@ export const User = () => {
       dataIndex: "name",
     },
     {
-      title: "Email",
+      title: "User Name / Email",
       dataIndex: "email",
     },
+
     {
       title: "Mobile Number",
       dataIndex: "mobile_no",
@@ -188,10 +210,16 @@ export const User = () => {
             onConfirm={() => handleDelete(record.id)} // Call your delete function here
             onCancel={() => handleCancel()}
           >
-            <span style={{ cursor: "pointer" }}>
+            <span style={{ cursor: "pointer", marginRight: "8px" }}>
               <DeleteTwoTone />
             </span>
           </Popconfirm>
+          <span
+            style={{ cursor: "pointer" }}
+            onClick={() => handlePassClick(record)}
+          >
+            <SettingTwoTone />
+          </span>
         </div>
       ),
     },
@@ -257,6 +285,20 @@ export const User = () => {
         />
       </Drawer>
 
+      <Drawer
+        width={500}
+        title="Change Password"
+        placement="right"
+        onClose={onClose}
+        open={passopen}
+      >
+        <ChangePassword
+          key={editdata[0]}
+          parentToChild={editdata}
+          parentFunction={parentFunction}
+        />
+      </Drawer>
+
       <Card title="User">
         <Row justify="space-between">
           <Col span={4}>
@@ -277,13 +319,14 @@ export const User = () => {
             </Button>
           </Col>
         </Row>
-
-        <Table
-          bordered
-          columns={tableColumns}
-          dataSource={userList}
-          rowKey="id"
-        />
+        <Spin spinning={loading}>
+          <Table
+            bordered
+            columns={tableColumns}
+            dataSource={userList}
+            rowKey="id"
+          />
+        </Spin>
       </Card>
 
       {isuploadvisible && (

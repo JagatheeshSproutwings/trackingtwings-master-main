@@ -15,7 +15,9 @@ const dateFormat = "YYYY-MM-DD";
 
 const { Option } = Select;
 
-const Create = (props) => {
+const Create = ({ parentToChild, ...props }) => {
+  const { sendDataToParent } = props;
+
   const [form] = Form.useForm();
 
   const [selectedNetworkId, setselectedNetworkId] = useState();
@@ -37,20 +39,27 @@ const Create = (props) => {
   };
 
   const onFinish = async (values) => {
+    sendDataToParent(values.sim_mob_no1);
+    console.log(parentToChild);
     const data = {
       network_id: values.network_id,
       sim_imei_no: values.sim_imei_no,
       sim_mob_no1: values.sim_mob_no1,
       sim_mob_no2: values.sim_mob_no2,
+      admin_id: parentToChild["admin_id"],
+      distributor_id: parentToChild["distributor_id"],
+      dealer_id: parentToChild["dealer_id"],
+      subdealer_id: parentToChild["subdealer_id"],
     };
+    console.log(data);
 
     try {
-      const valid_from = new Date(values["valid_from"]);
-      data["valid_from"] = valid_from.toISOString().split("T")[0];
-      const valid_to = new Date(values["valid_to"]);
-      data["valid_to"] = valid_to.toISOString().split("T")[0];
+      // const valid_from = new Date(values["valid_from"]);
+      // data["valid_from"] = valid_from.toISOString().split("T")[0];
+      // const valid_to = new Date(values["valid_to"]);
+      // data["valid_to"] = valid_to.toISOString().split("T")[0];
 
-      await api.post("sim/store", data);
+      await api.post("sim_store", data);
       form.resetFields();
       props.parentFunction();
       openNotification("success", "Sim", "Sim Inserted Successfully!");
@@ -178,7 +187,7 @@ const Create = (props) => {
           </Form.Item>
         </Col>
 
-        <Col sm={12} md={12} lg={12}>
+        {/* <Col sm={12} md={12} lg={12}>
           <Form.Item name="valid_from" label="Valid From">
             <DatePicker
               style={{ width: "100%", fontSize: "16px" }}
@@ -195,7 +204,7 @@ const Create = (props) => {
               format={dateFormat}
             ></DatePicker>
           </Form.Item>
-        </Col>
+        </Col> */}
       </Row>
 
       <Row align={"middle"}>
