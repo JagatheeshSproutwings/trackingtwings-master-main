@@ -35,6 +35,7 @@ import Device from "./device";
 
 import AdminUpdate from "./admin_update";
 import CustomerUpdate from "./customer_update";
+import ChangeSim from "./change_sim";
 
 const { Option } = Select;
 
@@ -601,6 +602,13 @@ const Vehicle = () => {
       >
         Edit
       </Menu.Item>
+      <Menu.Item
+        key="editsim"
+        icon={<EditTwoTone />}
+        onClick={() => handleSimEdit(record)}
+      >
+        Change Sim
+      </Menu.Item>
       <Menu.Item key="delete">
         <Popconfirm
           title="Are you sure to delete this Vehicle?"
@@ -657,6 +665,10 @@ const Vehicle = () => {
       setIsAdminUpdateVisible(true);
       setIsCustomerUpdateVisible(false);
     }
+  };
+  const handleSimEdit = async (record) => {
+    setUpdateData(record);
+    setIsChangeSimModalOpen(true);
   };
   const clickConfig = async () => {
     if (mulitiVehicles.length !== 0) {
@@ -792,14 +804,17 @@ const Vehicle = () => {
 
   const [isSimModalOpen, setIsSimModalOpen] = useState(false);
   const [isDeviceModalOpen, setIsDeviceModalOpen] = useState(false);
+  const [isChangeSimModalOpen, setIsChangeSimModalOpen] = useState(false);
 
   const handleOk = () => {
     setIsSimModalOpen(false);
     setIsDeviceModalOpen(false);
+    setIsChangeSimModalOpen(false);
   };
   const handleCancel = () => {
     setIsSimModalOpen(false);
     setIsDeviceModalOpen(false);
+    setIsChangeSimModalOpen(false);
   };
 
   useEffect(() => {
@@ -872,6 +887,20 @@ const Vehicle = () => {
           sendDataToParent={handleDataFromChildSim}
           parentFunction={parentFunction}
         ></Sim>
+      </Modal>
+
+      <Modal
+        title="Change Sim"
+        open={isChangeSimModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        <ChangeSim
+          parentToChild={updatedata}
+          sendDataToParent={handleDataFromChildSim}
+          parentFunction={parentFunction}
+        ></ChangeSim>
       </Modal>
 
       <Modal
