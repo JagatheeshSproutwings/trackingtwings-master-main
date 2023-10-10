@@ -1,15 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useRef } from "react";
 import {
+  Table,
   MapContainer,
   TileLayer,
   LayersControl,
   Marker,
   Popup,
   Polyline,
+  Tooltip
 } from "react-leaflet";
 import L from "leaflet";
 import { LeafletTrackingMarker } from "react-leaflet-tracking-marker";
-
+import api from "configs/apiConfig";
+import { getArrowOffset } from "antd/es/style/placementArrow";
 // Create a function to dynamically generate icons based on the iconUrl
 function createIcon(iconUrl) {
   return L.icon({
@@ -22,14 +25,50 @@ function createIcon(iconUrl) {
 
 export default function VehicleMarker({ data }) {
   const [vehiclesData, setVehiclesData] = useState(data || []);
+  const [address,setAddress] = useState([]);
+  const [popupOpen, setPopupOpen] = useState(true);
+  const markerRef = useRef();  
+   const  getAddress = async (vehicle) =>
+   {
+    const latitude = vehicle?.latitude;
+    const longtitude = vehicle?.longtitude;
+    if(latitude>0 && longtitude>0)
+    {
+      const live_coordinates = {
+        latitude:latitude,
+        longitude:longtitude
+      }
+      const live_address = await api.post("live_address",live_coordinates).then((res) => { return res;}).catch((err) => {return "loading..";});
+      console.log(live_address?.data?.data);
+      //return live_address?.data?.data;
+      const address_value = live_address?.data?.data;
+      setAddress(address_value);
+  
+    }
+  }
 
   useEffect(() => {
     //   const interval = setInterval(() => {
-    setVehiclesData(data);
+    const vehicle_data = data.map((vehicle) =>({
+      id:vehicle?.id,
+      title:vehicle?.title,
+      last_duration:vehicle?.last_duration,
+      latitude:vehicle?.latitude,
+      longtitude:vehicle?.longtitude,
+      speed:vehicle?.speed,
+      angle:vehicle?.angle,
+      icon_url:vehicle?.icon_url,
+      device_time:vehicle?.device_time,
+      address:getAddress(vehicle)
+    }))
+    setVehiclesData(vehicle_data);
     // }, 5000);
     // return () => {
     //   clearInterval(interval);
     //  };
+    if (markerRef.current) {
+      markerRef.current.openPopup();
+    }
   }, [data]);
   // Extract coordinates of all vehicles
   const coordinates = vehiclesData?.map((vehicle) => [
@@ -40,12 +79,13 @@ export default function VehicleMarker({ data }) {
   // Calculate map bounds that include all markers
   const bounds = L.latLngBounds(coordinates);
   const center =
-    data?.length > 0 ? [data[0].latitude, data[0].longtitude] : [0.0, 0.0];
+    data?.length > 0 ? [data[0].latitude, data[0].longtitude] : [20.5937, 78.9629];
+  const zoom = data?.length > 0 ? 25 :4; 
   return (
     <MapContainer
       center={center}
       bounds={coordinates}
-      zoom={25}
+      zoom={zoom}
       style={{ height: "500px", width: "100%" }}
     >
       <LayersControl>
@@ -73,6 +113,7 @@ export default function VehicleMarker({ data }) {
 
       {Array.isArray(vehiclesData) ? (
         vehiclesData?.map((vehicle) => (
+         
           <LeafletTrackingMarker
             key={vehicle?.id}
             position={[vehicle?.latitude || 0.0, vehicle?.longtitude || 0.0]}
@@ -80,8 +121,14 @@ export default function VehicleMarker({ data }) {
             rotationAngle={vehicle?.angle}
             icon={createIcon(vehicle?.icon_url)}
             keepAtCenter={true}
+            ref={markerRef}
           >
-            <Popup>
+            <Popup autoPan={false}
+          closeButton={false}
+          closeOnClick={false}
+          closeOnEscapeKey={false}
+          minWidth={200}
+          open={popupOpen}>
               <p style={{ margin: 0 }}>
                 <b>Vehicle Name: </b> {vehicle?.title}
               </p>
@@ -96,7 +143,11 @@ export default function VehicleMarker({ data }) {
               <p style={{ margin: 0 }}>
                 <b>Last Update: </b> {vehicle?.device_time}
               </p>
+              <p style={{ margin: 0 }}>
+                <b>Address: {address?address:'Loading..'} </b> 
+              </p>
             </Popup>
+            
           </LeafletTrackingMarker>
         ))
       ) : (
@@ -108,7 +159,7 @@ export default function VehicleMarker({ data }) {
           icon={createIcon(vehiclesData?.icon_url)}
           keepAtCenter={true}
         >
-          <Popup>
+          <Tooltip permanent>
             <p style={{ margin: 0 }}>
               <b>Vehicle Name: </b> {vehiclesData?.title}
             </p>
@@ -123,7 +174,8 @@ export default function VehicleMarker({ data }) {
             <p style={{ margin: 0 }}>
               <b>Last Update: </b> {vehiclesData?.device_time}
             </p>
-          </Popup>
+            
+          </Tooltip>
         </LeafletTrackingMarker>
       )}
     </MapContainer>

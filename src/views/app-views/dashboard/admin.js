@@ -79,6 +79,7 @@ export const Admin = () => {
   const [vehicle_status, setVehicleStatus] = useState("");
   const [selectedCustomer, SetSelectedCustomer] = useState("");
   const [loading, setLoading] = useState(false);
+  const [tabListLoading,setTabListLoading] = useState(false)
   const [adminLoading, setAdminLoading] = useState(false);
   const [distributorLoading, setDistributorLoading] = useState(false);
   const [dealerLoading, setDealerLoading] = useState(false);
@@ -445,6 +446,7 @@ export const Admin = () => {
   const vehicle_list = async (status) => {
     const current_vehicle = getCurrentVehicle();
     const status_vehicle = getCurrentVehicleStatus();
+    console.log(status_vehicle);
     try {
       if (role_id === 6) {
         const multiple_vehicles_data = await api
@@ -459,6 +461,7 @@ export const Admin = () => {
           const filteredItems = multiple_vehicles_data?.data?.data.filter(
             (item) => item.vehicle_current_status == status_vehicle
           );
+          
           if (filteredItems) {
             const device_imei =
               current_vehicle != ""
@@ -469,6 +472,7 @@ export const Admin = () => {
               id: item?.id,
               device_imei: item?.device_imei,
               live_status: vehicle_live_status(item?.vehicle_current_status),
+              device_time: item?.device_updatedtime || "0000-00-00 00:00:00",
               icon_url:
                 vehicle_icon_url(item?.vehicle_current_status) +
                 item?.short_name +
@@ -485,9 +489,15 @@ export const Admin = () => {
               gsm_count: item?.gsm_status == "1" ? GREEN_BASE : RED_BASE,
               power_status: item?.power_status ? GREEN_BASE : RED_BASE,
             }));
+            
             const single_data = filteredItems.filter(
               (item) => item.device_imei == device_imei
             );
+            if(filteredItems.length==0)
+            {
+              localStorage.setItem("current_vehicle_id","");
+              const device_imei = "";
+            }
             const processedData = single_data?.map((item) => ({
               id: item?.id,
               device_imei: item?.device_imei,
@@ -496,6 +506,7 @@ export const Admin = () => {
                 vehicle_icon_url(item?.vehicle_current_status) +
                 item?.short_name +
                 ".png",
+                device_time: item?.device_updatedtime || "0000-00-00 00:00:00",
               latitude: item.lattitute,
               longtitude: item.longitute,
               last_duration: item?.last_duration,
@@ -509,10 +520,12 @@ export const Admin = () => {
               power_status: item?.power_status ? GREEN_BASE : RED_BASE,
             }));
             setMultiplevehiclesData(multivehicleData);
+            
             setmapvehicleDate(processedData);
           }
         } else {
           const filteredItems = multiple_vehicles_data?.data?.data;
+          
           if (filteredItems) {
             const device_imei =
               current_vehicle != ""
@@ -653,7 +666,12 @@ export const Admin = () => {
     single_vehicle_live_data();
 
     const interval = setInterval(() => {
+      setTabListLoading(true);
+      setLoading(true);
       vehicle_list(vehicle_status);
+      vehicle_count();
+      setTabListLoading(false);
+      setLoading(false);
     }, 3000);
     return () => {
       clearInterval(interval);
@@ -1376,6 +1394,7 @@ export const Admin = () => {
       allowClear
       
     /> */}
+    {tabListLoading? (<Spin size="Large"/>) :(
                   <List
                     style={{
                       padding: "1px",
@@ -1476,7 +1495,7 @@ export const Admin = () => {
                         </Row>
                       </List.Item>
                     )}
-                  />
+                  />)}
                 </StickyContainer>
               </Card>
             </Col>
