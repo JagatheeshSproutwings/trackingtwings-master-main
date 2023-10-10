@@ -100,6 +100,7 @@ export const Admin = () => {
   const [currentVehicle, setCurrentVehicle] = useState("");
 
   const handleTabChange = (e) => {
+    setTabListLoading(true);
     const tab_value = e.target.getAttribute("value");
     setActiveKey(tab_value);
     localStorage.setItem("current_vehicle_status", tab_value);
@@ -449,6 +450,7 @@ export const Admin = () => {
     console.log(status_vehicle);
     try {
       if (role_id === 6) {
+        
         const multiple_vehicles_data = await api
           .get("multi_dashboard")
           .then((res) => {
@@ -457,11 +459,16 @@ export const Admin = () => {
           .catch((err) => {
             return [];
           });
+          setTabListLoading(false);
         if (multiple_vehicles_data?.data?.data && status_vehicle != "") {
           const filteredItems = multiple_vehicles_data?.data?.data.filter(
             (item) => item.vehicle_current_status == status_vehicle
           );
-          
+          if(filteredItems.length==0)
+          {
+            localStorage.setItem("current_vehicle_id","");
+            setmapvehicleDate([]);
+          }
           if (filteredItems) {
             const device_imei =
               current_vehicle != ""
@@ -489,15 +496,11 @@ export const Admin = () => {
               gsm_count: item?.gsm_status == "1" ? GREEN_BASE : RED_BASE,
               power_status: item?.power_status ? GREEN_BASE : RED_BASE,
             }));
-            
+
             const single_data = filteredItems.filter(
               (item) => item.device_imei == device_imei
             );
-            if(filteredItems.length==0)
-            {
-              localStorage.setItem("current_vehicle_id","");
-              const device_imei = "";
-            }
+            
             const processedData = single_data?.map((item) => ({
               id: item?.id,
               device_imei: item?.device_imei,
@@ -519,11 +522,13 @@ export const Admin = () => {
               gsm_count: item?.gsm_status == "1" ? GREEN_BASE : RED_BASE,
               power_status: item?.power_status ? GREEN_BASE : RED_BASE,
             }));
-            setMultiplevehiclesData(multivehicleData);
             
+            setMultiplevehiclesData(multivehicleData);
             setmapvehicleDate(processedData);
+            
           }
         } else {
+          
           const filteredItems = multiple_vehicles_data?.data?.data;
           
           if (filteredItems) {
@@ -582,6 +587,7 @@ export const Admin = () => {
             }));
             setmapvehicleDate(vehicleData);
           }
+          
         }
       } else {
         if (currentCustomerUser) {
@@ -666,12 +672,10 @@ export const Admin = () => {
     single_vehicle_live_data();
 
     const interval = setInterval(() => {
-      setTabListLoading(true);
-      setLoading(true);
+     
       vehicle_list(vehicle_status);
       vehicle_count();
-      setTabListLoading(false);
-      setLoading(false);
+      
     }, 3000);
     return () => {
       clearInterval(interval);
@@ -1393,14 +1397,16 @@ export const Admin = () => {
       onChange={onSearch}
       allowClear
       
+
     /> */}
-    {tabListLoading? (<Spin size="Large"/>) :(
+    
+    {tabListLoading? (<div ><Spin style={{textAlign:'center'}} size="Large" tip="Loading.." /></div>) :(
                   <List
                     style={{
                       padding: "1px",
                       margin: "1px",
                       fontSize: "10px",
-                      height: "700px",
+                      height: "400px",
                       border: "1px",
                       overflow: "auto",
                     }}

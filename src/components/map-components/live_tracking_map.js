@@ -80,7 +80,7 @@ export default function VehicleMarker({ data }) {
   const bounds = L.latLngBounds(coordinates);
   const center =
     data?.length > 0 ? [data[0].latitude, data[0].longtitude] : [20.5937, 78.9629];
-  const zoom = data?.length > 0 ? 25 :4; 
+  const zoom = data?.length > 0 ? 25 :25; 
   return (
     <MapContainer
       center={center}
