@@ -84,7 +84,7 @@ const KeyOnKeyOffReport = ({ parentToChild, ...props }) => {
 
       if (role == 6) {
         const data = { user_id: user };
-        const response = await api.post("vehicle_list", data);
+        const response = await api.post("report_vehicle_list", data);
         if (response.data.success) {
           setVehicleOptions(response.data.data);
         } else {
@@ -92,7 +92,7 @@ const KeyOnKeyOffReport = ({ parentToChild, ...props }) => {
         }
       } else {
         const data = { user_id: parentToChild };
-        const response = await api.post("vehicle_list", data);
+        const response = await api.post("report_vehicle_list", data);
         if (response.data.success) {
           setVehicleOptions(response.data.data);
         } else {
@@ -198,7 +198,7 @@ const KeyOnKeyOffReport = ({ parentToChild, ...props }) => {
                       key={vehicle.device_imei}
                       value={vehicle.device_imei}
                     >
-                      {vehicle.vehicle_name}
+                      {vehicle.vehicle_name + " - " + vehicle.device_imei}
                     </Option>
                   ))
                 ) : (

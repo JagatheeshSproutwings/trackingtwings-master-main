@@ -36,6 +36,7 @@ import Device from "./device";
 import AdminUpdate from "./admin_update";
 import CustomerUpdate from "./customer_update";
 import ChangeSim from "./change_sim";
+import ChangeDevice from "./change_device";
 
 const { Option } = Select;
 
@@ -602,23 +603,40 @@ const Vehicle = () => {
       >
         Edit
       </Menu.Item>
-      <Menu.Item
-        key="editsim"
-        icon={<EditTwoTone />}
-        onClick={() => handleSimEdit(record)}
-      >
-        Change Sim
-      </Menu.Item>
-      <Menu.Item key="delete">
-        <Popconfirm
-          title="Are you sure to delete this Vehicle?"
-          onConfirm={() => handleDelete(record.id)} // Define your delete function here
-          okText="Yes"
-          cancelText="No"
+
+      {currentRole != 6 && (
+        <Menu.Item
+          key="editsim"
+          icon={<EditTwoTone />}
+          onClick={() => handleSimEdit(record)}
         >
-          <DeleteTwoTone /> Delete
-        </Popconfirm>
-      </Menu.Item>
+          Change Sim
+        </Menu.Item>
+      )}
+
+      {currentRole != 6 && (
+        <Menu.Item
+          key="editdevice"
+          icon={<EditTwoTone />}
+          onClick={() => handleDeviceEdit(record)}
+        >
+          Change Device
+        </Menu.Item>
+      )}
+
+      {currentRole != 6 && (
+        <Menu.Item key="delete" icon={<DeleteTwoTone />}>
+          <Popconfirm
+            title="Are you sure to delete this Vehicle?"
+            onConfirm={() => handleDelete(record.id)} // Define your delete function here
+            okText="Yes"
+            cancelText="No"
+          >
+            Delete
+          </Popconfirm>
+        </Menu.Item>
+      )}
+
       <Menu.Item
         key="config"
         icon={<SettingTwoTone />}
@@ -669,6 +687,11 @@ const Vehicle = () => {
   const handleSimEdit = async (record) => {
     setUpdateData(record);
     setIsChangeSimModalOpen(true);
+  };
+
+  const handleDeviceEdit = async (record) => {
+    setUpdateData(record);
+    setIsChangeDeviceModalOpen(true);
   };
   const clickConfig = async () => {
     if (mulitiVehicles.length !== 0) {
@@ -805,16 +828,19 @@ const Vehicle = () => {
   const [isSimModalOpen, setIsSimModalOpen] = useState(false);
   const [isDeviceModalOpen, setIsDeviceModalOpen] = useState(false);
   const [isChangeSimModalOpen, setIsChangeSimModalOpen] = useState(false);
+  const [isChangeDeviceModalOpen, setIsChangeDeviceModalOpen] = useState(false);
 
   const handleOk = () => {
     setIsSimModalOpen(false);
     setIsDeviceModalOpen(false);
     setIsChangeSimModalOpen(false);
+    setIsChangeDeviceModalOpen(false);
   };
   const handleCancel = () => {
     setIsSimModalOpen(false);
     setIsDeviceModalOpen(false);
     setIsChangeSimModalOpen(false);
+    setIsChangeDeviceModalOpen(false);
   };
 
   useEffect(() => {
@@ -901,6 +927,20 @@ const Vehicle = () => {
           sendDataToParent={handleDataFromChildSim}
           parentFunction={parentFunction}
         ></ChangeSim>
+      </Modal>
+
+      <Modal
+        title="Change Device"
+        open={isChangeDeviceModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        <ChangeDevice
+          parentToChild={updatedata}
+          sendDataToParent={handleDataFromChildSim}
+          parentFunction={parentFunction}
+        ></ChangeDevice>
       </Modal>
 
       <Modal
