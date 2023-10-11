@@ -79,7 +79,6 @@ const items = [
 
 export const NavProfile = ({mode}) => {
 	const token = useSelector(state => state.auth);
-	console.log(token);
 	const [username,setUsername] = useState(localStorage.getItem('name') || token?.user_info?.name);
 	const [useremail,setUseremail] = useState(localStorage.getItem('email_address') || token?.user_info?.email);
 	return (

@@ -98,11 +98,7 @@ export const Admin = () => {
   const [mapvehicleDate, setmapvehicleDate] = useState([]);
   const [singleVehicle, setSingleVehicle] = useState("");
   const [currentVehicle, setCurrentVehicle] = useState("");
-  const handleClick = () => {
-    //alert('The paragraph was clicked!');
-    // You can add your custom logic here
-  };
-  
+
   const handleTabChange = (e) => {
     setTabListLoading(true);
     const tab_value = e.target.getAttribute("value");
@@ -606,7 +602,7 @@ export const Admin = () => {
             });
           if (customer_vehicles?.data?.data) {
             const single_data = customer_vehicles?.data?.data.filter(
-              (item) => item.device_imei == current_vehicle && item.vehicle_current_status==vehicle_status
+              (item) => item.device_imei == current_vehicle
             );
             const vehicleData = single_data?.map((item) => ({
               id: item?.id,
@@ -633,10 +629,7 @@ export const Admin = () => {
             setmapvehicleDate(vehicleData);
           }
           if (customer_vehicles?.data?.data) {
-            const filteredVehicles = customer_vehicles?.data?.data.filter(
-              (item) =>item.vehicle_current_status==vehicle_status
-            );
-            const AllvehicleData = filteredVehicles?.map(
+            const AllvehicleData = customer_vehicles?.data?.data?.map(
               (item) => ({
                 id: item?.id,
                 device_imei: item?.device_imei,
@@ -751,22 +744,6 @@ export const Admin = () => {
   //   { key: "6", tab: <p>Inactive-{vehilcecount?.inactive||0}</p>, content: <Dashboard_vehicles status={5} Customervalue={currentCustomerUser} map_vehicles_data={multiplevehiclesData}/> },
   //   { key: "7", tab: <p>Expired-{vehilcecount?.expired||0}</p>, content: <Dashboard_vehicles status={6} Customervalue={currentCustomerUser} map_vehicles_data={multiplevehiclesData}/> },
   // ];
-  const currentAdminList = async (value) => {
-    SetDistributorList([]);
-    SetDealerList([]);
-    SetSubdealerList([]);
-    SetCustomerList([]);
-    const user_data = { user_id: value };
-    const user_list = await api
-      .post("role_based_user_list", user_data)
-      .then((res) => {
-        return res;
-      })
-      .catch((err) => {
-        return [];
-      });
-    SetDistributorList(user_list?.data?.data?.user_list);
-  };
 
   const currentDistributorList = async (value) => {
     SetDealerList([]);
@@ -855,7 +832,6 @@ export const Admin = () => {
     setActiveKey(activeKey);
     SetSelectedCustomer(value);
     setCurrentCustomerUser(value);
-    console.log(value);
     const status_vehicle = getCurrentVehicleStatus();
     const current_vehicle = getCurrentVehicle();
     const customer_input = { user_id: value };
@@ -867,17 +843,15 @@ export const Admin = () => {
       .catch((err) => {
         return [];
       });
-      console.log(customer_vehicles);
-      console.log(status_vehicle);
-      
     if (customer_vehicles?.data?.data && status_vehicle != "") {
       const filteredItems = customer_vehicles?.data?.data.filter(
         (item) => item.vehicle_current_status === status_vehicle
       );
-      console.log(filteredItems);
-      if (filteredItems.lenght>0) {
-        const device_imei = current_vehicle ? current_vehicle: filteredItems[0].device_imei;
-        console.log(device_imei);
+      if (filteredItems) {
+        const device_imei =
+          current_vehicle != ""
+            ? current_vehicle
+            : filteredItems[0].device_imei;
         const single_vehicle_data = customer_vehicles?.data?.data.filter(
           (item) => item.device_imei === device_imei
         );
@@ -906,8 +880,6 @@ export const Admin = () => {
         setMultiplevehiclesData(processedData);
         setmapvehicleDate(processedData);
       }
-      setmapvehicleDate([]);
-      setMultiplevehiclesData([]);
     } else {
       const filteredItems = customer_vehicles?.data?.data;
 
@@ -981,7 +953,7 @@ export const Admin = () => {
     const selected_user_id = value;
     const selected_role_id = option.role_id;
 
-    switch (selected_role_id) {
+    switch (selected_user_id) {
       case 1:
         return getAdminList(selected_user_id);
         break;
@@ -1006,7 +978,7 @@ export const Admin = () => {
       <Row style={{ height: "800", margin: "0", padding: "0" }}>
         <Col xs={24} sm={24} md={24} lg={24} style={{ padding: 0, margin: 0 }}>
           <Row gutter={6} style={{ padding: 0, margin: 0 }}>
-            <Col sm={12} md={6} lg={6} style={{ padding: 0, margin: 0 }}> 
+            <Col sm={12} md={6} lg={6} style={{ padding: 0, margin: 0 }}>
               <Form
                 name="customer-form"
                 layout="vertical"
@@ -1031,7 +1003,7 @@ export const Admin = () => {
                         <Select
                           showSearch
                           optionFilterProp="children"
-                          onChange={currentAdminList}
+                          onChange={handleChange}
                           placeholder="Admin"
                           filterOption={(input, option) =>
                             option.props.children
@@ -1069,7 +1041,7 @@ export const Admin = () => {
                         rules={[
                           {
                             required: true,
-                            message: "Distributor Value is Required!",
+                            message: "Admin Value is Required!",
                           },
                         ]}
                       >
@@ -1267,7 +1239,7 @@ export const Admin = () => {
                         value=""
                         onClick={handleTabChange}
                       >
-                        <p style={{ fontSize: "10px", margin: "0px" }} value="" onClick={handleClick}>
+                        <p style={{ fontSize: "10px", margin: "0px" }} value="">
                           All
                         </p>
                         <p
@@ -1276,7 +1248,6 @@ export const Admin = () => {
                             margin: "0px",
                             color: "white",
                           }}
-                          onClick={handleClick} value=""
                         >
                           {vehilcecount?.total_vehicles || 0}
                         </p>
@@ -1294,7 +1265,6 @@ export const Admin = () => {
                         <p
                           style={{ fontSize: "10px", margin: "0px" }}
                           value="1"
-                          onClick={handleClick}
                         >
                           Parking
                         </p>
@@ -1304,8 +1274,6 @@ export const Admin = () => {
                             margin: "0px",
                             color: "white",
                           }}
-                          onClick={handleClick}
-                          value="1"
                         >
                           {vehilcecount?.stop || 0}
                         </p>
@@ -1322,7 +1290,7 @@ export const Admin = () => {
                       >
                         <p
                           style={{ fontSize: "10px", margin: "0px" }}
-                          value="2" onClick={handleClick}
+                          value="2"
                         >
                           Idle
                         </p>
@@ -1332,7 +1300,6 @@ export const Admin = () => {
                             margin: "0px",
                             color: "white",
                           }}
-                          value="2" onClick={handleClick}
                         >
                           {vehilcecount?.idle || 0}
                         </p>
@@ -1349,7 +1316,7 @@ export const Admin = () => {
                       >
                         <p
                           style={{ fontSize: "10px", margin: "0px" }}
-                          value="3" onClick={handleClick}
+                          value="3"
                         >
                           Moving
                         </p>
@@ -1359,7 +1326,6 @@ export const Admin = () => {
                             margin: "0px",
                             color: "white",
                           }}
-                          value="3" onClick={handleClick}
                         >
                           {vehilcecount?.running || 0}
                         </p>
@@ -1376,7 +1342,7 @@ export const Admin = () => {
                       >
                         <p
                           style={{ fontSize: "10px", margin: "0px" }}
-                          value="4" onClick={handleClick}
+                          value="4"
                         >
                           No Data
                         </p>
@@ -1386,7 +1352,6 @@ export const Admin = () => {
                             margin: "0px",
                             color: "white",
                           }}
-                          value="4" onClick={handleClick}
                         >
                           {vehilcecount?.no_data || 0}
                         </p>
@@ -1403,7 +1368,7 @@ export const Admin = () => {
                       >
                         <p
                           style={{ fontSize: "10px", margin: "0px" }}
-                          value="5"  onClick={handleClick}
+                          value="5"
                         >
                           Inactive
                         </p>
@@ -1413,7 +1378,6 @@ export const Admin = () => {
                             margin: "0px",
                             color: "white",
                           }}
-                          value="5"  onClick={handleClick}
                         >
                           {vehilcecount?.inactive || 0}
                         </p>
