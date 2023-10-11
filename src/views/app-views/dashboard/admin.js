@@ -656,6 +656,7 @@ export const Admin = () => {
             setMultiplevehiclesData(AllvehicleData);
           }
         }
+        setTabListLoading(false);
       }
     } catch (error) {
       setMultiplevehiclesData([]);
