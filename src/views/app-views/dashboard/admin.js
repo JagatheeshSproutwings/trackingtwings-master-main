@@ -1413,7 +1413,6 @@ export const Admin = () => {
                             margin: "0px",
                             color: "white",
                           }}
-                          value="5"  onClick={handleClick}
                         >
                           {vehilcecount?.inactive || 0}
                         </p>
